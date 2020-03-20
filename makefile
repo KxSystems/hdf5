@@ -28,8 +28,9 @@ all: headers/k.h headers/hdf5.h
 	$(CC) hdf5.c -m$(MS) $(OPTS) $(LDOPTS_DYNAMIC) $(LD_COMMON) $(LNK) -o $(TGT) $(OSXOPTS)
 
 install:
-	install $(TGT) $(Q)
-	install $(TGT) $(QARCH)
+	mkdir -p $(QARCH)
+	install  $(TGT) $(Q)
+	install  $(TGT) $(QARCH)
 
 clean:
 	rm -f hdf5.so
