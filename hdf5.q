@@ -43,8 +43,8 @@ funcs:(
 .hdf5,:(`$4_'string funcs[;0])!LIBPATH@/:funcs
 
 // Find the appropriate type for a dataset being written to hdf5
-i.self_type:{$[any 0h in distinct type each x;.z.s each x;distinct type each x]}
-i.nlist_types:{$[1=count l:distinct i.self_type x ;raze distinct l;'"mixed list detected"]}
+i.self_type:{$[any 0h in type each x;.z.s each x;raze type each x]}
+i.nlist_types:{$[1=count distinct l:i.self_type x;(abs distinct raze l)0;'"mixed list detected"]}
 i.fntyp:{first(.Q.t til 20)@i.nlist_types[x]}
 
 writeData:{[fname;dname;dset]
