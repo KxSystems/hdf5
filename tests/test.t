@@ -23,6 +23,27 @@ dset:"/dset"
 // Testing dataset functionality
 
 N:100;M:100;K:100
+
+// Atomic data
+data_real_atom :5e
+data_float_atom:1.2f
+data_short_atom:6h
+data_int_atom  :10i
+data_bool_atom :0b
+data_long_atom :15
+data_sym_atom  :`a
+data_char_atom :"b"
+
+// 1-Dimensional unenlisted
+data_real_norm :N?10e
+data_float_norm:N?10f
+data_short_norm:N?10h
+data_int_norm  :N?10i
+data_bool_norm :N?0b
+data_long_norm :N?10
+data_sym_norm  :`testing
+data_char_norm :"testing"
+
 // 1-Dimensional dataset
 data_real_1 :enlist N?10e
 data_float_1:enlist N?10f
@@ -68,6 +89,25 @@ data_long_3 :(N,M,K)#(N*M*K)?10
 .hdf5.createDataset[J;dset,"_2";`int$(N;M);"j"]
 
 // Write to the non grouped dataset at file root
+
+.hdf5.writeData[E;dset,"_atom";data_real_atom]
+.hdf5.writeData[F;dset,"_atom";data_float_atom]
+.hdf5.writeData[H;dset,"_atom";data_short_atom]
+.hdf5.writeData[I;dset,"_atom";data_int_atom]
+.hdf5.writeData[B;dset,"_atom";data_bool_atom]
+.hdf5.writeData[J;dset,"_atom";data_long_atom]
+.hdf5.writeData[C;dset,"_atom";data_char_atom]
+.hdf5.writeData[S;dset,"_atom";data_sym_atom]
+
+.hdf5.writeData[E;dset,"_norm";data_real_norm]
+.hdf5.writeData[F;dset,"_norm";data_float_norm]
+.hdf5.writeData[H;dset,"_norm";data_short_norm]
+.hdf5.writeData[I;dset,"_norm";data_int_norm]
+.hdf5.writeData[B;dset,"_norm";data_bool_norm]
+.hdf5.writeData[J;dset,"_norm";data_long_norm]
+.hdf5.writeData[C;dset,"_norm";data_char_norm]
+.hdf5.writeData[S;dset,"_norm";data_sym_norm]
+
 .hdf5.writeData[E;dset,"_1";data_real_1]
 .hdf5.writeData[F;dset,"_1";data_float_1]
 .hdf5.writeData[H;dset,"_1";data_short_1]
@@ -90,6 +130,24 @@ data_long_3 :(N,M,K)#(N*M*K)?10
 .hdf5.writeData[I;dset,"_3";data_int_3]
 .hdf5.writeData[B;dset,"_3";data_bool_3]
 .hdf5.writeData[J;dset,"_3";data_long_3]
+
+data_real_atom  ~ .hdf5.readData[E;dset,"_atom"]
+data_float_atom ~ .hdf5.readData[F;dset,"_atom"]
+data_short_atom ~ .hdf5.readData[H;dset,"_atom"]
+data_int_atom   ~ .hdf5.readData[I;dset,"_atom"]
+data_bool_atom  ~ "b"$.hdf5.readData[B;dset,"_atom"]
+data_long_atom  ~ .hdf5.readData[J;dset,"_atom"]
+data_char_atom  ~ first first .hdf5.readData[C;dset,"_atom"]
+data_sym_atom   ~ first `$.hdf5.readData[S;dset,"_atom"]
+
+data_real_norm  ~ .hdf5.readData[E;dset,"_norm"]
+data_float_norm ~ .hdf5.readData[F;dset,"_norm"]
+data_short_norm ~ .hdf5.readData[H;dset,"_norm"]
+data_int_norm   ~ .hdf5.readData[I;dset,"_norm"]
+data_bool_norm  ~ "b"$.hdf5.readData[B;dset,"_norm"]
+data_long_norm  ~ .hdf5.readData[J;dset,"_norm"]
+data_char_norm  ~ first .hdf5.readData[C;dset,"_norm"]
+data_sym_norm   ~ first `$.hdf5.readData[S;dset,"_norm"]
 
 first[data_real_1]  ~ .hdf5.readData[E;dset,"_1"]
 first[data_float_1] ~ .hdf5.readData[F;dset,"_1"]
@@ -152,12 +210,14 @@ data_long_2  ~ .hdf5.readData[J;G1dset]
 
 // Testing attribute functionality
 // These tests will need to be expanded moving forward to incorporate checking of more explicit types
-attrdata:2 2#4?10i;
+intattr:2 2#4?10i;
+strattr:"testing"
 .hdf5.createAttr[E;dset,"_2";"int attribute";2 2i;"i"]
 .hdf5.isAttr[E;dset,"_2";"int attribute"]
-.hdf5.writeAttr[E;dset,"_2";"int attribute";attrdata]
-attrdata ~ .hdf5.readAttr[E;dset,"_2";"int attribute"]
-
+.hdf5.writeAttr[E;dset,"_2";"int attribute";intattr]
+.hdf5.writeAttr[C;dset,"_1";"str attr";strattr]
+intattr ~ .hdf5.readAttr[E;dset,"_2";"int attribute"]
+strattr ~ first .hdf5.readAttr[C;dset,"_1";"str attr"]
 
 // Testing utility functions
 

@@ -218,12 +218,20 @@ static void writeShort(K dset, hid_t data, char *rdtype){
 }
 
 static void writeChar(K dset, hid_t data, char *data_attr){
-  long i;
+  long i,arr;
   hid_t memtype = H5Tcopy(H5T_C_S1);
   H5Tset_size(memtype, H5T_VARIABLE);
-  char *wdata[dset->n];
-  for(i=0;i<dset -> n;i++)
-    wdata[i] = getkstring(kK(dset)[i]);
+  if((KC == dset->t) || -KC == dset->t)
+    arr = 1;
+  else
+    arr = dset->n;
+  char *wdata[arr];
+  if((KC == dset->t) || -KC == dset->t)
+   wdata[0] = getkstring(dset);
+  else{
+    for(i=0;i<dset -> n;i++)
+      wdata[i] = getkstring(kK(dset)[i]);
+  }
   if(strcmp(data_attr,"d")==0)
     H5Dwrite(data, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
   else if(strcmp(data_attr,"a")==0)
@@ -254,15 +262,26 @@ static void writenumeric(K dset, hid_t data, char *data_attr){
 
 int intwrite(hid_t h5data, K dset, int *data, char *rdtype, long points,int idx){
   int i,j;
-  for(i=0;i<dset->n;i++){
-    K element = kK(dset)[i];
-    if(0==element->t)
-      idx = intwrite(h5data,element,data,rdtype,points,idx);
-    else{
-      for(j=0;j<element->n;j++){
-         *(data + idx + j) = kI(element)[j];
+  if(-KI == dset->t){
+    *(data + idx + i) = dset->i;
+    idx = idx + 1;
+  }
+  else if(KI == dset->t){
+    for(i = 0; i < dset -> n; i++)
+      *(data + idx + i) = kI(dset)[i];
+    idx = idx + dset -> n;
+  }
+  else{
+    for(i=0;i<dset->n;i++){
+      K element = kK(dset)[i];
+      if(0==element->t)
+        idx = intwrite(h5data,element,data,rdtype,points,idx);
+      else{
+        for(j=0;j<element->n;j++){
+          *(data + idx + j) = kI(element)[j];
+        }
+      idx = idx+element->n;
       }
-    idx = idx+element->n;
     }
   }
   // Write when the size of allocated buffer has been filled
@@ -278,15 +297,26 @@ int intwrite(hid_t h5data, K dset, int *data, char *rdtype, long points,int idx)
 
 int shortwrite(hid_t h5data, K dset, short *data, char *rdtype, long points,int idx){
   int i,j;
-  for(i=0;i<dset->n;i++){
-    K element = kK(dset)[i];
-    if(0==element->t)
-      idx = shortwrite(h5data,element,data,rdtype,points,idx);
-    else{
-      for(j=0;j<element->n;j++){
-         *(data + idx + j) = kH(element)[j];
+  if(-KH == dset->t){
+    *(data + idx + i) = dset->h;
+    idx = idx + 1;
+  }
+  else if(KH == dset->t){
+    for(i = 0; i < dset -> n; i++)
+      *(data + idx + i) = kH(dset)[i];
+    idx = idx + dset -> n;
+  }
+  else{
+    for(i=0;i<dset->n;i++){
+      K element = kK(dset)[i];
+      if(0==element->t)
+        idx = shortwrite(h5data,element,data,rdtype,points,idx);
+      else{
+        for(j=0;j<element->n;j++){
+           *(data + idx + j) = kH(element)[j];
+        }
+      idx = idx+element->n;
       }
-    idx = idx+element->n;
     }
   }
   // Write when the size of allocated buffer has been filled
@@ -302,15 +332,26 @@ int shortwrite(hid_t h5data, K dset, short *data, char *rdtype, long points,int 
 
 int longwrite(hid_t h5data, K dset, long *data, char *rdtype, long points,int idx){
   int i,j;
-  for(i=0;i<dset->n;i++){
-    K element = kK(dset)[i];
-    if(0==element->t)
-      idx = longwrite(h5data,element,data,rdtype,points,idx);
-    else{
-      for(j=0;j<element->n;j++){
-         *(data + idx + j) = kJ(element)[j];
+  if(-KJ == dset->t){
+    *(data + idx + i) = dset->j;
+    idx = idx + 1;
+  }
+  else if(KJ == dset->t){
+    for(i = 0; i < dset -> n; i++)
+      *(data + idx + i) = kJ(dset)[i];
+    idx = idx + dset -> n;
+  }
+  else{
+    for(i=0;i<dset->n;i++){
+      K element = kK(dset)[i];
+      if(0==element->t)
+        idx = longwrite(h5data,element,data,rdtype,points,idx);
+      else{
+        for(j=0;j<element->n;j++){
+          *(data + idx + j) = kJ(element)[j];
+        }
+      idx = idx+element->n;
       }
-    idx = idx+element->n;
     }
   }
   // Write when the size of allocated buffer has been filled
@@ -326,15 +367,26 @@ int longwrite(hid_t h5data, K dset, long *data, char *rdtype, long points,int id
 
 int floatwrite(hid_t h5data, K dset, double *data, char *rdtype, long points,int idx){
   int i,j;
-  for(i=0;i<dset->n;i++){
-    K element = kK(dset)[i];
-    if(0==element->t)
-      idx = floatwrite(h5data,element,data,rdtype,points,idx);
-    else{
-      for(j=0;j<element->n;j++){
-         *(data + idx + j) = kF(element)[j];
+  if(-KF == dset->t){
+    *(data + idx + i) = dset->f;
+    idx = idx + 1;
+  }
+  else if(KF == dset->t){
+    for(i = 0; i < dset -> n; i++)
+      *(data + idx + i) = kF(dset)[i];
+    idx = idx + dset -> n;
+  }
+  else{
+    for(i=0;i<dset->n;i++){
+      K element = kK(dset)[i];
+      if(0==element->t)
+        idx = floatwrite(h5data,element,data,rdtype,points,idx);
+      else{
+        for(j=0;j<element->n;j++){
+           *(data + idx + j) = kF(element)[j];
+        }
+      idx = idx+element->n;
       }
-    idx = idx+element->n;
     }
   }
   // Write when the size of allocated buffer has been filled
@@ -350,15 +402,26 @@ int floatwrite(hid_t h5data, K dset, double *data, char *rdtype, long points,int
 
 int realwrite(hid_t h5data, K dset, float *data, char *rdtype, long points,int idx){
   int i,j;
-  for(i=0;i<dset->n;i++){
-    K element = kK(dset)[i];
-    if(0==element->t)
-      idx = realwrite(h5data,element,data,rdtype,points,idx);
-    else{
-      for(j=0;j<element->n;j++){
-         *(data + idx + j) = kE(element)[j];
+  if(-KE == dset->t){
+    *(data + idx + i) = dset->e;
+    idx = idx + 1;
+  }
+  else if(KE == dset->t){
+    for(i = 0; i < dset -> n; i++)
+      *(data + idx + i) = kE(dset)[i];
+    idx = idx + dset -> n;
+  }
+  else{
+    for(i=0;i<dset->n;i++){
+      K element = kK(dset)[i];
+      if(0==element->t)
+        idx = realwrite(h5data,element,data,rdtype,points,idx);
+      else{
+        for(j=0;j<element->n;j++){
+           *(data + idx + j) = kE(element)[j];
+        }
+      idx = idx+element->n;
       }
-    idx = idx+element->n;
     }
   }
   // Write when the size of allocated buffer has been filled

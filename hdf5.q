@@ -43,13 +43,14 @@ funcs:(
 .hdf5,:(`$4_'string funcs[;0])!LIBPATH@/:funcs
 
 // Find the appropriate type for a dataset being written to hdf5
-i.self_type:{$[any 0h in distinct type each x;.z.s each x;distinct type each x]}
-i.nlist_types:{$[1=count l:distinct i.self_type x ;raze distinct l;'"mixed list detected"]}
+i.self_type:{$[any 0h in type each x;.z.s each x;raze type each x]}
+i.nlist_types:{$[1=count distinct l:i.self_type x;(abs distinct raze l)0;'"mixed list detected"]}
 i.fntyp:{first(.Q.t til 20)@i.nlist_types[x]}
 
 writeData:{[fname;dname;dset]
   if[11h = abs type dset;dset:string dset];
-  typ:i.fntyp $[10h=type dset;dset:enlist dset;dset];
+  if[10h = abs type dset;dset:enlist dset];
+  typ:i.fntyp dset;
   dims:"i"$i.shape dset;
   dset:$[typ in "cs";$[typ = "s";string dset;dset];$[typ="b";"i"$dset;dset]];
   writeDataset[fname;dname;dset;dims;typ]
@@ -57,7 +58,8 @@ writeData:{[fname;dname;dset]
 
 writeAttr:{[fname;dname;aname;dset]
   if[11h = abs type dset;dset:string dset];
-  typ:i.fntyp $[10h=type dset;dset:enlist dset;dset];
+  if[10h = abs type dset;dset:enlist dset];
+  typ:i.fntyp dset;
   dims:"i"$i.shape dset;
   dset:$[typ in "cs";$[typ = "s";string dset;dset];dset];
   writeAttrDataset[fname;dname;aname;dset;dims;typ]
