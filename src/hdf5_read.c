@@ -290,10 +290,10 @@ K readChar(hid_t dset, char *rdtyp){
     H5Dread(dset,memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT,rdata);
   }
   // Write the read data to a K object either a char array or list
+  vla = knk(0);
   if(1==dims[0])
-   vla = kp(rdata[0]);
+   jk(&vla, kp(rdata[0]));
   else{
-    vla = knk(0);
     for (i=0; i<dims[0]; i++)
       jk(&vla, kp(rdata[i]));
   }

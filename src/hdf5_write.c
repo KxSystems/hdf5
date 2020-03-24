@@ -218,12 +218,20 @@ static void writeShort(K dset, hid_t data, char *rdtype){
 }
 
 static void writeChar(K dset, hid_t data, char *data_attr){
-  long i;
+  long i,arr;
   hid_t memtype = H5Tcopy(H5T_C_S1);
   H5Tset_size(memtype, H5T_VARIABLE);
-  char *wdata[dset->n];
-  for(i=0;i<dset -> n;i++)
-    wdata[i] = getkstring(kK(dset)[i]);
+  if((KC == dset->t) || -KC == dset->t)
+    arr = 1;
+  else
+    arr = dset->n;
+  char *wdata[arr];
+  if((KC == dset->t) || -KC == dset->t)
+   wdata[0] = getkstring(dset);
+  else{
+    for(i=0;i<dset -> n;i++)
+      wdata[i] = getkstring(kK(dset)[i]);
+  }
   if(strcmp(data_attr,"d")==0)
     H5Dwrite(data, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
   else if(strcmp(data_attr,"a")==0)

@@ -49,7 +49,8 @@ i.fntyp:{first(.Q.t til 20)@i.nlist_types[x]}
 
 writeData:{[fname;dname;dset]
   if[11h = abs type dset;dset:string dset];
-  typ:i.fntyp $[10h=type dset;dset:enlist dset;dset];
+  if[10h = abs type dset;dset:enlist dset];
+  typ:i.fntyp dset;
   dims:"i"$i.shape dset;
   dset:$[typ in "cs";$[typ = "s";string dset;dset];$[typ="b";"i"$dset;dset]];
   writeDataset[fname;dname;dset;dims;typ]
@@ -57,7 +58,8 @@ writeData:{[fname;dname;dset]
 
 writeAttr:{[fname;dname;aname;dset]
   if[11h = abs type dset;dset:string dset];
-  typ:i.fntyp $[10h=type dset;dset:enlist dset;dset];
+  if[10h = abs type dset;dset:enlist dset];
+  typ:i.fntyp dset;
   dims:"i"$i.shape dset;
   dset:$[typ in "cs";$[typ = "s";string dset;dset];dset];
   writeAttrDataset[fname;dname;aname;dset;dims;typ]
