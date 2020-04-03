@@ -14,6 +14,7 @@ funcs:(
   (`hdf5isAttr;3);
   (`hdf5ishdf5;1);
   (`hdf5isObject;2);
+  (`hdf5fileSize;1);
   (`hdf5getAttrShape;3);
   (`hdf5getAttrPoints;3);
   (`hdf5getDataShape;2);

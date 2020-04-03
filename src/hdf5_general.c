@@ -263,3 +263,18 @@ EXP K hdf5copyObject(K fname, K oname, K fdest, K odest){
   return KNL;
 }
 
+// Get the size of a hdf5 file in megabytes
+EXP K hdf5fileSize(K fname){
+  disable_err();
+  char *filename = getkstring(fname);
+  double megab;
+  hid_t file_id;
+  hsize_t fsize;
+  file_id = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  H5Fget_filesize(file_id, &fsize);
+  megab = (double)fsize / 1000; 
+  free(filename);
+  H5Fclose(file_id);
+  return(kf(megab));
+}
+
