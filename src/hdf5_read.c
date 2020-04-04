@@ -19,6 +19,7 @@ K readChar(hid_t dset, char *rdtyp);
 K readCompound(hid_t dset, char *rdtyp);
 K compoundInteger(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char *rdtyp);
 K compoundFloat(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char *rdtyp);
+K compoundByte(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char *rdtyp);
 K compoundString(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char *rdtyp);
 
 
@@ -406,13 +407,14 @@ K readCompound(hid_t dset, char *rdtyp){
     kS(key_vals)[i] = member_name;
     memb_cls  = H5Tget_member_class(ntype,i);
     item_type = H5Tget_member_type(dtype, i);
-    if(memb_cls == H5T_INTEGER)
+    if(H5Tequal(item_type,HDF5INT) || H5Tequal(item_type,HDF5LONG) || H5Tequal(item_type,HDF5SHORT))
       memb_val = compoundInteger(dset, member_name, dims[0], item_type,rdtyp);
-    else if(memb_cls == H5T_FLOAT)
-      memb_val =   compoundFloat(dset, member_name, dims[0], item_type, rdtyp);
+    else if(H5Tequal(item_type,HDF5FLOAT) || H5Tequal(item_type,HDF5REAL))
+      memb_val = compoundFloat(dset, member_name, dims[0], item_type, rdtyp);
+    else if(H5Tequal(item_type,H5T_NATIVE_UCHAR) || H5Tequal(item_type,H5T_NATIVE_B8))
+      memb_val = compoundByte(dset, member_name, dims[0], item_type, rdtyp);
     else if(memb_cls == H5T_STRING)
-      memb_val =  compoundString(dset, member_name, dims[0], item_type, rdtyp);
-    free(member_name);
+      memb_val = compoundString(dset, member_name, dims[0], item_type, rdtyp);
     jk(&data_vals,memb_val);
   }
   H5Tclose(dtype);
@@ -469,6 +471,26 @@ K compoundInteger(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,cha
       kH(array)[j] = *(rdata + j);
     free(rdata);
   }
+  H5Tclose(cmpd_dset);
+  return array;
+}
+
+K compoundByte(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char *rdtyp){
+  hid_t cmpd_dset;
+  int j;
+  K array;
+  unsigned char *rdata;
+  cmpd_dset = H5Tcreate(H5T_COMPOUND, sizeof(unsigned char));
+  H5Tinsert(cmpd_dset, memb_name, 0, item_type);
+  rdata = (unsigned char*)malloc(dims * sizeof(unsigned char));
+  if(strcmp(rdtyp,"a")==0)
+    H5Aread(dset, cmpd_dset, rdata);
+  else
+    H5Dread(dset, cmpd_dset, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
+  array = ktn(KG, dims);
+  for(int j = 0; j < dims; j++)
+    kG(array)[j] = *(rdata + j);
+  free(rdata);
   H5Tclose(cmpd_dset);
   return array;
 }
