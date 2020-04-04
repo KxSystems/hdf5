@@ -9,6 +9,7 @@ int intwrite  (hid_t h5data, K dset, int    *data, char *rdtype, long points, in
 int shortwrite(hid_t h5data, K dset, short  *data, char *rdtype, long points, int idx);
 int realwrite (hid_t h5data, K dset, float  *data, char *rdtype, long points, int idx);
 int floatwrite(hid_t h5data, K dset, double *data, char *rdtype, long points, int idx);
+int bytewrite (hid_t h5data, K dset, unsigned char *data, char *rdtype, long points,int idx);
 static void writeChar(K dset, hid_t data, char *data_attr);
 
 // Write data to an attribute
@@ -161,6 +162,22 @@ static void writeFloat(K dset, hid_t data, char *rdtype){
   H5Sclose(space);
 }
 
+static void writeByte(K dset, hid_t data, char *rdtype){
+  long i;
+  hid_t space;
+  // Allocate the memory needed for writing to hdf5
+  if(strcmp(rdtype,"d")==0)
+    space = H5Dget_space(data);
+  else if(strcmp(rdtype,"a")==0)
+    space = H5Aget_space(data);
+  long points = H5Sget_simple_extent_npoints(space);
+  unsigned char *dset_data = (unsigned char *)malloc(points *sizeof(unsigned char));
+  bytewrite(data, dset, dset_data, rdtype, points, 0);
+  // Clean up
+  free(dset_data);
+  H5Sclose(space);
+}
+
 static void writeInt(K dset, hid_t data, char *rdtype){
   long i;
   hid_t space;
@@ -250,6 +267,8 @@ static void writenumeric(K dset, hid_t data, char *data_attr){
     writeInt(dset, data, data_attr);
   else if(H5Tequal(ntype, HDF5LONG))
     writeLong(dset, data, data_attr);
+  else if(H5Tequal(ntype, H5T_NATIVE_UCHAR))
+    writeByte(dset, data, data_attr);
   else if(H5Tequal(ntype, HDF5FLOAT))
     writeFloat(dset, data, data_attr);
   else if(H5Tequal(ntype, HDF5REAL))
@@ -435,3 +454,37 @@ int realwrite(hid_t h5data, K dset, float *data, char *rdtype, long points,int i
   return idx;
 }
 
+int bytewrite(hid_t h5data, K dset, unsigned char *data, char *rdtype, long points,int idx){
+  int i,j;
+  if(-KG == dset->t){
+    *(data + idx + i) = dset->g;
+    idx = idx + 1;
+  }
+  else if(KG == dset->t){
+    for(i = 0; i < dset -> n; i++)
+      *(data + idx + i) = kG(dset)[i];
+    idx = idx + dset -> n;
+  }
+  else{
+    for(i=0;i<dset->n;i++){
+      K element = kK(dset)[i];
+      if(0==element->t)
+        idx = bytewrite(h5data,element,data,rdtype,points,idx);
+      else{
+        for(j=0;j<element->n;j++){
+          *(data + idx + j) = kG(element)[j];
+        }
+      idx = idx+element->n;
+      }
+    }
+  }
+  // Write when the size of allocated buffer has been filled
+  if(((I)points)==idx){
+    if(strcmp(rdtype,"d")==0)
+      H5Dwrite(h5data, H5T_NATIVE_UCHAR, H5S_ALL, H5S_ALL, H5P_DEFAULT,data);
+    else if(strcmp(rdtype,"a")==0)
+      H5Awrite(h5data, H5T_NATIVE_UCHAR, data);
+    return 0;
+  }
+  return idx;
+}

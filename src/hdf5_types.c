@@ -14,6 +14,8 @@ hid_t hdf5typ_from_k(K ktype){
     val = HDF5REAL;
   else if(strcmp(kstring,"h")==0)
     val = HDF5SHORT;
+  else if(strcmp(kstring,"x")==0)
+    val = H5T_NATIVE_UCHAR;
   else
     val = 0;
   // Clean up

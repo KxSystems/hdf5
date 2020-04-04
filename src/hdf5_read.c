@@ -13,6 +13,8 @@ K readInt(hid_t dset, char *rdtyp);
 K readLong(hid_t dset, char *rdtyp);
 K readReal(hid_t dset, char *rdtyp);
 K readShort(hid_t dset, char *rdtyp);
+K readByte(hid_t dset, char *rdtyp);
+K readBitfield(hid_t dset, char *rdtyp);
 K readChar(hid_t dset, char *rdtyp);
 K readCompound(hid_t dset, char *rdtyp);
 K compoundInteger(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char *rdtyp);
@@ -126,6 +128,10 @@ K readData(hid_t data,char *rdtyp){
       result = readReal(data,rdtyp);
     else if(H5Tequal(ntype, HDF5SHORT))
       result = readShort(data,rdtyp);
+    else if(H5Tequal(ntype, H5T_NATIVE_B8))
+      result = readBitfield(data,rdtyp);
+    else if(H5Tequal(ntype, H5T_NATIVE_UCHAR))
+      result = readByte(data,rdtyp);
     else 
       result = readChar(data, rdtyp);
   }
@@ -191,6 +197,55 @@ K readInt(hid_t dset,char *rdtyp){
   z = ktn(KI,points);
   for (i=0;i<points;i++)
     kI(z)[i] = *(rdata + i);
+  free(rdata);
+  H5Sclose(space);
+  return(z);
+}
+
+K readBitfield(hid_t dset,char *rdtyp){
+  hid_t space;
+  K z;
+  int i, rank;
+  long points;
+  unsigned char *rdata;
+  if(strcmp(rdtyp,"a")==0)
+    space = H5Aget_space(dset);
+  else
+    space = H5Dget_space(dset);
+  points = H5Sget_simple_extent_npoints(space);
+  rdata = (unsigned char *)malloc(points * sizeof (unsigned char));
+
+  if(strcmp(rdtyp,"a")==0)
+    H5Aread(dset, H5T_NATIVE_B8, rdata);
+  else
+    H5Dread(dset, H5T_NATIVE_B8, H5S_ALL, H5S_ALL, H5P_DEFAULT,rdata);
+  z = ktn(KG,points);
+  for (i=0;i<points;i++)
+    kG(z)[i] = *(rdata + i);
+  free(rdata);
+  H5Sclose(space);
+  return(z);
+}
+
+K readByte(hid_t dset,char *rdtyp){
+  hid_t space;
+  K z;
+  int i, rank;
+  long points;
+  unsigned char *rdata;
+  if(strcmp(rdtyp,"a")==0)
+    space = H5Aget_space(dset);
+  else
+    space = H5Dget_space(dset);
+  points = H5Sget_simple_extent_npoints(space);
+  rdata = (unsigned char *)malloc(points * sizeof (unsigned char));
+  if(strcmp(rdtyp,"a")==0)
+    H5Aread(dset, H5T_NATIVE_UCHAR, rdata);
+  else
+    H5Dread(dset, H5T_NATIVE_UCHAR, H5S_ALL, H5S_ALL, H5P_DEFAULT,rdata);
+  z = ktn(KG,points);
+  for (i=0;i<points;i++)
+    kG(z)[i] = *(rdata + i);
   free(rdata);
   H5Sclose(space);
   return(z);
@@ -357,6 +412,7 @@ K readCompound(hid_t dset, char *rdtyp){
       memb_val =   compoundFloat(dset, member_name, dims[0], item_type, rdtyp);
     else if(memb_cls == H5T_STRING)
       memb_val =  compoundString(dset, member_name, dims[0], item_type, rdtyp);
+    free(member_name);
     jk(&data_vals,memb_val);
   }
   H5Tclose(dtype);

@@ -20,6 +20,8 @@ funcs:(
   (`hdf5getDataShape;2);
   (`hdf5getDataPoints;2);
   (`hdf5datasetInfo;2);
+  (`hdf5version;1);
+  (`hdf5copyObject;4);
   (`hdf5gc;1);
   (`hdf5ls;1);
 
