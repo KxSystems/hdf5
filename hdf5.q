@@ -15,11 +15,14 @@ funcs:(
   (`hdf5ishdf5;1);
   (`hdf5isObject;2);
   (`hdf5fileSize;1);
+  (`hdf5dataSize;2);
   (`hdf5getAttrShape;3);
   (`hdf5getAttrPoints;3);
   (`hdf5getDataShape;2);
   (`hdf5getDataPoints;2);
   (`hdf5datasetInfo;2);
+  (`hdf5version;1);
+  (`hdf5copyObject;4);
   (`hdf5gc;1);
   (`hdf5ls;1);
 
@@ -48,13 +51,21 @@ i.self_type:{$[any 0h in type each x;.z.s each x;raze type each x]}
 i.nlist_types:{$[1=count distinct l:i.self_type x;(abs distinct raze l)0;'"mixed list detected"]}
 i.fntyp:{first(.Q.t til 20)@i.nlist_types[x]}
 
+datamap:`b`p`m`d`z`n`u`v`t!`boolean`timestamp`month`date`datetime`timespan`minute`second`time;
+
 writeData:{[fname;dname;dset]
   if[11h = abs type dset;dset:string dset];
   if[10h = abs type dset;dset:enlist dset];
   typ:i.fntyp dset;
   dims:"i"$i.shape dset;
-  dset:$[typ in "cs";$[typ = "s";string dset;dset];$[typ="b";"i"$dset;dset]];
-  writeDataset[fname;dname;dset;dims;typ]
+  dset:$[typ in "cs";
+         $[typ = "s";string dset;dset];
+         $[typ in "bmduvt";"i"$dset;
+           typ in "pn";"j"$dset;
+           typ = "z";"f"$dset;
+           dset]];
+  writeDataset[fname;dname;dset;dims;typ];
+  if[typ in"bpmdznuvt";writeAttr[fname;dname;"datatype_kdb";datamap`$typ]];
   }
 
 writeAttr:{[fname;dname;aname;dset]
@@ -67,6 +78,8 @@ writeAttr:{[fname;dname;aname;dset]
   }
 
 readAttr:{[fname;dname;aname]getAttrShape[fname;dname;aname]#readAttrDataset[fname;dname;aname]}
-readData:{[fname;dname]getDataShape[fname;dname]#readDataset[fname;dname]}
+readData:{[fname;dname]
+  data:getDataShape[fname;dname]#readDataset[fname;dname];
+  $[isAttr[fname;dname;"datatype_kdb"];(first `$readAttr[fname;dname;"datatype_kdb"])$;]data}
 
 i.shape:{-1_count each first scan x}

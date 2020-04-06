@@ -184,7 +184,7 @@ EXP K hdf5isObject(K fname, K oname){
 EXP K hdf5version(K UNUSED(x)){
   unsigned int maj, min, rel;
   H5get_libversion(&maj, &min, &rel);
-  return xd("Major",ki(maj),"Minor",ki(min),"Release",ki(rel));
+  return xd("Major",kj(maj),"Minor",kj(min),"Release",kj(rel));
 }
 
 // Garbage collection for hdf5 interface, return the data collected from free lists
@@ -278,3 +278,20 @@ EXP K hdf5fileSize(K fname){
   return(kf(megab));
 }
 
+EXP K hdf5dataSize(K fname, K dname){
+  disable_err();
+  char *filename = getkstring(fname);
+  char *dataname = getkstring(dname);
+  hid_t file_id, data_id;
+  hsize_t dsize;
+  double megab;
+  file_id = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  data_id = H5Dopen(file_id , dataname, H5P_DEFAULT);
+  dsize = H5Dget_storage_size(data_id);
+  megab = (double)dsize / 1000;
+  free(filename);
+  free(dataname);
+  H5Fclose(file_id);
+  H5Dclose(data_id);
+  return(kf(megab));
+}
