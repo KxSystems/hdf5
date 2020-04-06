@@ -51,7 +51,7 @@ i.self_type:{$[any 0h in type each x;.z.s each x;raze type each x]}
 i.nlist_types:{$[1=count distinct l:i.self_type x;(abs distinct raze l)0;'"mixed list detected"]}
 i.fntyp:{first(.Q.t til 20)@i.nlist_types[x]}
 
-datamap:`p`m`d`z`n`u`v`t!`timestamp`month`date`datetime`timespan`minute`second`time;
+datamap:`b`p`m`d`z`n`u`v`t!`boolean`timestamp`month`date`datetime`timespan`minute`second`time;
 
 writeData:{[fname;dname;dset]
   if[11h = abs type dset;dset:string dset];
@@ -65,7 +65,7 @@ writeData:{[fname;dname;dset]
            typ = "z";"f"$dset;
            dset]];
   writeDataset[fname;dname;dset;dims;typ];
-  if[typ in"pmdznuvt";show typ;writeAttr[fname;dname;"datatype_kdb";datamap`$typ]];
+  if[typ in"bpmdznuvt";writeAttr[fname;dname;"datatype_kdb";datamap`$typ]];
   }
 
 writeAttr:{[fname;dname;aname;dset]
@@ -78,6 +78,8 @@ writeAttr:{[fname;dname;aname;dset]
   }
 
 readAttr:{[fname;dname;aname]getAttrShape[fname;dname;aname]#readAttrDataset[fname;dname;aname]}
-readData:{[fname;dname]getDataShape[fname;dname]#readDataset[fname;dname]}
+readData:{[fname;dname]
+  data:getDataShape[fname;dname]#readDataset[fname;dname];
+  $[isAttr[fname;dname;"datatype_kdb"];(first `$readAttr[fname;dname;"datatype_kdb"])$;]data}
 
 i.shape:{-1_count each first scan x}

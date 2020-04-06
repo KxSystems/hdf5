@@ -184,7 +184,7 @@ EXP K hdf5isObject(K fname, K oname){
 EXP K hdf5version(K UNUSED(x)){
   unsigned int maj, min, rel;
   H5get_libversion(&maj, &min, &rel);
-  return xd("Major",ki(maj),"Minor",ki(min),"Release",ki(rel));
+  return xd("Major",kj(maj),"Minor",kj(min),"Release",kj(rel));
 }
 
 // Garbage collection for hdf5 interface, return the data collected from free lists
