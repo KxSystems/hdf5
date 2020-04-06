@@ -475,7 +475,6 @@ K readULong(hid_t dset, char *rdtyp){
   return(z);
 }
 
-
 K readCompound(hid_t dset, char *rdtyp){
   int i, nmembs, rank;
   hid_t dtype, space;
