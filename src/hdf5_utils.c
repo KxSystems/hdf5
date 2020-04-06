@@ -151,9 +151,9 @@ static void closeGroupData(hid_t file, char *dataname,hid_t data){
 int checkvalid(char *ktype){
   int flag=0;
   int i,j;
-  char num[7] = "hijfebx";
+  char num[15] = "hijfebxpmdznuvt";
   char str[3] = "cs";
-  for(i=0;i<7;i++){
+  for(i=0;i<15;i++){
     if(ktype[0] == num[i]){
       flag = 1;
       break;
