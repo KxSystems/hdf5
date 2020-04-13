@@ -253,6 +253,7 @@ static void writeChar(K dset, hid_t data, char *data_attr){
     H5Dwrite(data, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
   else if(strcmp(data_attr,"a")==0)
     H5Awrite(data, memtype, wdata);
+  free(wdata[0]);
   H5Tclose(memtype);
 } 
 
