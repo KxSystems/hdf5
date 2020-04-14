@@ -59,8 +59,8 @@ writeData:{[fname;dname;dset]
   if[10h = abs type dset;dset:enlist dset];
   typ:i.fntyp dset;
   dims:"i"$i.shape dset;
-  dset:$[typ in "cs";
-         $[typ = "s";string dset;dset];
+  dset:$[typ in "csg";
+         $[typ in "gs";string dset;dset];
          $[typ in "bmduvt";"i"$dset;
            typ in "pn";"j"$dset;
            typ = "z";"f"$dset;
@@ -74,13 +74,13 @@ writeAttr:{[fname;dname;aname;dset]
   if[10h = abs type dset;dset:enlist dset];
   typ:i.fntyp dset;
   dims:"i"$i.shape dset;
-  dset:$[typ in "cs";
-         $[typ = "s";string dset;dset];
+  dset:$[typ in "csg";
+         $[typ in "gs";string dset;dset];
          $[typ in "bmduvt";"i"$dset;
            typ in "pn";"j"$dset;
            typ = "z";"f"$dset;
            dset]];
-  if[typ in"g ";'"Data cannot be written to attribute"];
+  if[typ in" ";'"This data format cannot be written to an attribute"];
   writeAttrDataset[fname;dname;aname;dset;dims;typ]
   }
 

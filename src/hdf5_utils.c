@@ -152,7 +152,7 @@ int checkvalid(char *ktype){
   int flag=0;
   int i,j;
   char num[15] = "hijfebxpmdznuvt";
-  char str[3] = "cs";
+  char str[3] = "csg";
   for(i=0;i<15;i++){
     if(ktype[0] == num[i]){
       flag = 1;

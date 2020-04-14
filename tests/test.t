@@ -1,13 +1,17 @@
 \l hdf5.q
 
-E:"test_real.h5"
-F:"test_float.h5"
-H:"test_short.h5"
-I:"test_int.h5"
-B:"test_bool.h5"
-J:"test_long.h5"
-C:"test_char.h5"
-S:"test_symbol.h5"
+// File names
+E :"test_real.h5"
+F :"test_float.h5"
+H :"test_short.h5"
+I :"test_int.h5"
+B :"test_bool.h5"
+J :"test_long.h5"
+C :"test_char.h5"
+S :"test_symbol.h5"
+TD:"test_tab_dict.h5"
+LF:"test_linking.h5"
+// Generic dataset name
 dset:"/dset"
 
 .hdf5.createFile[E]
@@ -18,7 +22,6 @@ dset:"/dset"
 .hdf5.createFile[J]
 .hdf5.createFile[C]
 .hdf5.createFile[S]
-
 
 // Testing dataset functionality
 
@@ -71,6 +74,14 @@ data_short_3:(N,M,K)#(N*M*K)?10h
 data_int_3  :(N,M,K)#(N*M*K)?10i
 data_bool_3 :(N,M,K)#(N*M*K)?0b
 data_long_3 :(N,M,K)#(N*M*K)?10
+
+// Create a number of tables to write to file
+data_tab_num  :([]N?5;N?5h;N?5f;N?0b;N?0p;N?0t;N?10i)
+data_tab_mix  :([]N?1f;N?("test";"array";"mix");N?0b;N?0p)
+data_tab_atom :([]1?1f;1?0b;1?("test";"test1");1?0p)
+data_dict_atom:enlist[`test]!enlist 1
+data_dict_num :`t`t1`t2`t3`t4!(N?0p;N?0t;N?5f;N?5i;N?5h)
+data_dict_mix :`t`t1`t2`t3`t4!(N?1f;N?0b;N?("test";"array");N?0x0;`date$N?5)
 
 // Create a dataset at the root of the file 
 .hdf5.createDataset[E;dset,"_1";enlist `int$N;"e"]
@@ -131,6 +142,16 @@ data_long_3 :(N,M,K)#(N*M*K)?10
 .hdf5.writeData[B;dset,"_3";data_bool_3]
 .hdf5.writeData[J;dset,"_3";data_long_3]
 
+.hdf5.writeData[TD;"num_tab"  ;data_tab_num]
+.hdf5.writeData[TD;"mix_tab"  ;data_tab_mix]
+.hdf5.writeData[TD;"atom_tab" ;data_tab_atom]
+.hdf5.writeData[TD;"atom_dict";data_dict_atom]
+.hdf5.writeData[TD;"num_dict" ;data_dict_num]
+.hdf5.writeData[TD;"mix_dict" ;data_dict_mix]
+
+
+-1"Testing atomic data";
+
 data_real_atom  ~ .hdf5.readData[E;dset,"_atom"]
 data_float_atom ~ .hdf5.readData[F;dset,"_atom"]
 data_short_atom ~ .hdf5.readData[H;dset,"_atom"]
@@ -139,6 +160,9 @@ data_bool_atom  ~ .hdf5.readData[B;dset,"_atom"]
 data_long_atom  ~ .hdf5.readData[J;dset,"_atom"]
 data_char_atom  ~ first first .hdf5.readData[C;dset,"_atom"]
 data_sym_atom   ~ first `$.hdf5.readData[S;dset,"_atom"]
+
+-1"Atomic data testing complete\n";
+-1"Testing arrays 1D -> 3D";
 
 data_real_norm  ~ .hdf5.readData[E;dset,"_norm"]
 data_float_norm ~ .hdf5.readData[F;dset,"_norm"]
@@ -172,8 +196,19 @@ data_int_3   ~ .hdf5.readData[I;dset,"_3"]
 data_bool_3  ~ .hdf5.readData[B;dset,"_3"]
 data_long_3  ~ .hdf5.readData[J;dset,"_3"]
 
+-1"Testing of arrays complete\n";
+-1"Testing tabular & dict read/write";
 
-// Testing grouping functionality
+data_tab_num   ~ .hdf5.readData[TD;"num_tab"]
+data_tab_mix   ~ .hdf5.readData[TD;"mix_tab"]
+data_tab_atom  ~ .hdf5.readData[TD;"atom_tab"]
+data_dict_atom ~ .hdf5.readData[TD;"atom_dict"]
+data_dict_num  ~ .hdf5.readData[TD;"num_dict"]
+data_dict_mix  ~ .hdf5.readData[TD;"mix_dict"]
+
+
+-1"Testing of tabular & dict read/write complete\n";
+-1"Testing grouping functionality";
 
 // Create a group "/Group1" within the previously created files
 G1:"/Group1"
@@ -186,12 +221,6 @@ G1:"/Group1"
 
 // Create a dataset to be populated within the groups
 G1dset:G1,dset
-.hdf5.createDataset[E;G1dset;`int$(N;M);"e"]
-.hdf5.createDataset[F;G1dset;`int$(N;M);"f"]
-.hdf5.createDataset[H;G1dset;`int$(N;M);"h"]
-.hdf5.createDataset[I;G1dset;`int$(N;M);"i"]
-.hdf5.createDataset[B;G1dset;`int$(N;M);"i"]
-.hdf5.createDataset[J;G1dset;`int$(N;M);"j"]
 
 // Write to the datasets within groups
 .hdf5.writeData[E;G1dset;data_real_2]
@@ -208,8 +237,9 @@ data_int_2   ~ .hdf5.readData[I;G1dset]
 data_bool_2  ~ .hdf5.readData[B;G1dset]
 data_long_2  ~ .hdf5.readData[J;G1dset]
 
-// Testing attribute functionality
-// These tests will need to be expanded moving forward to incorporate checking of more explicit types
+-1"Grouping functionality testing complete\n";
+-1"Testing attribute functionality";
+
 intattr:2 2#4?10i;
 strattr:"testing"
 .hdf5.createAttr[E;dset,"_2";"int attribute";2 2i;"i"]
@@ -219,7 +249,19 @@ strattr:"testing"
 intattr ~ .hdf5.readAttr[E;dset,"_2";"int attribute"]
 strattr ~ first .hdf5.readAttr[C;dset,"_1";"str attr"]
 
-// Testing utility functions
+-1"Attribute functionality testing complete\n";
+-1"Testing of linking functionality";
+
+// Location which does not exist in file and acts as hard/soft links
+n_loc:"new_loc"
+.hdf5.createSoft[I;G1dset;n_loc]
+data_int_2 ~ .hdf5.readData[I;n_loc]
+.hdf5.delLink[I;n_loc];
+.hdf5.createHard[I;G1dset;n_loc]
+data_int_2 ~ .hdf5.readData[I;n_loc]
+
+-1"Linking functionality testing complete\n";
+-1"Testing of utility functions";
 
 // Create a file to check function of ishdf5
 `:test_txt.txt 0: enlist "text to save";
@@ -232,6 +274,7 @@ not .hdf5.ishdf5["test_txt.txt"]
 
 .hdf5.datasetInfo[J;dset,"_2"]~`type`ndims`dims!(`long;2i;100 100i)
 .hdf5.datasetInfo[F;dset,"_3"]~`type`ndims`dims!(`float;3i;100 100 100i)
+-1"Testing of utility functions complete\n";
 
 // Clean up
 $[.z.o like "w*";system "del test_*";system"rm test_*"];
