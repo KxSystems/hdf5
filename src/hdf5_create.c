@@ -17,7 +17,7 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   char *dataname = getkstring(dname);
   char *attrname = getkstring(aname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  // Error if the file you doesn't exist
+  // Error if the file doesn't exist attributes only added to existing groups/dsets
   if(file < 0){
     free(filename);
     free(dataname);
@@ -63,6 +63,8 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
 EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   // Disable errors from hdf5
   disable_err();
+  if(!checkType("[Cs][Cs][Ii][Ccs]", fname, dname, kdims, ktype))
+    return KNL;
   htri_t file_nm;
   hid_t file;
   char *filename = getkstring(fname);
@@ -75,9 +77,9 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   // Create a numerical dataset with relevant dimensionality and type
   if(dtype == 1){
-    // Check dimensionality is relevant for the type being created
+    // Check that the dataset can be created appropriately
     if(0==createsimpledataset(file, dataname, kdims, ktype)){
-      // Clean up if dimensionality is insufficent
+      // Clean up if dimensionality is not suited
       free(filename);
       free(dataname);
       H5Fclose(file);
@@ -106,11 +108,9 @@ EXP K hdf5createFile(K fname){
   disable_err();
   if(!checkType("[Cs]",fname))
     return KNL;
-  hid_t file;
   char *filename = getkstring(fname);
   createfile(filename);
   // Clean up
   free(filename);
-  H5Fclose(file);
   return 0;
 }

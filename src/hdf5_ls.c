@@ -12,6 +12,7 @@ int group_check(struct opdata *od, haddr_t target_addr);
 herr_t opfunc(hid_t loc_id, const char *name, const H5L_info_t *info, void *operator_data);
 
 EXP K hdf5ls(K fname){
+  disable_err();
   if(!checkType("[Cs]",fname))
     return KNL;
   char *filename = getkstring(fname);
@@ -19,6 +20,11 @@ EXP K hdf5ls(K fname){
   H5O_info_t infobuf;
   struct opdata od;
   file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
+  if(file<0){
+    free(filename);
+    H5Fclose(file);
+    return krr((S)"file does not exist");
+  }
   H5Oget_info1(file,&infobuf);
   od.recurs = 0;
   od.prev = NULL;
@@ -34,12 +40,12 @@ EXP K hdf5ls(K fname){
 // Utility functions
 
 int group_check(struct opdata *od, haddr_t target_addr){
-    if (od->addr == target_addr)
-        return 1;
-    else if (!od->recurs)
-        return 0;
-    else
-        return group_check (od->prev, target_addr);
+  if (od->addr == target_addr)
+    return 1;
+  else if (!od->recurs)
+    return 0;
+  else
+    return group_check (od->prev, target_addr);
 }
 
 herr_t opfunc(hid_t loc_id, const char *name, const H5L_info_t *info, void *operator_data){
@@ -62,9 +68,9 @@ herr_t opfunc(hid_t loc_id, const char *name, const H5L_info_t *info, void *oper
         return_val = H5Literate_by_name(loc_id, name, H5_INDEX_NAME,
                        H5_ITER_NATIVE, NULL, opfunc, (void *) &nextod,
                        H5P_DEFAULT);
-        }
-        printf ("%*s}\n", spaces, "");
-        break;
+      }
+      printf ("%*s}\n", spaces, "");
+      break;
     case H5O_TYPE_DATASET:
       printf ("Dataset: %s\n", name);
       break;
@@ -74,5 +80,5 @@ herr_t opfunc(hid_t loc_id, const char *name, const H5L_info_t *info, void *oper
     default:
       printf ( "Unknown: %s\n", name);
     }
-    return return_val;
+  return return_val;
 }

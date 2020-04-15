@@ -5,6 +5,7 @@
 #define HDF5REAL  H5T_NATIVE_FLOAT
 #define HDF5SHORT H5T_NATIVE_SHORT
 #define HDF5CHAR  H5T_C_S1
+#define HDF5BYTE  H5T_NATIVE_UCHAR
 #ifdef __GNUC__
 #  define UNUSED(x) x __attribute__((__unused__))
 #else
