@@ -32,8 +32,8 @@ hid_t hdf5typ_from_k(K ktype){
       break;
     default:
       val = 0;
-    }
+  }
   // Clean up
   free(kstring);
   return val;
-  }
+}
