@@ -1,40 +1,39 @@
 /* --- Retrieve hdf5 numeric types --- */
 hid_t hdf5typ_from_k(K ktype){
   hid_t val;
-  char* kstring = getkstring(ktype);
-  if(strcmp(kstring,"i")==0)
-    val = HDF5INT;
-  else if(strcmp(kstring,"b")==0)
-    val = HDF5INT;
-  else if(strcmp(kstring,"m")==0)
-    val = HDF5INT;
-  else if(strcmp(kstring,"d")==0)
-    val = HDF5INT;
-  else if(strcmp(kstring,"u")==0)
-    val = HDF5INT;
-  else if(strcmp(kstring,"v")==0)
-    val = HDF5INT;
-  else if(strcmp(kstring,"t")==0)
-    val = HDF5INT;
-  else if(strcmp(kstring,"j")==0)
-    val = HDF5LONG;
-  else if(strcmp(kstring,"p")==0)
-    val = HDF5LONG;
-  else if(strcmp(kstring,"n")==0)
-    val = HDF5LONG;
-  else if(strcmp(kstring,"f")==0)
-    val = HDF5FLOAT;
-  else if(strcmp(kstring,"z")==0)
-    val = HDF5FLOAT;
-  else if(strcmp(kstring,"e")==0)
-    val = HDF5REAL;
-  else if(strcmp(kstring,"h")==0)
-    val = HDF5SHORT;
-  else if(strcmp(kstring,"x")==0)
-    val = H5T_NATIVE_UCHAR;
-  else
-    val = 0;
+  char* kstring = getkstring(ktype);  
+  char typ = kstring[0];
+  switch(typ){
+    case 'i':
+    case 'b':
+    case 'd':
+    case 'u':
+    case 'v':
+    case 't':
+      val = HDF5INT;
+      break;
+    case 'j':
+    case 'p':
+    case 'n':
+      val = HDF5LONG;
+      break;
+    case 'f':
+    case 'z':
+      val = HDF5FLOAT;
+      break;
+    case 'e':
+      val = HDF5REAL;
+      break;
+    case 'h':
+      val = HDF5SHORT;
+      break;
+    case 'x':
+      val = H5T_NATIVE_UCHAR;
+      break;
+    default:
+      val = 0;
+  }
   // Clean up
   free(kstring);
   return val;
-  }
+}

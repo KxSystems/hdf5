@@ -58,6 +58,7 @@ static I checkType(const C* tc, ...){
   return match;
 }
 
+/* functionality to create dictionaries as key,val,key,val */
 K xd0(I n, ...){
   va_list a;
   S s;

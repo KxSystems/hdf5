@@ -5,10 +5,10 @@
 */
 
 // Retrieve the shape of a dataspace
-EXP K hdf5getShape(hid_t space){
+K hdf5getShape(hid_t space){
   // Assign appropriate elements
   K kdims;
-  int rank,i;
+  int rank;
   // Get # dimensions in the dataset and assign a space to hold these
   rank = H5Sget_simple_extent_ndims(space);
   hsize_t dims[rank];
@@ -16,46 +16,72 @@ EXP K hdf5getShape(hid_t space){
   H5Sget_simple_extent_dims(space, dims, NULL);
   // Convert dimensions to appropriate kdb+ data
   kdims = ktn(KJ,(J)rank);
-  for(i=0;i<rank;i++)
+  for(int i=0;i<rank;i++)
     kJ(kdims)[i] = dims[i];
   return(kdims);
 }
 
 EXP K hdf5getDataShape(K fname, K dname){
-  // Assign appropriate elements
-  K kdims;
-  hid_t file, data, space;
-  char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
+  disable_err();
   // Check datatypes are relevant
   if(!checkType("[Cs][Cs]",fname,dname))
     return KNL;
+  // Assign appropriate elements
+  K res;
+  hid_t file, data, space;
+  char *filename = getkstring(fname);
   // Open relevant files and datasets
   file  = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if(file < 0){
+    free(filename);
+    H5Fclose(file);
+    return krr((S)"file does not exist");
+  }
+  char *dataname = getkstring(dname);
   data  = H5Dopen(file, dataname, H5P_DEFAULT);
+  if(data < 0){
+    free(filename);
+    free(dataname);
+    H5Dclose(data);
+    H5Fclose(file);
+    return krr((S)"dataset not appropriate for problem");
+  }
   space = H5Dget_space(data);
-  kdims = hdf5getShape(space);
+  res = hdf5getShape(space);
   // Clean up
   free(filename);
   free(dataname);
   H5Fclose(file);
   H5Dclose(data);
   H5Sclose(space);
-  return kdims;
+  return res;
 }
 
 EXP K hdf5getDataPoints(K fname, K dname){
-  // Assign appropriate elements
-  hid_t file, data, space;
-  char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
-  long points;
+  disable_err();
   // Check relevant datatypes
   if(!checkType("[Cs][Cs]",fname,dname))
     return KNL;
+  // Assign appropriate elements
+  hid_t file, data, space;
+  char *filename = getkstring(fname);
+  long points;
   // Open relevant file, dataset and dataspace
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if(file < 0){
+    free(filename);
+    H5Fclose(file);
+    return krr((S)"file does not exist");
+  }
+  char *dataname = getkstring(dname);
   data = H5Dopen(file, dataname, H5P_DEFAULT);
+  if(data < 0){
+    free(filename);
+    free(dataname);
+    H5Dclose(data);
+    H5Fclose(file);
+    return krr((S)"dataset not appropriate for problem");
+  }
   space = H5Dget_space(data);
   // Retrieve the number of datapoints in the dataset
   points = (J)H5Sget_simple_extent_npoints(space);
@@ -69,16 +95,38 @@ EXP K hdf5getDataPoints(K fname, K dname){
 }
 
 EXP K hdf5getAttrShape(K fname, K dname, K aname){
+  disable_err();
+  if(!checkType("[Cs][Cs][Cs]",fname,dname,aname))
+    return KNL;
   K kdims;
   hid_t file, data, attr, space;
   char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
-  char *attrname = getkstring(aname);
-  if(!checkType("[Cs][Cs][Cs]",fname,dname,aname))
-    return KNL;
   file  = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if(file < 0){
+    free(filename);
+    H5Fclose(file);
+    return krr((S)"file does not exist");
+  }
+  char *dataname = getkstring(dname);
   data  = isGroupData(file, dataname);
+  if(data < 0){
+    closeGroupData(file, dataname, data);
+    free(filename);
+    free(dataname);
+    H5Fclose(file);
+    return krr((S)"dataset/group could not be opened");
+  }
+  char *attrname = getkstring(aname);
   attr  = H5Aopen(data, attrname, H5P_DEFAULT);
+  if(attr < 0){
+    closeGroupData(file, dataname, data);
+    free(attrname);
+    free(dataname);
+    free(filename);
+    H5Fclose(file);
+    H5Aclose(attr);
+    return krr((S)"attribute could not be opened");
+  }
   space = H5Aget_space(attr);
   kdims = hdf5getShape(space);
   closeGroupData(file, dataname, data);
@@ -92,16 +140,38 @@ EXP K hdf5getAttrShape(K fname, K dname, K aname){
 }
 
 EXP K hdf5getAttrPoints(K fname, K dname, K aname){
-  hid_t file, data, attr, space;
-  char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
-  char *attrname = getkstring(aname);
-  long points;
+  disable_err();
   if(!checkType("[Cs][Cs][Cs]",fname,dname,aname))
     return KNL;
+  hid_t file, data, attr, space;
+  char *filename = getkstring(fname);
+  long points;
   file   = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if(file < 0){
+    free(filename);
+    H5Fclose(file);
+    return krr((S)"file does not exist");
+  }
+  char *dataname = getkstring(dname);
   data   = isGroupData(file, dataname);
+  if(data < 0){
+    free(filename);
+    free(dataname);
+    closeGroupData(file, dataname, data);
+    H5Fclose(file);
+    return krr((S)"dataset/group could not be opened");
+  }
+  char *attrname = getkstring(aname);
   attr   = H5Aopen(data, attrname, H5P_DEFAULT);
+  if(attr < 0){
+    closeGroupData(file, dataname, data);
+    free(attrname);
+    free(dataname);
+    free(filename);
+    H5Fclose(file);
+    H5Aclose(attr);
+    return krr((S)"attribute could not be opened");
+  }
   space  = H5Aget_space(attr);
   points = (J)H5Sget_simple_extent_npoints(space);
   closeGroupData(file, dataname, data);
@@ -140,11 +210,23 @@ EXP K hdf5isAttr(K fname, K dname, K aname){
   hid_t file, data;
   htri_t aexists;
   char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
-  char *attrname = getkstring(aname);
   // Open file and dataset, check if a named attribute exists
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if(file < 0){
+    free(filename);
+    H5Fclose(file);
+    return krr((S)"file does not exist");
+  }
+  char *dataname = getkstring(dname);
   data = isGroupData(file, dataname);
+  if(data < 0){
+    free(filename);
+    free(dataname);
+    closeGroupData(file, dataname, data);
+    H5Fclose(file);
+    return krr((S)"dataset/group could not be opened");
+  }
+  char *attrname = getkstring(aname);
   aexists = H5Aexists(data, attrname);
   // Clean up
   closeGroupData(file,dataname,data);
@@ -162,13 +244,18 @@ EXP K hdf5isAttr(K fname, K dname, K aname){
 // Does the requested object (group/dataset exist)
 /* oname = object name */ 
 EXP K hdf5isObject(K fname, K oname){
+  disable_err();
   if(!checkType("[Cs][Cs]", fname, oname))
     return KNL;
   hid_t file;
   htri_t isobj;
   char *filename = getkstring(fname);
-  char *objname  = getkstring(oname);
   file  = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if(file < 0)
+    free(filename);
+    H5Fclose(file);
+    return krr((S)"file does not exist");
+  char *objname  = getkstring(oname);
   isobj = H5Oexists_by_name(file,objname, H5P_DEFAULT);
   free(filename);
   free(objname);
@@ -182,35 +269,52 @@ EXP K hdf5isObject(K fname, K oname){
 
 // Return the major/minor and release versions as a dictionary
 EXP K hdf5version(K UNUSED(x)){
+  disable_err();
   unsigned int maj, min, rel;
-  H5get_libversion(&maj, &min, &rel);
-  return xd("Major",kj(maj),"Minor",kj(min),"Release",kj(rel));
+  if(H5get_libversion(&maj, &min, &rel)<0)
+    return krr((S)"Error evaluating version of HDF5 C api");
+  else
+    return xd("Major",kj(maj),"Minor",kj(min),"Release",kj(rel));
 }
 
 // Garbage collection for hdf5 interface, return the data collected from free lists
 EXP K hdf5gc(K UNUSED(x)){
+  disable_err();
   return ki(H5garbage_collect());
 }
 
 // Return the rank, type, and dimensionality of the dataset
 EXP K hdf5datasetInfo(K fname, K dname){
+  disable_err();
+  if(!checkType("[Cs][Cs]",fname,dname))
+    return KNL;
   K kdims, kdtype;
   hid_t file, data, dtype, ntype, space;
   char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
-  int rank, i;
-  if(!checkType("[Cs][Cs]",fname,dname))
-    return KNL;
+  int rank;
   // Open files and dataset and retrieve the dataspace
   file  = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if(file < 0){
+    free(filename);
+    H5Fclose(file);
+    return krr((S)"file does not exist");
+  }
+  char *dataname = getkstring(dname);
   data  = H5Dopen(file, dataname, H5P_DEFAULT);
+  if(data < 0){
+    free(filename);
+    free(dataname);
+    H5Dclose(data);
+    H5Fclose(file);
+    return krr((S)"dataset could not be opened");
+  }
   space = H5Dget_space(data);
   // Retrieve dimensionality information
   rank = H5Sget_simple_extent_ndims(space);
   hsize_t dims[rank];
   H5Sget_simple_extent_dims(space, dims, NULL);
   kdims = ktn(KI,rank);
-  for(i=0;i<rank;i++)
+  for(int i=0;i<rank;i++)
     kI(kdims)[i] = dims[i];
   // Retrieve the type of the dataset 
   dtype = H5Dget_type(data);
@@ -244,54 +348,89 @@ EXP K hdf5datasetInfo(K fname, K dname){
  * odest = destination object
 */
 EXP K hdf5copyObject(K fname, K oname, K fdest, K odest){
+  disable_err();
+  if(!checkType("[Cs][Cs][Cs][Cs]",fname, oname, fdest, odest))
+    return KNL;
   char *filename = getkstring(fname);
-  char *objname  = getkstring(oname);
   char *destname = getkstring(fdest);
-  char *destobj  = getkstring(odest);
-  hid_t file_id, dest_id;
+  K res;
+  hid_t file, dest;
   // Open files (can be the same) and copy object reference from one point to another
-  file_id = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  dest_id = H5Fopen(destname, H5F_ACC_RDWR, H5P_DEFAULT);
-  H5Ocopy(file_id, objname, dest_id, destobj, H5P_DEFAULT, H5P_DEFAULT);
+  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  dest = H5Fopen(destname, H5F_ACC_RDWR, H5P_DEFAULT);
+  if((file < 0) || dest < 0){
+    free(filename);
+    free(destname);
+    H5Fclose(file);
+    H5Fclose(dest);
+    return krr((S)"Opening of files unsuccessful");
+  }
+  char *objname  = getkstring(oname);
+  char *destobj  = getkstring(odest);
+  if(H5Ocopy(file, objname, dest, destobj, H5P_DEFAULT, H5P_DEFAULT)<0)
+    res = krr((S)"Error while copying the object");
+  else
+    res = 0;
   // Clean up
   free(filename);
   free(objname);
   free(destname);
   free(destobj);
-  H5Fclose(file_id);
-  H5Fclose(dest_id);
-  return KNL;
+  H5Fclose(file);
+  H5Fclose(dest);
+  return res;
 }
 
 // Get the size of a hdf5 file in megabytes
 EXP K hdf5fileSize(K fname){
   disable_err();
+  if(!checkType("[Cs]",fname))
+    return KNL;
   char *filename = getkstring(fname);
   double megab;
-  hid_t file_id;
+  hid_t file;
   hsize_t fsize;
-  file_id = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  H5Fget_filesize(file_id, &fsize);
-  megab = (double)fsize / 1000; 
+  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if(file < 0){
+    free(filename);
+    H5Fclose(file);
+    return krr((S)"file does not exist");
+  }
+  H5Fget_filesize(file, &fsize);
+  megab = (double)fsize / 1000000; 
   free(filename);
-  H5Fclose(file_id);
+  H5Fclose(file);
   return(kf(megab));
 }
 
 EXP K hdf5dataSize(K fname, K dname){
   disable_err();
+  if(!checkType("[Cs][Cs]",fname,dname))
+    return KNL;
   char *filename = getkstring(fname);
   char *dataname = getkstring(dname);
-  hid_t file_id, data_id;
+  hid_t file, data;
   hsize_t dsize;
   double megab;
-  file_id = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  data_id = H5Dopen(file_id , dataname, H5P_DEFAULT);
-  dsize = H5Dget_storage_size(data_id);
-  megab = (double)dsize / 1000;
+  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if(file < 0){
+    free(filename);
+    H5Fclose(file); 
+    return krr((S)"file does not exist");
+  }
+  data = H5Dopen(file, dataname, H5P_DEFAULT);
+  if(data < 0){
+    free(filename);
+    free(dataname);
+    H5Dclose(data);
+    H5Fclose(file);
+    return krr((S)"dataset could not be opened");
+  }
+  dsize = H5Dget_storage_size(data);
+  megab = (double)dsize / 1000000;
   free(filename);
   free(dataname);
-  H5Fclose(file_id);
-  H5Dclose(data_id);
+  H5Fclose(file);
+  H5Dclose(data);
   return(kf(megab));
 }

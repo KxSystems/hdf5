@@ -54,18 +54,19 @@ i.fntyp:{first(.Q.t til 20)@i.nlist_types[x]}
 datamap:`b`p`m`d`z`n`u`v`t!`boolean`timestamp`month`date`datetime`timespan`minute`second`time;
 
 writeData:{[fname;dname;dset]
+  if[type[dset]in 98 99h;:writeDictTab[fname;dname;dset]];
   if[11h = abs type dset;dset:string dset];
   if[10h = abs type dset;dset:enlist dset];
   typ:i.fntyp dset;
   dims:"i"$i.shape dset;
-  dset:$[typ in "cs";
-         $[typ = "s";string dset;dset];
+  dset:$[typ in "csg";
+         $[typ in "gs";string dset;dset];
          $[typ in "bmduvt";"i"$dset;
            typ in "pn";"j"$dset;
            typ = "z";"f"$dset;
            dset]];
   writeDataset[fname;dname;dset;dims;typ];
-  if[typ in"bpmdznuvt";writeAttr[fname;dname;"datatype_kdb";datamap`$typ]];
+  if[typ in"bpmdznuvt";writeAttr[fname;dname;"datatype_kdb";datamap`$typ]]
   }
 
 writeAttr:{[fname;dname;aname;dset]
@@ -73,13 +74,52 @@ writeAttr:{[fname;dname;aname;dset]
   if[10h = abs type dset;dset:enlist dset];
   typ:i.fntyp dset;
   dims:"i"$i.shape dset;
-  dset:$[typ in "cs";$[typ = "s";string dset;dset];dset];
+  dset:$[typ in "csg";
+         $[typ in "gs";string dset;dset];
+         $[typ in "bmduvt";"i"$dset;
+           typ in "pn";"j"$dset;
+           typ = "z";"f"$dset;
+           dset]];
+  if[typ in" ";'"This data format cannot be written to an attribute"];
   writeAttrDataset[fname;dname;aname;dset;dims;typ]
   }
 
 readAttr:{[fname;dname;aname]getAttrShape[fname;dname;aname]#readAttrDataset[fname;dname;aname]}
 readData:{[fname;dname]
+  if[isAttr[fname;dname;"datatype_kdb"];
+    typ:readAttr[fname;dname;"datatype_kdb"]0;
+    if[(typ~"table")|typ~"dict";:readDictTab[fname;dname;typ]]];
   data:getDataShape[fname;dname]#readDataset[fname;dname];
   $[isAttr[fname;dname;"datatype_kdb"];(first `$readAttr[fname;dname;"datatype_kdb"])$;]data}
 
 i.shape:{-1_count each first scan x}
+
+// Functionality to recursively write a kdb+ table/dictionary to a hdf5 group
+writeDictTab:{[fname;dname;dset]
+  createGroup[fname;dname];
+  $[98h=type dset;
+    [writeAttr[fname;dname;"datatype_kdb";"table"];
+     writeAttr[fname;dname;"kdb_columns";cols[dset]];
+     dict_keys:dname,/:"/",/:string cols dset;
+     data:value flip dset]; 
+    [writeAttr[fname;dname;"datatype_kdb";"dict"]
+    writeAttr[fname;dname;"kdb_keys";kvals:key[dset]];
+    dict_keys:dname,/:"/",/:string kvals;
+    data:value dset]];
+  writeData[fname]'[dict_keys;data];
+  }
+
+// Read a kdb+ table/dictionary written from q to a group
+readDictTab:{[fname;dname;typ]
+  $["table"~typ;
+    [tab_cols:readAttr[fname;dname;"kdb_columns"];
+     kdb_data:readData[fname]each dname,/:"/",/:tab_cols;
+     r:flip (`$tab_cols)!kdb_data];
+    [dict_cols:readAttr[fname;dname;"kdb_keys"];
+     kdb_data:readData[fname]each dname,/:"/",/:dict_cols;
+     r:(`$dict_cols)!kdb_data]
+   ];
+  r
+  }
+
+
