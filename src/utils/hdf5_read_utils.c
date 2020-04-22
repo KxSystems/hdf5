@@ -71,7 +71,7 @@ K readInt(hid_t dset,char *rdtyp){
 K readBitfield(hid_t dset,char *rdtyp){
   hid_t space;
   K z;
-  int i, rank;
+  int i;
   long points;
   unsigned char *rdata;
   if(strcmp(rdtyp,"a")==0)
@@ -96,7 +96,7 @@ K readBitfield(hid_t dset,char *rdtyp){
 K readByte(hid_t dset,char *rdtyp){
   hid_t space;
   K z;
-  int i, rank;
+  int i;
   long points;
   unsigned char *rdata;
   if(strcmp(rdtyp,"a")==0)
@@ -229,7 +229,7 @@ K readChar(hid_t dset, char *rdtyp){
     sz++;
     H5Tset_size(memtype,sz);
     rdata[0] = (char *)malloc(dims[0] * sz * sizeof(char));
-    for (int j=1; j<dims[0]; j++)
+    for (int j=1; j < (int)dims[0]; j++)
       rdata[j] = rdata[0] + j * sz;
     if(strcmp(rdtyp,"a")==0)
       H5Aread(dset, memtype, rdata[0]);
@@ -238,7 +238,7 @@ K readChar(hid_t dset, char *rdtyp){
   }
   // Write the read data to a K object either a char array or list
   vla = knk(0);
-  for (int i=0; i<dims[0]; i++)
+  for (int i=0; i < (int)dims[0]; i++)
     jk(&vla, kp((char*)rdata[i]));
   // Clean up
   // Reclaim unused memory from variable length data
@@ -333,9 +333,8 @@ K readULong(hid_t dset, char *rdtyp){
 /* Logic for reading individual compound types from a compound dataset */
 
 K compoundInteger(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char *rdtyp){
-  hid_t cmpd_dset;
-  int j;
-  K array;
+  hid_t cmpd_dset = 0;
+  K array = 0;
   if(H5Tequal(item_type,HDF5INT)){
     int *rdata;
     cmpd_dset = H5Tcreate(H5T_COMPOUND, sizeof(int));
@@ -346,7 +345,7 @@ K compoundInteger(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,cha
     else
       H5Dread(dset, cmpd_dset, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
     array = ktn(KI, dims);
-    for(int j = 0; j < dims; j++)
+    for(int j = 0; j < (int)dims; j++)
       kI(array)[j] = *(rdata + j);
     free(rdata);
   }
@@ -360,7 +359,7 @@ K compoundInteger(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,cha
     else
       H5Dread(dset, cmpd_dset, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
     array = ktn(KJ, dims);
-    for(int j = 0; j < dims; j++)
+    for(int j = 0; j < (int)dims; j++)
       kJ(array)[j] = *(rdata + j);
     free(rdata);
   }
@@ -374,7 +373,7 @@ K compoundInteger(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,cha
     else
       H5Dread(dset, cmpd_dset, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
     array = ktn(KH, dims);
-    for(int j = 0; j < dims; j++)
+    for(int j = 0; j < (int)dims; j++)
       kH(array)[j] = *(rdata + j);
     free(rdata);
   }
@@ -383,9 +382,8 @@ K compoundInteger(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,cha
 } 
 
 K compoundFloat(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char *rdtyp){
-  hid_t cmpd_dset;
-  int j;
-  K array;
+  hid_t cmpd_dset = 0;
+  K array = 0;
   if(H5Tequal(item_type,HDF5FLOAT)){
     double *rdata;
     cmpd_dset = H5Tcreate(H5T_COMPOUND, sizeof(double));
@@ -396,7 +394,7 @@ K compoundFloat(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char 
     else
       H5Dread(dset, cmpd_dset, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
     array = ktn(KF, dims);
-    for(int j = 0; j < dims; j++)
+    for(int j = 0; j < (int)dims; j++)
       kF(array)[j] = *(rdata + j);
     free(rdata);
   }
@@ -410,7 +408,7 @@ K compoundFloat(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char 
     else
       H5Dread(dset, cmpd_dset, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
     array = ktn(KE, dims);
-    for(int j = 0; j < dims; j++)
+    for(int j = 0; j < (int)dims; j++)
       kE(array)[j] = *(rdata + j);
     free(rdata);
   }
@@ -420,7 +418,6 @@ K compoundFloat(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char 
 
 K compoundByte(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char *rdtyp){
   hid_t cmpd_dset;
-  int j;
   K array;
   unsigned char *rdata;
   cmpd_dset = H5Tcreate(H5T_COMPOUND, sizeof(unsigned char));
@@ -431,7 +428,7 @@ K compoundByte(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char *
   else
     H5Dread(dset, cmpd_dset, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
   array = ktn(KG, dims);
-  for(int j = 0; j < dims; j++)
+  for(int j = 0; j < (int)dims; j++)
     kG(array)[j] = *(rdata + j);
   free(rdata);
   H5Tclose(cmpd_dset);
@@ -440,7 +437,6 @@ K compoundByte(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char *
 
 K compoundBool(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type, char *rdtyp){
   hid_t cmpd_dset;
-  int j;
   K array;
   hbool_t *rdata;
   cmpd_dset = H5Tcreate(H5T_COMPOUND, sizeof(unsigned long));
@@ -451,7 +447,7 @@ K compoundBool(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type, char 
   else
     H5Dread(dset, cmpd_dset, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
   array = ktn(KG, dims);
-  for(int j = 0; j < dims; j++)
+  for(int j = 0; j < (int)dims; j++)
     kG(array)[j] = *(rdata + j);
   free(rdata);
   H5Tclose(cmpd_dset);
@@ -462,7 +458,6 @@ K compoundBool(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type, char 
 
 K compoundString(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char *rdtyp){
   hid_t cmpd_dset, temp_type;
-  int j;
   K array = knk(0);
   char **rdata;
   rdata = (char **)malloc(dims * sizeof(char *));
@@ -483,14 +478,14 @@ K compoundString(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char
     cmpd_dset = H5Tcreate(H5T_COMPOUND, sz);
     H5Tinsert(cmpd_dset, memb_name, 0, temp_type);
     rdata[0] = (char *)malloc(dims * sz * sizeof(char));
-    for (int j=1; j<dims; j++)
+    for (int j=1; j < (int)dims; j++)
       rdata[j] = rdata[0] + j * sz;
     if(strcmp(rdtyp,"a")==0)
       H5Aread(dset,cmpd_dset,rdata[0]);
     else
       H5Dread(dset, cmpd_dset, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata[0]);
   }
-  for(int j=0; j<dims; j++)
+  for(int j=0; j < (int)dims; j++)
     jk(&array,kp((char*)rdata[j]));
   free(rdata);
   H5Tclose(temp_type);
@@ -502,7 +497,6 @@ K compoundString(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type,char
 
 K compoundUInt(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type, char *rdtyp){
   hid_t cmpd_dset;
-  int j;
   K array;
   unsigned *rdata;
   cmpd_dset = H5Tcreate(H5T_COMPOUND, sizeof(unsigned));
@@ -513,7 +507,7 @@ K compoundUInt(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type, char 
   else
     H5Dread(dset, cmpd_dset, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
   array = ktn(KJ, dims);
-  for(int j = 0; j < dims; j++){
+  for(int j = 0; j < (int)dims; j++){
     kJ(array)[j] = *(rdata + j);
   }
   free(rdata);
@@ -523,7 +517,6 @@ K compoundUInt(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type, char 
 
 K compoundUShort(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type, char *rdtyp){
   hid_t cmpd_dset;
-  int j;
   K array;
   unsigned short *rdata;
   cmpd_dset = H5Tcreate(H5T_COMPOUND, sizeof(unsigned short));
@@ -534,7 +527,7 @@ K compoundUShort(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type, cha
   else
     H5Dread(dset, cmpd_dset, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
   array = ktn(KI, dims);
-  for(int j = 0; j < dims; j++)
+  for(int j = 0; j < (int)dims; j++)
     kI(array)[j] = *(rdata + j);
   free(rdata);
   H5Tclose(cmpd_dset);
@@ -544,7 +537,6 @@ K compoundUShort(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type, cha
 
 K compoundULong(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type, char *rdtyp){
   hid_t cmpd_dset;
-  int j;
   K array;
   unsigned long *rdata;
   cmpd_dset = H5Tcreate(H5T_COMPOUND, sizeof(unsigned long));
@@ -555,7 +547,7 @@ K compoundULong(hid_t dset, char* memb_name, hsize_t dims, hid_t item_type, char
   else
     H5Dread(dset, cmpd_dset, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
   array = ktn(KJ, dims);
-  for(int j = 0; j < dims; j++)
+  for(int j = 0; j < (int)dims; j++)
     kJ(array)[j] = *(rdata + j);
   free(rdata);
   H5Tclose(cmpd_dset);

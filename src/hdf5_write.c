@@ -8,8 +8,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   // Ensure q types are correct
   if(!checkType("[Cs][Cs][Cs][Ii][Ccs]", fname, dname, aname, kdims, ktype))
     return KNL;
-  htri_t file_nm, aexists;
-  int isdset;
+  htri_t aexists;
   hid_t data, file,attr;
   char *filename = getkstring(fname);
   // Attempt to open file, error out if it doesn't exist

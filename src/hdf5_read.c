@@ -99,7 +99,7 @@ K readData(hid_t data,char *rdtyp){
   // Get type based on form of object being read
   if(strcmp("d",rdtyp)==0)
     dtype = H5Dget_type(data);
-  else if(strcmp("a",rdtyp)==0)
+  else
     dtype = H5Aget_type(data);
   ntype = H5Tget_native_type(dtype,H5T_DIR_ASCEND);
   // Read as a compound datatype if suitable

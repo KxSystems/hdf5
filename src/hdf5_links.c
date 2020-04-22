@@ -48,7 +48,6 @@ EXP K hdf5createHard(K fname, K oname, K lname){
     return KNL;
   K res;
   hid_t file;
-  herr_t status;
   char *filename = getkstring(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
