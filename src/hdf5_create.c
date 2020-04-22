@@ -9,7 +9,7 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   // Check types 
   if(!checkType("[Cs][Cs][Cs][Ii][Ccs]", fname, dname, aname, kdims, ktype))
     return KNL;
-  hid_t file, data, space;
+  hid_t file, data;
   htri_t aexists;
   // Determine the type which the attribute will have (symbol/char vs numeric)
   int  dtype = checkvalid(getkstring(ktype));
@@ -38,7 +38,6 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   if(aexists > 0){
     closeGroupData(file,dataname,data);
     H5Fclose(file);
-    H5Sclose(space);
     free(filename);
     free(dataname);
     free(attrname);
@@ -52,7 +51,6 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   // Clean up
   closeGroupData(file,dataname,data);
   H5Fclose(file);
-  H5Sclose(space);
   free(filename);
   free(dataname);
   free(attrname);

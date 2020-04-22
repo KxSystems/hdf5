@@ -14,7 +14,7 @@ fname:"test.h5";
 // Inititalize the name of the dataset
 dname:"dset";
 
--1"The dataset '",dname,"' will be written to the file ",fname,"\n";
+-1"The dataset '",dname,"' will be written to the file '",fname,"'\n";
 -1"The following is the dataset to be written to file:\n";
 show dset:3 100000#300000?1f;
 

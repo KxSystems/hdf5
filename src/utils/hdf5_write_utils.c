@@ -15,7 +15,7 @@ static void writeFloat(K dset, hid_t data, char *rdtype){
   // Get the dataspace identifier based on if attr/dset
   if(strcmp(rdtype,"d")==0)
     space = H5Dget_space(data);
-  else if(strcmp(rdtype,"a")==0)
+  else
     space = H5Aget_space(data);
   // Allocate the memory needed for writing to hdf5
   long points = H5Sget_simple_extent_npoints(space);
@@ -30,7 +30,7 @@ static void writeByte(K dset, hid_t data, char *rdtype){
   hid_t space;
   if(strcmp(rdtype,"d")==0)
     space = H5Dget_space(data);
-  else if(strcmp(rdtype,"a")==0)
+  else
     space = H5Aget_space(data);
   long points = H5Sget_simple_extent_npoints(space);
   unsigned char *dset_data = (unsigned char *)malloc(points *sizeof(unsigned char));
@@ -43,7 +43,7 @@ static void writeInt(K dset, hid_t data, char *rdtype){
   hid_t space;
   if(strcmp(rdtype,"d")==0)
     space = H5Dget_space(data);
-  else if(strcmp(rdtype,"a")==0)
+  else
     space = H5Aget_space(data);
   long points = H5Sget_simple_extent_npoints(space);
   int *dset_data = (int *)malloc(points *sizeof(int));
@@ -56,7 +56,7 @@ static void writeLong(K dset, hid_t data, char *rdtype){
   hid_t space;
   if(strcmp(rdtype,"d")==0)
     space = H5Dget_space(data);
-  else if(strcmp(rdtype,"a")==0)
+  else
     space = H5Aget_space(data);
   long points = H5Sget_simple_extent_npoints(space);
   long *dset_data = (long *)malloc(points *sizeof(long));
@@ -69,7 +69,7 @@ static void writeReal(K dset, hid_t data, char *rdtype){
   hid_t space;
   if(strcmp(rdtype,"d")==0)
     space = H5Dget_space(data);
-  else if(strcmp(rdtype,"a")==0)
+  else
     space = H5Aget_space(data);
   long points = H5Sget_simple_extent_npoints(space);
   float *dset_data = (float *)malloc(points *sizeof(float));
@@ -82,7 +82,7 @@ static void writeShort(K dset, hid_t data, char *rdtype){
   hid_t space;
   if(strcmp(rdtype,"d")==0)
     space = H5Dget_space(data);
-  else if(strcmp(rdtype,"a")==0)
+  else
     space = H5Aget_space(data);
   long  points = H5Sget_simple_extent_npoints(space);
   short *dset_data = (short *)malloc(points *sizeof(short));
@@ -96,7 +96,7 @@ static void writenumeric(K dset, hid_t data, char *data_attr){
   // Retrieve an identifier to the dataset type
   if(strcmp("d",data_attr)==0)
     dtype = H5Dget_type(data);
-  else if(strcmp("a",data_attr)==0)
+  else
     dtype = H5Aget_type(data);
   // Retrieve the underlying C representation of the type
   ntype = H5Tget_native_type(dtype,H5T_DIR_ASCEND);
@@ -137,7 +137,7 @@ static void writeChar(K dset, hid_t data, char *data_attr){
   }
   if(strcmp(data_attr,"d")==0)
     H5Dwrite(data, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
-  else if(strcmp(data_attr,"a")==0)
+  else
     H5Awrite(data, memtype, wdata);
   free(wdata[0]);
   H5Tclose(memtype);
@@ -146,7 +146,7 @@ static void writeChar(K dset, hid_t data, char *data_attr){
 /* Functionality for writing iteratively writing to numeric types*/
 
 int intwrite(hid_t h5data, K dset, int *data, char *rdtype, long points,int idx){
-  int i,j;
+  int i=0, j;
   if(-KI == dset->t){
     *(data + idx + i) = dset->i;
     idx = idx + 1;
@@ -172,7 +172,7 @@ int intwrite(hid_t h5data, K dset, int *data, char *rdtype, long points,int idx)
   if(((I)points)==idx){
     if(strcmp(rdtype,"d")==0)
       H5Dwrite(h5data, HDF5INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,data);
-    else if(strcmp(rdtype,"a")==0)
+    else
       H5Awrite(h5data, HDF5INT, data);
     return 0;
   }
@@ -180,7 +180,7 @@ int intwrite(hid_t h5data, K dset, int *data, char *rdtype, long points,int idx)
 }
 
 int shortwrite(hid_t h5data, K dset, short *data, char *rdtype, long points,int idx){
-  int i,j;
+  int i=0, j;
   if(-KH == dset->t){
     *(data + idx + i) = dset->h;
     idx = idx + 1;
@@ -206,7 +206,7 @@ int shortwrite(hid_t h5data, K dset, short *data, char *rdtype, long points,int 
   if(((I)points)==idx){
     if(strcmp(rdtype,"d")==0)
       H5Dwrite(h5data, HDF5SHORT, H5S_ALL, H5S_ALL, H5P_DEFAULT,data);
-    else if(strcmp(rdtype,"a")==0)
+    else
       H5Awrite(h5data, HDF5SHORT, data);
     return 0;
   }
@@ -214,7 +214,7 @@ int shortwrite(hid_t h5data, K dset, short *data, char *rdtype, long points,int 
 }
 
 int longwrite(hid_t h5data, K dset, long *data, char *rdtype, long points,int idx){
-  int i,j;
+  int i=0, j;
   if(-KJ == dset->t){
     *(data + idx + i) = dset->j;
     idx = idx + 1;
@@ -240,7 +240,7 @@ int longwrite(hid_t h5data, K dset, long *data, char *rdtype, long points,int id
   if(((I)points)==idx){
     if(strcmp(rdtype,"d")==0)
       H5Dwrite(h5data, HDF5LONG, H5S_ALL, H5S_ALL, H5P_DEFAULT,data);
-    else if(strcmp(rdtype,"a")==0)
+    else
       H5Awrite(h5data, HDF5LONG, data);
     return 0;
   }
@@ -248,7 +248,7 @@ int longwrite(hid_t h5data, K dset, long *data, char *rdtype, long points,int id
 }
 
 int floatwrite(hid_t h5data, K dset, double *data, char *rdtype, long points,int idx){
-  int i,j;
+  int i=0, j;
   if(-KF == dset->t){
     *(data + idx + i) = dset->f;
     idx = idx + 1;
@@ -274,7 +274,7 @@ int floatwrite(hid_t h5data, K dset, double *data, char *rdtype, long points,int
   if(((I)points)==idx){
     if(strcmp(rdtype,"d")==0)
       H5Dwrite(h5data, HDF5FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT,data);
-    else if(strcmp(rdtype,"a")==0)
+    else
       H5Awrite(h5data, HDF5FLOAT, data);
     return 0;
   }
@@ -282,7 +282,7 @@ int floatwrite(hid_t h5data, K dset, double *data, char *rdtype, long points,int
 }
 
 int realwrite(hid_t h5data, K dset, float *data, char *rdtype, long points,int idx){
-  int i,j;
+  int i=0, j;
   if(-KE == dset->t){
     *(data + idx + i) = dset->e;
     idx = idx + 1;
@@ -308,7 +308,7 @@ int realwrite(hid_t h5data, K dset, float *data, char *rdtype, long points,int i
   if(((I)points)==idx){
     if(strcmp(rdtype,"d")==0)
       H5Dwrite(h5data, HDF5REAL, H5S_ALL, H5S_ALL, H5P_DEFAULT,data);
-    else if(strcmp(rdtype,"a")==0)
+    else
       H5Awrite(h5data, HDF5REAL, data);
     return 0;
   }
@@ -316,7 +316,7 @@ int realwrite(hid_t h5data, K dset, float *data, char *rdtype, long points,int i
 }
 
 int bytewrite(hid_t h5data, K dset, unsigned char *data, char *rdtype, long points,int idx){
-  int i,j;
+  int i=0, j;
   if(-KG == dset->t){
     *(data + idx + i) = dset->g;
     idx = idx + 1;
@@ -342,7 +342,7 @@ int bytewrite(hid_t h5data, K dset, unsigned char *data, char *rdtype, long poin
   if(((I)points)==idx){
     if(strcmp(rdtype,"d")==0)
       H5Dwrite(h5data, H5T_NATIVE_UCHAR, H5S_ALL, H5S_ALL, H5P_DEFAULT,data);
-    else if(strcmp(rdtype,"a")==0)
+    else
       H5Awrite(h5data, H5T_NATIVE_UCHAR, data);
     return 0;
   }

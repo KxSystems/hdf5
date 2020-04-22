@@ -91,7 +91,6 @@ int createsimpledataset(hid_t file, char *dataname, K kdims, K ktype){
 
 // Check that the dataset exists
 int checkdataset(hid_t file, char *dataname){
-  hid_t data;
   // Create a buffer for datatype
   H5G_stat_t statbuf;
   // Commit the data information to the buffer
@@ -104,7 +103,6 @@ int checkdataset(hid_t file, char *dataname){
 }
 
 int checkgroup(hid_t file, char *groupname){
-  hid_t data;
   H5G_stat_t statbuf;
   H5Gget_objinfo(file, groupname, 0, &statbuf);
   if(H5G_GROUP == statbuf.type)
@@ -126,6 +124,7 @@ hid_t isGroupData(hid_t file, char *dataname){
     data = H5Dopen(file, dataname, H5P_DEFAULT);
     break;
   default:
+    data = 0;
     break;
   }
   return data;
