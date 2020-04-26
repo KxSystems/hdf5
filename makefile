@@ -4,7 +4,7 @@ endif
 
 W_OPTS         = -Wall -Wno-strict-aliasing -Wno-parentheses -Wextra -Werror -Wsign-compare
 I_OPTS         = -I${HDF5_HOME}/include -Isrc
-L_OPTS         = -L${HDF5_HOME}/lib -lhdf5 -lz -lpthread -lssl -shared
+L_OPTS         = -L${HDF5_HOME}/lib -Wl,-rpath=${HDF5_HOME}/lib -lhdf5 -lz -lpthread -lssl -shared
 OPTS           = -DKXVER=3 -fPIC
 
 MS             = $(shell getconf LONG_BIT)
