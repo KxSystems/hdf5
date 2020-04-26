@@ -6,10 +6,11 @@
 
 #include <stdlib.h>
 #include <string.h>
-
+#include "k.h"
 #include "hdf5.h"
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
+
 #include "hdf5_read_utils.c"
 
 // Function prototypes for utility functions relating to reading of hdf5 data 

@@ -4,10 +4,11 @@
  * themselves do not relate to the other files within this code base explicitly.
 */
 
+#include <stdlib.h>
+#include "k.h"
 #include "hdf5.h"
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
-#include <stdlib.h>
 
 // Retrieve the shape of a dataspace
 K hdf5getShape(hid_t space){

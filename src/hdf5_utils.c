@@ -1,9 +1,10 @@
 /* --- HDF5 utility functions --- */
 
 #include <stdlib.h>
-
-#include "hdf5_utils.h"
+#include "k.h"
+#include "hdf5.h"
 #include "kdb_utils.h"
+#include "hdf5_utils.h"
 
 // Retrieve hdf5 numeric types
 hid_t hdf5typ_from_k(K ktype){

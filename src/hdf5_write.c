@@ -4,10 +4,11 @@
 
 #include <stdlib.h>
 #include <string.h>
-
+#include "k.h"
 #include "hdf5.h"
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
+
 #include "hdf5_write_utils.c"
 
 // Write data to an attribute
