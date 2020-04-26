@@ -1,4 +1,5 @@
-/* --- HDF5 utility functions --- */
+#ifndef HDF5_UTILS_H
+#define HDF5_UTILS_H
 
 #include "hdf5.h"
 #include "k.h"
@@ -49,3 +50,5 @@ void closeGroupData(hid_t file, char *dataname,hid_t data);
 
 // used to check what datatype is being passed in to make decisions on write path
 int checkvalid(char *ktype);
+
+#endif // HDF5_UTILS_H

@@ -1,3 +1,6 @@
+#ifndef KDB_UTILS_H
+#define KDB_UTILS_H
+
 #include "k.h"
 
 #ifdef __GNUC__
@@ -23,3 +26,5 @@ int checkType(const C* tc, ...);
 // create dictionaries as key, val, key, val ...
 K xd0(I n, ...); 
 #define xd(...) xd0(0, __VA_ARGS__, (S) 0)
+
+#endif // KDB_UTILS_H
