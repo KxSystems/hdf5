@@ -2,6 +2,14 @@
  * The following function is used in writing kdb+ data to hdf5 format.
  */
 
+#include <stdlib.h>
+#include <string.h>
+
+#include "hdf5.h"
+#include "kdb_util.h"
+#include "hdf5_utils.h"
+#include "hdf5_write_utils.c"
+
 // Write data to an attribute
 EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   disable_err();
