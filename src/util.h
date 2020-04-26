@@ -1,3 +1,5 @@
+#include "k.h"
+
 #define KNL (K) 0
 
 #define HDF5FLOAT H5T_NATIVE_DOUBLE 
@@ -20,3 +22,12 @@
 #  define EXP
 #endif
 
+// get k string or symbol name
+char * getkstring(K x);
+
+// check types
+int checkType(const C* tc, ...);
+
+// create dictionaries as key, val, key, val ...
+K xd0(I n, ...); 
+#define xd(...) xd0(0, __VA_ARGS__, (S) 0)
