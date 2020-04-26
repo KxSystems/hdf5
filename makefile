@@ -26,8 +26,11 @@ Q     = $(QHOME)/$(QARCH)
 all: src/util.o
 	$(CC) src/util.o $(L_OPTS) $(LNK) -o hdf5.so
 
-src/util.o: src/util.c src/util.h src/k.h
+src/util.o: src/util.c src/k.h
 	$(CC) src/util.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/util.o
+
+src/hdf5_utils.o: src/hdf5_utils.c src/k.h
+	$(CC) src/hdf5_utils.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/hdf5_utils.o
 
 src/k.h:
 	curl -s -L https://github.com/KxSystems/kdb/raw/master/c/c/k.h -o src/k.h
