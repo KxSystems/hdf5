@@ -4,6 +4,13 @@
  * this may need to be reevaluated in order to improve efficiency.
 */
 
+#include <stdlib.h>
+#include <string.h>
+
+#include "hdf5.h"
+#include "kdb_util.h"
+#include "hdf5_utils.h"
+#include "hdf5_read_utils.c"
 
 // Function prototypes for utility functions relating to reading of hdf5 data 
 // these are defined later in this script
