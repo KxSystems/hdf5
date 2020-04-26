@@ -3,6 +3,15 @@
 #include "hdf5.h"
 #include "k.h"
 
+// HDF5 Types
+#define HDF5FLOAT H5T_NATIVE_DOUBLE 
+#define HDF5INT   H5T_NATIVE_INT
+#define HDF5LONG  H5T_NATIVE_LONG
+#define HDF5REAL  H5T_NATIVE_FLOAT
+#define HDF5SHORT H5T_NATIVE_SHORT
+#define HDF5CHAR  H5T_C_S1
+#define HDF5BYTE  H5T_NATIVE_UCHAR
+
 // Retrieve hdf5 numeric types
 hid_t hdf5typ_from_k(K ktype);
 

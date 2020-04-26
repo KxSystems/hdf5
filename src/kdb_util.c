@@ -3,10 +3,10 @@
  * the hdf5 interface but are also generally applicable for other interfaces
 */
 
+#include "kdb_util.h"
+
 #include <stdlib.h>
 #include <string.h>
-
-#include "kdb_util.h"
 
 /* get k string or symbol name */
 char * getkstring(K x){
