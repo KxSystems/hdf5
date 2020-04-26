@@ -23,8 +23,8 @@ endif
 QARCH = $(OSFLAG)$(MS)
 Q     = $(QHOME)/$(QARCH)
 
-all: src/kdb_util.o
-	$(CC) src/kdb_util.o $(L_OPTS) $(LNK) -o hdf5.so
+all: src/kdb_util.o src/hdf5_utils.o src/hdf5_create.o
+	$(CC) src/kdb_util.o src/hdf5_utils.o src/hdf5_create.o $(L_OPTS) $(LNK) -o hdf5.so
 
 src/kdb_util.o: src/kdb_util.c src/k.h
 	$(CC) src/kdb_util.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/kdb_util.o
