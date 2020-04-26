@@ -26,8 +26,11 @@ endif
 QARCH = $(OSFLAG)$(MS)
 Q     = $(QHOME)/$(QARCH)
 
-all: headers/k.h headers/hdf5.h
+all: src/k.h
 	$(CC) hdf5.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) $(L_OPTS) $(LNK) -o $(TGT) $(OSXOPTS)
+
+src/k.h:
+	curl -s -L https://github.com/KxSystems/kdb/raw/master/c/c/k.h -o src/k.h
 
 install:
 	mkdir -p $(QARCH)
