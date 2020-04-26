@@ -251,10 +251,11 @@ EXP K hdf5isObject(K fname, K oname){
   htri_t isobj;
   char *filename = getkstring(fname);
   file  = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  if(file < 0)
+  if(file < 0){
     free(filename);
     H5Fclose(file);
     return krr((S)"file does not exist");
+  }
   char *objname  = getkstring(oname);
   isobj = H5Oexists_by_name(file,objname, H5P_DEFAULT);
   free(filename);
