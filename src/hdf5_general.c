@@ -5,7 +5,7 @@
 */
 
 #include "hdf5.h"
-#include "kdb_util.h"
+#include "kdb_utils.h"
 #include "hdf5_utils.h"
 #include <stdlib.h>
 

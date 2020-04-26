@@ -3,7 +3,7 @@
  * the hdf5 interface but are also generally applicable for other interfaces
 */
 
-#include "kdb_util.h"
+#include "kdb_utils.h"
 
 #include <stdlib.h>
 #include <string.h>

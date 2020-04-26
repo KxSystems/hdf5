@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "hdf5.h"
-#include "kdb_util.h"
+#include "kdb_utils.h"
 #include "hdf5_utils.h"
 #include "hdf5_read_utils.c"
 
@@ -16,7 +16,6 @@
 // these are defined later in this script
 K readData(hid_t data, char *rdtyp);
 K readCompound(hid_t dset, char *rdtyp);
-
 
 // Read data from an attribute associated with a group or dataset
 EXP K hdf5readAttrDataset(K fname, K dname, K aname){

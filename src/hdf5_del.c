@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "hdf5.h"
-#include "kdb_util.h"
+#include "kdb_utils.h"
 #include "hdf5_utils.h"
 
 EXP K hdf5delAttr(K fname, K dname, K aname){

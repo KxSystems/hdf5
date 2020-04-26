@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "hdf5.h"
-#include "kdb_util.h"
+#include "kdb_utils.h"
 #include "hdf5_utils.h"
 
 // This will create a group or set of intermediate groups /group1 ... /group1/group11/group21 

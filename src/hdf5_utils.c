@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "hdf5_utils.h"
-#include "kdb_util.h"
+#include "kdb_utils.h"
 
 // Retrieve hdf5 numeric types
 hid_t hdf5typ_from_k(K ktype){

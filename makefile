@@ -24,11 +24,11 @@ QLIB  = $(QHOME)/$(QARCH)
 
 all: hdf5.so
 
-hdf5.so: src/kdb_util.o src/hdf5_utils.o src/hdf5_create.o src/hdf5_general.o src/hdf5_read.o src/hdf5_write.o src/hdf5_ls.o src/hdf5_groups.o src/hdf5_links.o src/hdf5_del.o
-	$(CC) src/kdb_util.o src/hdf5_utils.o src/hdf5_create.o src/hdf5_general.o src/hdf5_read.o src/hdf5_write.o src/hdf5_ls.o src/hdf5_groups.o src/hdf5_links.o src/hdf5_del.o $(L_OPTS) $(LNK) -o hdf5.so
+hdf5.so: src/kdb_utils.o src/hdf5_utils.o src/hdf5_create.o src/hdf5_general.o src/hdf5_read.o src/hdf5_write.o src/hdf5_ls.o src/hdf5_groups.o src/hdf5_links.o src/hdf5_del.o
+	$(CC) src/kdb_utils.o src/hdf5_utils.o src/hdf5_create.o src/hdf5_general.o src/hdf5_read.o src/hdf5_write.o src/hdf5_ls.o src/hdf5_groups.o src/hdf5_links.o src/hdf5_del.o $(L_OPTS) $(LNK) -o hdf5.so
 
-src/kdb_util.o: src/kdb_util.c src/k.h
-	$(CC) src/kdb_util.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/kdb_util.o
+src/kdb_utils.o: src/kdb_utils.c src/k.h
+	$(CC) src/kdb_utils.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/kdb_utils.o
 
 src/hdf5_utils.o: src/hdf5_utils.c src/k.h
 	$(CC) src/hdf5_utils.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/hdf5_utils.o
