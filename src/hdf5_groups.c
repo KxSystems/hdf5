@@ -1,3 +1,9 @@
+#include <stdlib.h>
+
+#include "hdf5.h"
+#include "kdb_util.h"
+#include "hdf5_utils.h"
+
 // This will create a group or set of intermediate groups /group1 ... /group1/group11/group21 
 EXP K hdf5createGroup(K fname, K gname){
   disable_err();
