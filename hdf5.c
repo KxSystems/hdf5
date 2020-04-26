@@ -9,10 +9,9 @@
 #define EXP
 #endif
 
-#include <hdf5.h>
-#include "headers/k.h"
-#include "headers/q_hdf5.h"
-
+#include "hdf5.h"
+#include "src/k.h"
+#include "src/q_hdf5.h"
 #include "src/utils/utils.c"
 #include "src/utils/hdf5_type_utils.c"
 #include "src/utils/hdf5_utils.c"
