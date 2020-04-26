@@ -29,6 +29,9 @@ all: src/util.o
 src/util.o: src/util.c src/k.h
 	$(CC) src/util.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/util.o
 
+src/hdf5_create.o: src/hdf5_create.c src/k.h
+	$(CC) src/hdf5_create.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/hdf5_create.o
+
 src/hdf5_utils.o: src/hdf5_utils.c src/k.h
 	$(CC) src/hdf5_utils.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/hdf5_utils.o
 
@@ -41,4 +44,4 @@ install:
 	install  $(TGT) $(QARCH)
 
 clean:
-	rm -f src/*.o hdf5.so $(QARCH)/hdf5.so
+	rm -f src/k.h src/*.o hdf5.so $(QARCH)/hdf5.so
