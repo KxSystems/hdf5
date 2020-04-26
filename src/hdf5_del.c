@@ -1,5 +1,11 @@
 /* --- Deletion functionality --- */
 
+#include <stdlib.h>
+
+#include "hdf5.h"
+#include "kdb_util.h"
+#include "hdf5_utils.h"
+
 EXP K hdf5delAttr(K fname, K dname, K aname){
   disable_err();
   if(!checkType("[Cs][Cs][Cs]", fname, dname, aname))
