@@ -2,6 +2,12 @@
  * Function to display the structure of a file 
 */
 
+#include <stdlib.h>
+
+#include "hdf5.h"
+#include "kdb_util.h"
+#include "hdf5_utils.h"
+
 struct opdata {
     unsigned recurs;     // Recursion level.  0=root
     struct opdata *prev; // Pointer to previous opdata
@@ -48,7 +54,7 @@ int group_check(struct opdata *od, haddr_t target_addr){
     return group_check (od->prev, target_addr);
 }
 
-herr_t opfunc(hid_t loc_id, const char *name, const H5L_info_t *info, void *operator_data){
+herr_t opfunc(hid_t loc_id, const char *name, const H5L_info_t * UNUSED(info), void *operator_data){
   herr_t return_val = 0;
   info=0;
   H5O_info_t infobuf;

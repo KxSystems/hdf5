@@ -44,6 +44,9 @@ src/hdf5_read.o: src/hdf5_read.c src/k.h
 src/hdf5_write.o: src/hdf5_write.c src/k.h
 	$(CC) src/hdf5_write.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/hdf5_write.o
 
+src/hdf5_ls.o: src/hdf5_ls.c src/k.h
+	$(CC) src/hdf5_ls.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/hdf5_ls.o
+
 src/k.h:
 	curl -s -L https://github.com/KxSystems/kdb/raw/master/c/c/k.h -o src/k.h
 
