@@ -3,12 +3,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#ifdef _WIN32
-#define EXP __declspec(dllexport)
-#else
-#define EXP
-#endif
-
 #include "hdf5.h"
 #include "src/k.h"
 #include "src/q_hdf5.h"
