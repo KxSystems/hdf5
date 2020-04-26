@@ -3,7 +3,7 @@ ifndef HDF5_HOME
 endif
 
 W_OPTS         = -Wall -Wno-strict-aliasing -Wno-parentheses -Wextra -Werror -Wsign-compare
-I_OPTS         = -I${HDF5_HOME}/include
+I_OPTS         = -I${HDF5_HOME}/include -Isrc
 L_OPTS         = -L${HDF5_HOME}/lib -lhdf5 -lz -lpthread -lssl -shared
 OPTS           = -DKXVER=3 -fPIC
 
@@ -23,8 +23,11 @@ endif
 QARCH = $(OSFLAG)$(MS)
 Q     = $(QHOME)/$(QARCH)
 
-all: src/k.h
-	$(CC) hdf5.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) $(L_OPTS) $(LNK) -o $(TGT) $(OSXOPTS)
+all: src/util.o
+	$(CC) hdf5.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o $(TGT) $(OSXOPTS)
+
+src/util.o: src/util.c src/util.h src/k.h
+	$(CC) src/util.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) $(L_OPTS) $(LNK) -o $(TGT) $(OSXOPTS)
 
 src/k.h:
 	curl -s -L https://github.com/KxSystems/kdb/raw/master/c/c/k.h -o src/k.h
@@ -35,5 +38,4 @@ install:
 	install  $(TGT) $(QARCH)
 
 clean:
-	rm -f hdf5.so
-	rm -f $(QARCH)/hdf5.so
+	rm -f src/*.o hdf5.so $(QARCH)/hdf5.so
