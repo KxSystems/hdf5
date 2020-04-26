@@ -24,10 +24,10 @@ QARCH = $(OSFLAG)$(MS)
 Q     = $(QHOME)/$(QARCH)
 
 all: src/util.o
-	$(CC) hdf5.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o $(TGT) $(OSXOPTS)
+	$(CC) src/util.o $(L_OPTS) $(LNK) -o hdf5.so
 
 src/util.o: src/util.c src/util.h src/k.h
-	$(CC) src/util.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) $(L_OPTS) $(LNK) -o $(TGT) $(OSXOPTS)
+	$(CC) src/util.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/util.o
 
 src/k.h:
 	curl -s -L https://github.com/KxSystems/kdb/raw/master/c/c/k.h -o src/k.h
