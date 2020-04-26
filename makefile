@@ -1,20 +1,25 @@
-OSFLAG :=
-MS :=
+ifndef HDF5_HOME
+ $(error HDF5_HOME must be set to the location of your cloned and installed hdf5-group repository)
+endif
 
+HDF5_INCLUDE   = ${HDF5_HOME}/include
+HDF5_LIB       = ${HDF5_HOME}/lib
+
+I_OPTS         = -I${HDF5_INCLUDE}
 W_OPTS         = -Wall -Wno-strict-aliasing -Wno-parentheses -Wextra -Werror -Wsign-compare
-OPTS           = -DKXVER=3 -shared -fPIC $(W_OPTS)
-LD_COMMON      = -lz -lpthread -lssl -g -O2
-LDOPTS_DYNAMIC = -L/usr/lib/ -lhdf5
+L_OPTS         = -L${HDF5_LIB} -lhdf5 -lz -lpthread -lssl -g -O2
+OPTS           = -DKXVER=3 -shared -fPIC
+
 MS             = $(shell getconf LONG_BIT)
 TGT            = hdf5.so
 
 ifeq ($(shell uname),Linux)
  LNK     = -lrt
  OSFLAG  = l
- OSXOPTS:=
+ OSXOPTS =
 else ifeq ($(shell uname),Darwin)
+ LNK     =
  OSFLAG  = m
- LNK:=
  OSXOPTS = -undefined dynamic_lookup  -mmacosx-version-min=10.12
 endif
 
@@ -22,7 +27,7 @@ QARCH = $(OSFLAG)$(MS)
 Q     = $(QHOME)/$(QARCH)
 
 all: headers/k.h headers/hdf5.h
-	$(CC) hdf5.c -m$(MS) $(OPTS) $(LDOPTS_DYNAMIC) $(LD_COMMON) $(LNK) -o $(TGT) $(OSXOPTS)
+	$(CC) hdf5.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) $(L_OPTS) $(LNK) -o $(TGT) $(OSXOPTS)
 
 install:
 	mkdir -p $(QARCH)
