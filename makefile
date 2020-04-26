@@ -23,7 +23,7 @@ endif
 QARCH = $(OSFLAG)$(MS)
 Q     = $(QHOME)/$(QARCH)
 
-all: src/kdb_util.o src/hdf5_utils.o src/hdf5_create.o
+all: src/kdb_util.o src/hdf5_utils.o src/hdf5_create.o src/hdf5_general.o
 	$(CC) src/kdb_util.o src/hdf5_utils.o src/hdf5_create.o $(L_OPTS) $(LNK) -o hdf5.so
 
 src/kdb_util.o: src/kdb_util.c src/k.h
@@ -34,6 +34,9 @@ src/hdf5_utils.o: src/hdf5_utils.c src/k.h
 
 src/hdf5_create.o: src/hdf5_create.c src/k.h
 	$(CC) src/hdf5_create.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/hdf5_create.o
+
+src/hdf5_general.o: src/hdf5_general.c src/k.h
+	$(CC) src/hdf5_general.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/hdf5_general.o
 
 src/k.h:
 	curl -s -L https://github.com/KxSystems/kdb/raw/master/c/c/k.h -o src/k.h
