@@ -4,6 +4,12 @@
  * soft/hard and symbolic links
 */
 
+#include <stdlib.h>
+
+#include "hdf5.h"
+#include "kdb_util.h"
+#include "hdf5_utils.h"
+
 // Create a symbolic/soft link between a paths within a local hdf5 file
 // and an external link in another hdf5 file.
 /* tname = target file path */
