@@ -8,7 +8,6 @@ L_OPTS         = -L${HDF5_HOME}/lib -Wl,-rpath=${HDF5_HOME}/lib -lhdf5 -lz -lpth
 OPTS           = -DKXVER=3 -fPIC
 
 MS             = $(shell getconf LONG_BIT)
-TGT            = hdf5.so
 
 ifeq ($(shell uname),Linux)
  LNK     = -lrt
@@ -21,9 +20,11 @@ else ifeq ($(shell uname),Darwin)
 endif
 
 QARCH = $(OSFLAG)$(MS)
-Q     = $(QHOME)/$(QARCH)
+QLIB  = $(QHOME)/$(QARCH)
 
-all: src/kdb_util.o src/hdf5_utils.o src/hdf5_create.o src/hdf5_general.o src/hdf5_read.o src/hdf5_write.o src/hdf5_ls.o src/hdf5_groups.o src/hdf5_links.o src/hdf5_del.o
+all: hdf5.so
+
+hdf5.so: src/kdb_util.o src/hdf5_utils.o src/hdf5_create.o src/hdf5_general.o src/hdf5_read.o src/hdf5_write.o src/hdf5_ls.o src/hdf5_groups.o src/hdf5_links.o src/hdf5_del.o
 	$(CC) src/kdb_util.o src/hdf5_utils.o src/hdf5_create.o src/hdf5_general.o src/hdf5_read.o src/hdf5_write.o src/hdf5_ls.o src/hdf5_groups.o src/hdf5_links.o src/hdf5_del.o $(L_OPTS) $(LNK) -o hdf5.so
 
 src/kdb_util.o: src/kdb_util.c src/k.h
@@ -59,10 +60,9 @@ src/hdf5_del.o: src/hdf5_del.c src/k.h
 src/k.h:
 	curl -s -L https://github.com/KxSystems/kdb/raw/master/c/c/k.h -o src/k.h
 
-install:
-	mkdir -p $(QARCH)
-	install  $(TGT) $(Q)
-	install  $(TGT) $(QARCH)
+install: hdf5.so
+	install hdf5.so $(QLIB)
+	install hdf5.q $(QHOME)
 
 clean:
-	rm -f src/k.h src/*.o hdf5.so $(QARCH)/hdf5.so
+	rm -f src/k.h src/*.o hdf5.so
