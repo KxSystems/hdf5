@@ -23,17 +23,17 @@ endif
 QARCH = $(OSFLAG)$(MS)
 Q     = $(QHOME)/$(QARCH)
 
-all: src/util.o
-	$(CC) src/util.o $(L_OPTS) $(LNK) -o hdf5.so
+all: src/kdb_util.o
+	$(CC) src/kdb_util.o $(L_OPTS) $(LNK) -o hdf5.so
 
-src/util.o: src/util.c src/k.h
-	$(CC) src/util.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/util.o
-
-src/hdf5_create.o: src/hdf5_create.c src/k.h
-	$(CC) src/hdf5_create.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/hdf5_create.o
+src/kdb_util.o: src/kdb_util.c src/k.h
+	$(CC) src/kdb_util.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/kdb_util.o
 
 src/hdf5_utils.o: src/hdf5_utils.c src/k.h
 	$(CC) src/hdf5_utils.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/hdf5_utils.o
+
+src/hdf5_create.o: src/hdf5_create.c src/k.h
+	$(CC) src/hdf5_create.c -m$(MS) $(OPTS) $(I_OPTS) $(W_OPTS) -c -o src/hdf5_create.o
 
 src/k.h:
 	curl -s -L https://github.com/KxSystems/kdb/raw/master/c/c/k.h -o src/k.h

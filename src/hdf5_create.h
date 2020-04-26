@@ -4,7 +4,7 @@
 */
 
 #include "k.h"
-#include "util.h"
+#include "kdb_util.h"
 
 EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype);
 
