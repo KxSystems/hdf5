@@ -2,13 +2,10 @@ ifndef HDF5_HOME
  $(error HDF5_HOME must be set to the location of your cloned and installed hdf5-group repository)
 endif
 
-HDF5_INCLUDE   = ${HDF5_HOME}/include
-HDF5_LIB       = ${HDF5_HOME}/lib
-
-I_OPTS         = -I${HDF5_INCLUDE}
 W_OPTS         = -Wall -Wno-strict-aliasing -Wno-parentheses -Wextra -Werror -Wsign-compare
-L_OPTS         = -L${HDF5_LIB} -lhdf5 -lz -lpthread -lssl -g -O2
-OPTS           = -DKXVER=3 -shared -fPIC
+I_OPTS         = -I${HDF5_HOME}/include
+L_OPTS         = -L${HDF5_HOME}/lib -lhdf5 -lz -lpthread -lssl -shared
+OPTS           = -DKXVER=3 -fPIC
 
 MS             = $(shell getconf LONG_BIT)
 TGT            = hdf5.so
