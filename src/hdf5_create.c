@@ -5,9 +5,9 @@
 
 #include <stdlib.h>
 
-#include "hdf5_create.h"
-#include "hdf5_utils.h"
 #include "hdf5.h"
+#include "kdb_util.h"
+#include "hdf5_utils.h"
 
 EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   // Disable the in built hdf5 errors
