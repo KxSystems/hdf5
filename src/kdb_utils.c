@@ -32,7 +32,7 @@ char * kdbGetString(K x){
       str[len] = 0;
       break;
     default:
-      krr("type");
+      krr((S)"type");
   }
   return str;
 }
