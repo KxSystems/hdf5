@@ -122,24 +122,15 @@ static void writeChar(K dset, hid_t data, char *data_attr){
   // Create a variable length memory space to store the K chars
   hid_t memtype = H5Tcopy(H5T_C_S1);
   H5Tset_size(memtype, H5T_VARIABLE);
-  // if singular char/char array the data is 1 dimensional
-  if((KC == dset->t) || -KC == dset->t)
-    arr = 1;
-  else
-    arr = dset->n;
-  // set char array to hold the q data
-  char *wdata[arr];
-  if((KC == dset->t) || -KC == dset->t)
-   wdata[0] = getkstring(dset);
-  else{
-    for(i=0;i<dset -> n;i++)
-      wdata[i] = getkstring(kK(dset)[i]);
-  }
+  arr = dset->n;
+  char **wdata = malloc(sizeof(char*) * arr);
+  for(i=0;i<arr;i++)
+    wdata[i]= getkstring(kK(dset)[i]);
   if(strcmp(data_attr,"d")==0)
     H5Dwrite(data, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
   else
     H5Awrite(data, memtype, wdata);
-  free(wdata[0]);
+  free(wdata);
   H5Tclose(memtype);
 }
 
