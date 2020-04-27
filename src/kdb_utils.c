@@ -3,8 +3,13 @@
  * the hdf5 interface but are also generally applicable for other interfaces
 */
 
+#include "kdb_utils.h"
+
+#include <stdlib.h>
+#include <string.h>
+
 /* get k string or symbol name */
-static char * getkstring(K x){
+char * getkstring(K x){
   char *s=NULL;
   int len;
   switch (xt){
@@ -21,7 +26,7 @@ static char * getkstring(K x){
 }
 
 /* type checking functionality */
-static I checkType(const C* tc, ...){
+int checkType(const C* tc, ...){
   va_list args;
   K x;
   static C lt[256]= " tvunzdmpscfejihg xb*BX GHIJEFCSPMDZNUVT";
@@ -70,6 +75,3 @@ K xd0(I n, ...){
   va_end(a);
   return xD(y, z);
 }
-
-#define xd(...) xd0(0, __VA_ARGS__, (S) 0)
-

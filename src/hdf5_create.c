@@ -3,6 +3,12 @@
  * objects, links or h5 files using this interface.
 */
 
+#include <stdlib.h>
+#include "k.h"
+#include "hdf5.h"
+#include "kdb_utils.h"
+#include "hdf5_utils.h"
+
 EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   // Disable the in built hdf5 errors
   disable_err();
