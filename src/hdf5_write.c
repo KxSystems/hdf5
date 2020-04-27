@@ -15,7 +15,7 @@
 EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   disable_err();
   // Ensure q types are correct
-  if(!checkType("[Cs][Cs][Cs][Ii][Ccs]", fname, dname, aname, kdims, ktype))
+  if(!kdbCheckType("[Cs][Cs][Cs][Ii][Ccs]", fname, dname, aname, kdims, ktype))
     return KNL;
   htri_t aexists;
   hid_t data, file,attr;
@@ -98,7 +98,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
 
 EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   disable_err();
-  if(!checkType("[Cs][Cs][Ii][Ccs]", fname, dname, kdims, ktype))
+  if(!kdbCheckType("[Cs][Cs][Ii][Ccs]", fname, dname, kdims, ktype))
     return KNL;
   htri_t file_nm;
   int isdset;

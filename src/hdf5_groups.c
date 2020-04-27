@@ -7,7 +7,7 @@
 // This will create a group or set of intermediate groups /group1 ... /group1/group11/group21 
 EXP K hdf5createGroup(K fname, K gname){
   disable_err();
-  if(!checkType("[Cs][Cs]", fname, gname))
+  if(!kdbCheckType("[Cs][Cs]", fname, gname))
     return KNL;
   K res;
   // gcpl -> group creation property list

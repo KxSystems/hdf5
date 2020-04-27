@@ -19,7 +19,7 @@ herr_t opfunc(hid_t loc_id, const char *name, const H5L_info_t *info, void *oper
 
 EXP K hdf5ls(K fname){
   disable_err();
-  if(!checkType("[Cs]",fname))
+  if(!kdbCheckType("[Cs]",fname))
     return KNL;
   char *filename = getkstring(fname);
   hid_t file;

@@ -8,7 +8,7 @@
 
 EXP K hdf5delAttr(K fname, K dname, K aname){
   disable_err();
-  if(!checkType("[Cs][Cs][Cs]", fname, dname, aname))
+  if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
     return KNL;
   K res;
   hid_t file, data;

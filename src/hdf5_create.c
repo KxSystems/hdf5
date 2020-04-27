@@ -13,7 +13,7 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   // Disable the in built hdf5 errors
   disable_err();
   // Check types 
-  if(!checkType("[Cs][Cs][Cs][Ii][Ccs]", fname, dname, aname, kdims, ktype))
+  if(!kdbCheckType("[Cs][Cs][Cs][Ii][Ccs]", fname, dname, aname, kdims, ktype))
     return KNL;
   hid_t file, data;
   htri_t aexists;
@@ -67,7 +67,7 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
 EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   // Disable errors from hdf5
   disable_err();
-  if(!checkType("[Cs][Cs][Ii][Ccs]", fname, dname, kdims, ktype))
+  if(!kdbCheckType("[Cs][Cs][Ii][Ccs]", fname, dname, kdims, ktype))
     return KNL;
   htri_t file_nm;
   hid_t file;
@@ -110,7 +110,7 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
 EXP K hdf5createFile(K fname){
   // Disable errors from hdf5
   disable_err();
-  if(!checkType("[Cs]",fname))
+  if(!kdbCheckType("[Cs]",fname))
     return KNL;
   char *filename = getkstring(fname);
   createfile(filename);

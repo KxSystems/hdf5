@@ -20,8 +20,8 @@
 // get k string or symbol name
 char * getkstring(K x);
 
-// check types
-int checkType(const C* tc, ...);
+// check types of args
+int kdbCheckType(const char *typePattern, ...);
 
 // create dictionary (key, val, key, val, ...)
 K kdbCreateDict0(void *dummy, ...);

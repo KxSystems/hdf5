@@ -26,41 +26,43 @@ char * getkstring(K x){
   return s;
 }
 
-/* type checking functionality */
-int checkType(const C* tc, ...){
+// check types of args
+int kdbCheckType(const char *typePattern, ...){
+  int match = 0;
+  static char errstr[256];
+  static char ktypes[256] = " tvunzdmpscfejihg xb*BX GHIJEFCSPMDZNUVT";
+  ktypes[20 + 98] = '+';
+  ktypes[20 + 99] = '!';
+  K arg;
+  short argtype;
   va_list args;
-  K x;
-  static C lt[256]= " tvunzdmpscfejihg xb*BX GHIJEFCSPMDZNUVT";
-  static C b[256];
-  const C* tc0= tc;
-  I match=0;
-  lt[20 + 98]= '+';
-  lt[20 + 99]= '!';
-  va_start(args, tc);
-  for(; *tc;){
-    match= 0;
-    x= va_arg(args, K);
-    if(!x){
-      strcpy(b, "incomplete type string ");
+  va_start(args, typePattern);
+  const C* tc = typePattern;
+  while(*tc){
+    match = 0;
+    arg = va_arg(args, K);
+    if(!arg){
+      strcpy(errstr, "incomplete type string");
       break;
     };
+    argtype = 20 + arg->t;
     if('[' == *tc){
-      while(*tc && ']' != *tc){
-        match= match || lt[20 + xt] == *tc;
+      while( *tc && (']' != *tc) ){
+        match = match || (ktypes[argtype] == *tc);
         ++tc;
       }
     }
     else
-      match= lt[20 + xt] == *tc;
+      match = ktypes[argtype] == *tc;
     if(!match){
-      strcat(strcpy(b, "type:expected "), tc0);
+      strcat(strcpy(errstr, "type: expected "), typePattern);
       break;
-    };
+    }
     ++tc;
   }
   va_end(args);
   if(!match)
-    krr(b);
+    krr(errstr);
   return match;
 }
 

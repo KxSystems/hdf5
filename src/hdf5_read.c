@@ -22,7 +22,7 @@ K readCompound(hid_t dset, char *rdtyp);
 EXP K hdf5readAttrDataset(K fname, K dname, K aname){
   disable_err();
   // Type check inputs
-  if(!checkType("[Cs][Cs][Cs]", fname, dname,aname))
+  if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname,aname))
     return KNL;
   // Define required elements
   K result;
@@ -69,7 +69,7 @@ EXP K hdf5readAttrDataset(K fname, K dname, K aname){
 EXP K hdf5readDataset(K fname, K dname){
   disable_err();
   // Type check inputs
-  if(!checkType("[Cs][Cs]", fname, dname))
+  if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
   // Define required elements
   K result;
