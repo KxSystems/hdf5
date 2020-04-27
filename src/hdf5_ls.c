@@ -18,7 +18,6 @@ int group_check(struct opdata *od, haddr_t target_addr);
 herr_t opfunc(hid_t loc_id, const char *name, const H5L_info_t *info, void *operator_data);
 
 EXP K hdf5ls(K fname){
-  disable_err();
   if(!kdbCheckType("[Cs]",fname))
     return KNL;
   char *filename = kdbGetString(fname);

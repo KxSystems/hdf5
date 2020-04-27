@@ -6,6 +6,11 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
+K hdf5init(K UNUSED(dummy)){
+  disable_err();
+  return KNL;
+}
+
 // Retrieve hdf5 numeric types
 hid_t hdf5typ_from_k(K ktype){
   hid_t val;
@@ -46,13 +51,8 @@ hid_t hdf5typ_from_k(K ktype){
   return val;
 }
 
-K hdf5init(K UNUSED(dummy)){
-  H5Eset_auto1(NULL,NULL);
-  return KNL;
-}
-
 // Disable errors from hdf5 side
-void disable_err(void){}
+void disable_err(void){H5Eset_auto1(NULL,NULL);}
 
 // check if a file/attribute exists
 htri_t ish5(char *filename){return H5Fis_hdf5(filename);}

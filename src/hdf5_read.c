@@ -20,8 +20,6 @@ K readCompound(hid_t dset, char *rdtyp);
 
 // Read data from an attribute associated with a group or dataset
 EXP K hdf5readAttrDataset(K fname, K dname, K aname){
-  disable_err();
-  // Type check inputs
   if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname,aname))
     return KNL;
   // Define required elements
@@ -67,8 +65,6 @@ EXP K hdf5readAttrDataset(K fname, K dname, K aname){
 
 // Read data from a signularly typed HDF5 dataset
 EXP K hdf5readDataset(K fname, K dname){
-  disable_err();
-  // Type check inputs
   if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
   // Define required elements

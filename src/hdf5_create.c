@@ -10,9 +10,6 @@
 #include "hdf5_utils.h"
 
 EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
-  // Disable the in built hdf5 errors
-  disable_err();
-  // Check types 
   if(!kdbCheckType("[Cs][Cs][Cs][Ii][Ccs]", fname, dname, aname, kdims, ktype))
     return KNL;
   hid_t file, data;
@@ -63,10 +60,7 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   return 0;
 }
 
-
 EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
-  // Disable errors from hdf5
-  disable_err();
   if(!kdbCheckType("[Cs][Cs][Ii][Ccs]", fname, dname, kdims, ktype))
     return KNL;
   htri_t file_nm;
@@ -106,11 +100,8 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   return 0;
 }
 
-
 EXP K hdf5createFile(K fname){
-  // Disable errors from hdf5
-  disable_err();
-  if(!kdbCheckType("[Cs]",fname))
+  if(!kdbCheckType("[Cs]", fname))
     return KNL;
   char *filename = kdbGetString(fname);
   createfile(filename);

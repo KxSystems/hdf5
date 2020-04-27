@@ -28,8 +28,6 @@ K hdf5getShape(hid_t space){
 }
 
 EXP K hdf5getDataShape(K fname, K dname){
-  disable_err();
-  // Check datatypes are relevant
   if(!kdbCheckType("[Cs][Cs]",fname,dname))
     return KNL;
   // Assign appropriate elements
@@ -64,8 +62,6 @@ EXP K hdf5getDataShape(K fname, K dname){
 }
 
 EXP K hdf5getDataPoints(K fname, K dname){
-  disable_err();
-  // Check relevant datatypes
   if(!kdbCheckType("[Cs][Cs]",fname,dname))
     return KNL;
   // Assign appropriate elements
@@ -101,7 +97,6 @@ EXP K hdf5getDataPoints(K fname, K dname){
 }
 
 EXP K hdf5getAttrShape(K fname, K dname, K aname){
-  disable_err();
   if(!kdbCheckType("[Cs][Cs][Cs]",fname,dname,aname))
     return KNL;
   K kdims;
@@ -146,7 +141,6 @@ EXP K hdf5getAttrShape(K fname, K dname, K aname){
 }
 
 EXP K hdf5getAttrPoints(K fname, K dname, K aname){
-  disable_err();
   if(!kdbCheckType("[Cs][Cs][Cs]",fname,dname,aname))
     return KNL;
   hid_t file, data, attr, space;
@@ -192,7 +186,6 @@ EXP K hdf5getAttrPoints(K fname, K dname, K aname){
 
 // Is the file being passed a hdf5 file
 EXP K hdf5ishdf5(K fname){
-  disable_err();
   if(!kdbCheckType("[Cs]",fname))
     return KNL;
   htri_t file_nm;
@@ -210,7 +203,6 @@ EXP K hdf5ishdf5(K fname){
 
 // Does the requested attribute exist
 EXP K hdf5isAttr(K fname, K dname, K aname){
-  disable_err();
   if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
     return KNL;
   hid_t file, data;
@@ -250,7 +242,6 @@ EXP K hdf5isAttr(K fname, K dname, K aname){
 // Does the requested object (group/dataset exist)
 /* oname = object name */ 
 EXP K hdf5isObject(K fname, K oname){
-  disable_err();
   if(!kdbCheckType("[Cs][Cs]", fname, oname))
     return KNL;
   hid_t file;
@@ -276,7 +267,6 @@ EXP K hdf5isObject(K fname, K oname){
 
 // Return the major/minor and release versions as a dictionary
 EXP K hdf5version(K UNUSED(x)){
-  disable_err();
   unsigned int maj, min, rel;
   if(H5get_libversion(&maj, &min, &rel)<0)
     return krr((S)"Error evaluating version of HDF5 C api");
@@ -286,13 +276,11 @@ EXP K hdf5version(K UNUSED(x)){
 
 // Garbage collection for hdf5 interface, return the data collected from free lists
 EXP K hdf5gc(K UNUSED(x)){
-  disable_err();
   return ki(H5garbage_collect());
 }
 
 // Return the rank, type, and dimensionality of the dataset
 EXP K hdf5datasetInfo(K fname, K dname){
-  disable_err();
   if(!kdbCheckType("[Cs][Cs]",fname,dname))
     return KNL;
   K kdims, kdtype;
@@ -355,7 +343,6 @@ EXP K hdf5datasetInfo(K fname, K dname){
  * odest = destination object
 */
 EXP K hdf5copyObject(K fname, K oname, K fdest, K odest){
-  disable_err();
   if(!kdbCheckType("[Cs][Cs][Cs][Cs]",fname, oname, fdest, odest))
     return KNL;
   char *filename = kdbGetString(fname);
@@ -390,7 +377,6 @@ EXP K hdf5copyObject(K fname, K oname, K fdest, K odest){
 
 // Get the size of a hdf5 file in megabytes
 EXP K hdf5fileSize(K fname){
-  disable_err();
   if(!kdbCheckType("[Cs]",fname))
     return KNL;
   char *filename = kdbGetString(fname);
@@ -411,7 +397,6 @@ EXP K hdf5fileSize(K fname){
 }
 
 EXP K hdf5dataSize(K fname, K dname){
-  disable_err();
   if(!kdbCheckType("[Cs][Cs]",fname,dname))
     return KNL;
   char *filename = kdbGetString(fname);

@@ -15,7 +15,6 @@
 /* tname = target file path */
 /* tobj = object path in target file */
 EXP K hdf5createExternal(K fname, K lname, K tname, K tobj){
-  disable_err();
   if(!kdbCheckType("[Cs][Cs][Cs][Cs]", fname, lname, tname, tobj))
     return KNL;
   K res;
@@ -49,7 +48,6 @@ EXP K hdf5createExternal(K fname, K lname, K tname, K tobj){
 /* oname = name of the object being linked to */
 /* lname = linking path name */
 EXP K hdf5createHard(K fname, K oname, K lname){
-  disable_err();
   if(!kdbCheckType("[Cs][Cs][Cs]", fname, oname, lname))
     return KNL;
   K res;
@@ -79,7 +77,6 @@ EXP K hdf5createHard(K fname, K oname, K lname){
 /* tpath = target path (may be dangling) */
 /* lpath = soft link path */
 EXP K hdf5createSoft(K fname,K tpath,K lname){
-  disable_err();
   if(!kdbCheckType("[Cs][Cs][Cs]", fname, tpath, lname))
     return KNL;
   K res;
@@ -107,7 +104,6 @@ EXP K hdf5createSoft(K fname,K tpath,K lname){
 
 // Delete a hard/soft or external link
 EXP K hdf5delLink(K fname, K lname){
-  disable_err();
   if(!kdbCheckType("[Cs][Cs]", fname, lname))
     return KNL;
   K res;
