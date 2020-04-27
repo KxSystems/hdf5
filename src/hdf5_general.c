@@ -281,7 +281,7 @@ EXP K hdf5version(K UNUSED(x)){
   if(H5get_libversion(&maj, &min, &rel)<0)
     return krr((S)"Error evaluating version of HDF5 C api");
   else
-    return xd("Major",kj(maj),"Minor",kj(min),"Release",kj(rel));
+    return kdbCreateDict("Major", kj(maj), "Minor", kj(min), "Release", kj(rel));
 }
 
 // Garbage collection for hdf5 interface, return the data collected from free lists
@@ -346,7 +346,7 @@ EXP K hdf5datasetInfo(K fname, K dname){
   H5Fclose(file);
   H5Tclose(dtype);
   H5Tclose(ntype);
-  return xd("type",kdtype,"ndims",ki(rank),"dims",kdims);
+  return kdbCreateDict("type", kdtype, "ndims", ki(rank), "dims", kdims);
 }
 
 // Copy the contents of one object to another location within a file or in a completely different file

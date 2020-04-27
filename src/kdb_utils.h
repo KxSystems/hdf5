@@ -23,8 +23,8 @@ char * getkstring(K x);
 // check types
 int checkType(const C* tc, ...);
 
-// create dictionaries as key, val, key, val ...
-K xd0(I n, ...); 
-#define xd(...) xd0(0, __VA_ARGS__, (S) 0)
+// create dictionary (key, val, key, val, ...)
+K kdbCreateDict0(void *dummy, ...);
+#define kdbCreateDict(...) kdbCreateDict0(0, __VA_ARGS__, (S)0)
 
 #endif // KDB_UTILS_H

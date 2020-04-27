@@ -5,6 +5,7 @@
 
 #include "kdb_utils.h"
 
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -63,15 +64,18 @@ int checkType(const C* tc, ...){
   return match;
 }
 
-/* functionality to create dictionaries as key,val,key,val */
-K xd0(I n, ...){
-  va_list a;
-  S s;
-  K x, y= ktn(KS, n), z= ktn(0, n);
-  y->n=0;z->n=0;
-  va_start(a, n);
-  for(; s= va_arg(a, S), s && (x= va_arg(a, K));)
-    js(&y, ss(s)), jk(&z, x);
-  va_end(a);
-  return xD(y, z);
+// create dictionary (key, val, key, val, ...)
+K kdbCreateDict0(void *dummy, ...){
+  va_list args;
+  K keys = ktn(KS, 0);
+  K vals = ktn(0 , 0);
+  S key;
+  K val;
+  va_start(args, dummy);
+  while( (key=va_arg(args, S)) && (val=va_arg(args, K)) ){
+    js(&keys, ss(key));
+    jk(&vals, val);
+  }
+  va_end(args);
+  return xD(keys, vals);
 }
