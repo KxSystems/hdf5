@@ -1,14 +1,60 @@
 /* --- HDF5 utility functions --- */
 
+#include <stdlib.h>
+#include "k.h"
+#include "hdf5.h"
+#include "kdb_utils.h"
+#include "hdf5_utils.h"
+
+// Retrieve hdf5 numeric types
+hid_t hdf5typ_from_k(K ktype){
+  hid_t val;
+  char* kstring = getkstring(ktype);
+  char typ = kstring[0];
+  switch(typ){
+    case 'i':
+    case 'b':
+    case 'd':
+    case 'u':
+    case 'v':
+    case 't':
+      val = HDF5INT;
+      break;
+    case 'j':
+    case 'p':
+    case 'n':
+      val = HDF5LONG;
+      break;
+    case 'f':
+    case 'z':
+      val = HDF5FLOAT;
+      break;
+    case 'e':
+      val = HDF5REAL;
+      break;
+    case 'h':
+      val = HDF5SHORT;
+      break;
+    case 'x':
+      val = H5T_NATIVE_UCHAR;
+      break;
+    default:
+      val = 0;
+  }
+  // Clean up
+  free(kstring);
+  return val;
+}
+
 // Disable errors from hdf5 side
-static void disable_err(void){H5Eset_auto1(NULL,NULL);}
+void disable_err(void){H5Eset_auto1(NULL,NULL);}
 
 // check if a file/attribute exists
 htri_t ish5(char *filename){return H5Fis_hdf5(filename);}
 htri_t isattr(hid_t data,char *attrname){return H5Aexists(data, attrname);}
 
 // Create a file based on name
-static void createfile(char *filename){H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);}
+void createfile(char *filename){H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);}
 
 // Create a string attribute
 int createstrattr(hid_t data, char *attrname, K kdims){
@@ -26,7 +72,6 @@ int createstrattr(hid_t data, char *attrname, K kdims){
   H5Tclose(filetype);
   return 1;
 }
-
 
 // Used for the creation of simple attributes for types ijhef
 int createsimpleattr(hid_t data, char *attrname, K kdims, K ktype){
@@ -131,7 +176,7 @@ hid_t isGroupData(hid_t file, char *dataname){
 }
 
 // Close the group or datatype depending on object type
-static void closeGroupData(hid_t file, char *dataname,hid_t data){
+void closeGroupData(hid_t file, char *dataname,hid_t data){
   H5G_stat_t statbuf;
   H5Gget_objinfo(file, dataname, 0, &statbuf);
   switch(statbuf.type){

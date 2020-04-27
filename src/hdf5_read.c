@@ -4,12 +4,19 @@
  * this may need to be reevaluated in order to improve efficiency.
 */
 
+#include <stdlib.h>
+#include <string.h>
+#include "k.h"
+#include "hdf5.h"
+#include "kdb_utils.h"
+#include "hdf5_utils.h"
+
+#include "hdf5_read_utils.c"
 
 // Function prototypes for utility functions relating to reading of hdf5 data 
 // these are defined later in this script
 K readData(hid_t data, char *rdtyp);
 K readCompound(hid_t dset, char *rdtyp);
-
 
 // Read data from an attribute associated with a group or dataset
 EXP K hdf5readAttrDataset(K fname, K dname, K aname){
