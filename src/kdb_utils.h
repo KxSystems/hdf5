@@ -17,8 +17,8 @@
 
 #define KNL (K) 0
 
-// get k string or symbol name
-char * getkstring(K x);
+// get string from kdb char, string or symbol
+char * kdbGetString(K x);
 
 // check types of args
 int kdbCheckType(const char *typePattern, ...);

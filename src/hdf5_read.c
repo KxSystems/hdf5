@@ -27,9 +27,9 @@ EXP K hdf5readAttrDataset(K fname, K dname, K aname){
   // Define required elements
   K result;
   hid_t file, data, attr;
-  char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
-  char *attrname = getkstring(aname);
+  char *filename = kdbGetString(fname);
+  char *dataname = kdbGetString(dname);
+  char *attrname = kdbGetString(aname);
   // Open file and dataset
   file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
   // error if file doesn't exist
@@ -74,8 +74,8 @@ EXP K hdf5readDataset(K fname, K dname){
   // Define required elements
   K result;
   hid_t file, data;
-  char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
+  char *filename = kdbGetString(fname);
+  char *dataname = kdbGetString(dname);
   // Open file and dataset
   file   = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
   if(file < 0){

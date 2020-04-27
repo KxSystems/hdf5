@@ -21,7 +21,7 @@ EXP K hdf5ls(K fname){
   disable_err();
   if(!kdbCheckType("[Cs]",fname))
     return KNL;
-  char *filename = getkstring(fname);
+  char *filename = kdbGetString(fname);
   hid_t file;
   H5O_info_t infobuf;
   struct opdata od;

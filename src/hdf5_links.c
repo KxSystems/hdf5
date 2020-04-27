@@ -20,16 +20,16 @@ EXP K hdf5createExternal(K fname, K lname, K tname, K tobj){
     return KNL;
   K res;
   hid_t file;
-  char *filename = getkstring(fname);
+  char *filename = kdbGetString(fname);
   file = H5Fopen(filename,  H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
     H5Fclose(file);
     return krr((S)"file does not exist");
   }
-  char *linkname = getkstring(lname);
-  char *targetnm = getkstring(tname);
-  char *tobjname = getkstring(tobj);
+  char *linkname = kdbGetString(lname);
+  char *targetnm = kdbGetString(tname);
+  char *tobjname = kdbGetString(tobj);
   // Create link to external location
   if(H5Lcreate_external(targetnm, tobjname, file, linkname, H5P_DEFAULT, H5P_DEFAULT)<0)
     res = krr((S)"Creation of external link unsuccessful");
@@ -54,15 +54,15 @@ EXP K hdf5createHard(K fname, K oname, K lname){
     return KNL;
   K res;
   hid_t file;
-  char *filename = getkstring(fname);
+  char *filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
     H5Fclose(file);
     return krr((S)"file does not exist");
   }
-  char *objname  = getkstring(oname);
-  char *linkname = getkstring(lname);
+  char *objname  = kdbGetString(oname);
+  char *linkname = kdbGetString(lname);
   // Create hard link between two physical locations within a file
   if(H5Lcreate_hard(file, objname, H5L_SAME_LOC, linkname, H5P_DEFAULT, H5P_DEFAULT)<0)
     res = krr((S)"Creation of hard link unsuccessful");
@@ -84,9 +84,9 @@ EXP K hdf5createSoft(K fname,K tpath,K lname){
     return KNL;
   K res;
   hid_t file;
-  char *filename = getkstring(fname);
-  char *tarname  = getkstring(tpath);
-  char *linkname = getkstring(lname);
+  char *filename = kdbGetString(fname);
+  char *tarname  = kdbGetString(tpath);
+  char *linkname = kdbGetString(lname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
@@ -112,14 +112,14 @@ EXP K hdf5delLink(K fname, K lname){
     return KNL;
   K res;
   hid_t file;
-  char *filename = getkstring(fname);
+  char *filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
     H5Fclose(file);
     return krr((S)"file does not exist");
   }
-  char *linkname = getkstring(lname);
+  char *linkname = kdbGetString(lname);
   if(H5Ldelete(file, linkname, H5P_DEFAULT)<0)
     res = krr("could not delete specified link");
   else

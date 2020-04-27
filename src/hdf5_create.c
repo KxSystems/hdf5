@@ -18,10 +18,10 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   hid_t file, data;
   htri_t aexists;
   // Determine the type which the attribute will have (symbol/char vs numeric)
-  int  dtype = checkvalid(getkstring(ktype));
-  char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
-  char *attrname = getkstring(aname);
+  int  dtype = checkvalid(kdbGetString(ktype));
+  char *filename = kdbGetString(fname);
+  char *dataname = kdbGetString(dname);
+  char *attrname = kdbGetString(aname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   // Error if the file doesn't exist attributes only added to existing groups/dsets
   if(file < 0){
@@ -71,9 +71,9 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
     return KNL;
   htri_t file_nm;
   hid_t file;
-  char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
-  int  dtype = checkvalid(getkstring(ktype));
+  char *filename = kdbGetString(fname);
+  char *dataname = kdbGetString(dname);
+  int  dtype = checkvalid(kdbGetString(ktype));
   // Create a file is it does not exist
   file_nm = ish5(filename);
   if((file_nm == 0) || file_nm < 0)
@@ -112,7 +112,7 @@ EXP K hdf5createFile(K fname){
   disable_err();
   if(!kdbCheckType("[Cs]",fname))
     return KNL;
-  char *filename = getkstring(fname);
+  char *filename = kdbGetString(fname);
   createfile(filename);
   // Clean up
   free(filename);

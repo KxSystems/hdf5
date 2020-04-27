@@ -19,7 +19,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
     return KNL;
   htri_t aexists;
   hid_t data, file,attr;
-  char *filename = getkstring(fname);
+  char *filename = kdbGetString(fname);
   // Attempt to open file, error out if it doesn't exist
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
@@ -27,7 +27,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
     H5Fclose(file);
     return(krr((S)"file does not exist"));
   }
-  char *dataname = getkstring(dname);
+  char *dataname = kdbGetString(dname);
   // is dname a group/dataset, error out on issue
   data = isGroupData(file, dataname);
   if(data < 0){
@@ -36,8 +36,8 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
     H5Fclose(file);
     return(krr((S)"dataset or group to write attribute to does not exist"));
   }
-  char *attrname = getkstring(aname);
-  char *ktyp = getkstring(ktype);
+  char *attrname = kdbGetString(aname);
+  char *ktyp = kdbGetString(ktype);
   // Check if type that is to be written to is numeric
   if(1 == checkvalid(ktyp)){
     // Does the attribute already exist
@@ -103,7 +103,7 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   htri_t file_nm;
   int isdset;
   hid_t data, file;
-  char *filename = getkstring(fname);
+  char *filename = kdbGetString(fname);
   // Create a file is it does not exist
   file_nm = ish5(filename);
   if(file_nm < 0)
@@ -113,8 +113,8 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
     return krr((S)"This file already exists and is not a hdf5 file");
   }
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  char *dataname = getkstring(dname);
-  char *ktyp = getkstring(ktype);
+  char *dataname = kdbGetString(dname);
+  char *ktyp = kdbGetString(ktype);
   // Create the appropriate dataset if it doesn't exist typed appropriately
   isdset = checkdataset(file, dataname);
   if(1 == checkvalid(ktyp)){

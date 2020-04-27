@@ -9,30 +9,40 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* get k string or symbol name */
-char * getkstring(K x){
-  char *s=NULL;
+// get string from kdb char, string or symbol
+char * kdbGetString(K x){
+  char *str = NULL;
   int len;
   switch (xt){
-    case -KC :
-      s = calloc(2,1); s[0] = xg; break;
-    case KC :
-      s = calloc(1+xn,1); memmove(s, xG, xn); break;
-    case -KS : 
-      len = 1+strlen(xs);
-      s = calloc(len,1); memmove(s, xs, len); break;
-    default : krr("invalid name");
+    case -KC:
+      str = malloc(2);
+      str[0] = xg;
+      str[1] = 0;
+      break;
+    case  KC:
+      str = malloc(1+xn);
+      memmove(str, xG, xn);
+      str[xn] = 0;
+      break;
+    case -KS: 
+      len = 1 + strlen(xs);
+      str = malloc(len);
+      memmove(str, xs, len);
+      str[len] = 0;
+      break;
+    default:
+      krr("type");
   }
-  return s;
+  return str;
 }
 
 // check types of args
 int kdbCheckType(const char *typePattern, ...){
   int match = 0;
   static char errstr[256];
-  static char ktypes[256] = " tvunzdmpscfejihg xb*BX GHIJEFCSPMDZNUVT";
-  ktypes[20 + 98] = '+';
-  ktypes[20 + 99] = '!';
+  static char ktypes[256] = " tvunzdmpscfejihg xb*BX GHIJEFCSPMDZNUVT"; // atom/list types
+  ktypes[20 + 98] = '+'; // table
+  ktypes[20 + 99] = '!'; // dictionary
   K arg;
   short argtype;
   va_list args;

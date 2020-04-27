@@ -12,7 +12,7 @@ EXP K hdf5createGroup(K fname, K gname){
   K res;
   // gcpl -> group creation property list
   hid_t file, group, gcpl;
-  char *filename   = getkstring(fname);
+  char *filename   = kdbGetString(fname);
   // Create a file is it does not exist
   htri_t file_nm = ish5(filename);
   if(file_nm < 0)
@@ -22,7 +22,7 @@ EXP K hdf5createGroup(K fname, K gname){
     return krr((S)"This file already exists and is not a hdf5 file");
   }
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  char *groupnames = getkstring(gname);
+  char *groupnames = kdbGetString(gname);
   gcpl = H5Pcreate(H5P_LINK_CREATE);
   // 2nd arg -> 1 = create any missing groups
   H5Pset_create_intermediate_group(gcpl, 1);

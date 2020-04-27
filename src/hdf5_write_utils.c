@@ -130,10 +130,10 @@ static void writeChar(K dset, hid_t data, char *data_attr){
   // set char array to hold the q data
   char *wdata[arr];
   if((KC == dset->t) || -KC == dset->t)
-   wdata[0] = getkstring(dset);
+   wdata[0] = kdbGetString(dset);
   else{
     for(i=0;i<dset -> n;i++)
-      wdata[i] = getkstring(kK(dset)[i]);
+      wdata[i] = kdbGetString(kK(dset)[i]);
   }
   if(strcmp(data_attr,"d")==0)
     H5Dwrite(data, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);

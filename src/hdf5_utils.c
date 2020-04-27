@@ -9,7 +9,7 @@
 // Retrieve hdf5 numeric types
 hid_t hdf5typ_from_k(K ktype){
   hid_t val;
-  char* kstring = getkstring(ktype);
+  char* kstring = kdbGetString(ktype);
   char typ = kstring[0];
   switch(typ){
     case 'i':
