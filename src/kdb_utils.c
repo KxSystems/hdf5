@@ -1,7 +1,8 @@
-/* --- General use utils for handling kdb objects --- 
+/*
+ * General use utils for handling kdb objects
  * The purpose of this script is to house utility functions which are used here for
  * the hdf5 interface but are also generally applicable for other interfaces
-*/
+ */
 
 #include "kdb_utils.h"
 
@@ -9,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// get string from kdb char, string or symbol
+// get c string from kdb char, string or symbol
 char * kdbGetString(K x){
   char *str = NULL;
   int len;
@@ -36,7 +37,7 @@ char * kdbGetString(K x){
   return str;
 }
 
-// check types of args
+// check types of args vs typePattern
 int kdbCheckType(const char *typePattern, ...){
   int match = 0;
   static char errstr[256];

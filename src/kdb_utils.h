@@ -17,10 +17,10 @@
 
 #define KNL (K) 0
 
-// get string from kdb char, string or symbol
+// get c string from kdb char, string or symbol
 char * kdbGetString(K x);
 
-// check types of args
+// check types of args vs typePattern
 int kdbCheckType(const char *typePattern, ...);
 
 // create dictionary (key, val, key, val, ...)

@@ -28,7 +28,7 @@ K hdf5getShape(hid_t space){
 }
 
 EXP K hdf5getDataShape(K fname, K dname){
-  if(!kdbCheckType("[Cs][Cs]",fname,dname))
+  if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
   // Assign appropriate elements
   K res;
@@ -62,7 +62,7 @@ EXP K hdf5getDataShape(K fname, K dname){
 }
 
 EXP K hdf5getDataPoints(K fname, K dname){
-  if(!kdbCheckType("[Cs][Cs]",fname,dname))
+  if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
   // Assign appropriate elements
   hid_t file, data, space;
@@ -97,7 +97,7 @@ EXP K hdf5getDataPoints(K fname, K dname){
 }
 
 EXP K hdf5getAttrShape(K fname, K dname, K aname){
-  if(!kdbCheckType("[Cs][Cs][Cs]",fname,dname,aname))
+  if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
     return KNL;
   K kdims;
   hid_t file, data, attr, space;
@@ -141,7 +141,7 @@ EXP K hdf5getAttrShape(K fname, K dname, K aname){
 }
 
 EXP K hdf5getAttrPoints(K fname, K dname, K aname){
-  if(!kdbCheckType("[Cs][Cs][Cs]",fname,dname,aname))
+  if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
     return KNL;
   hid_t file, data, attr, space;
   char *filename = kdbGetString(fname);
@@ -186,7 +186,7 @@ EXP K hdf5getAttrPoints(K fname, K dname, K aname){
 
 // Is the file being passed a hdf5 file
 EXP K hdf5ishdf5(K fname){
-  if(!kdbCheckType("[Cs]",fname))
+  if(!kdbCheckType("[Cs]", fname))
     return KNL;
   htri_t file_nm;
   char *filename = kdbGetString(fname);
@@ -281,7 +281,7 @@ EXP K hdf5gc(K UNUSED(x)){
 
 // Return the rank, type, and dimensionality of the dataset
 EXP K hdf5datasetInfo(K fname, K dname){
-  if(!kdbCheckType("[Cs][Cs]",fname,dname))
+  if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
   K kdims, kdtype;
   hid_t file, data, dtype, ntype, space;
@@ -343,7 +343,7 @@ EXP K hdf5datasetInfo(K fname, K dname){
  * odest = destination object
 */
 EXP K hdf5copyObject(K fname, K oname, K fdest, K odest){
-  if(!kdbCheckType("[Cs][Cs][Cs][Cs]",fname, oname, fdest, odest))
+  if(!kdbCheckType("[Cs][Cs][Cs][Cs]", fname, oname, fdest, odest))
     return KNL;
   char *filename = kdbGetString(fname);
   char *destname = kdbGetString(fdest);
@@ -377,7 +377,7 @@ EXP K hdf5copyObject(K fname, K oname, K fdest, K odest){
 
 // Get the size of a hdf5 file in megabytes
 EXP K hdf5fileSize(K fname){
-  if(!kdbCheckType("[Cs]",fname))
+  if(!kdbCheckType("[Cs]", fname))
     return KNL;
   char *filename = kdbGetString(fname);
   double megab;
@@ -397,7 +397,7 @@ EXP K hdf5fileSize(K fname){
 }
 
 EXP K hdf5dataSize(K fname, K dname){
-  if(!kdbCheckType("[Cs][Cs]",fname,dname))
+  if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
   char *filename = kdbGetString(fname);
   char *dataname = kdbGetString(dname);
