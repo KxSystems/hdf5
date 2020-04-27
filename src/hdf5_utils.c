@@ -1,6 +1,7 @@
 /* --- HDF5 utility functions --- */
 
 #include <stdlib.h>
+#include <string.h>
 #include "k.h"
 #include "hdf5.h"
 #include "kdb_utils.h"
@@ -197,22 +198,10 @@ void closeGroupData(hid_t file, char *dataname,hid_t data){
 }
 
 // used to check what datatype is being passed in to make decisions on write path
-int checkvalid(char *ktype){
-  int flag=0;
-  int i,j;
-  char num[15] = "hijfebxpmdznuvt";
-  char str[3] = "csg";
-  for(i=0;i<15;i++){
-    if(ktype[0] == num[i]){
-      flag = 1;
-      break;
-    }
-  }
-  for(j=0;j<3;j++){
-    if(ktype[0] == str[j]){
-      flag = 2;
-      break;
-    }
-  }
-  return(flag);
+kdata_t checkvalid(char ktype){
+  if(NULL != strchr("hijfebxpmdznuvt", ktype))
+    return NUMERIC;
+  if(NULL != strchr("csg", ktype))
+    return STRING;
+  return INVALID;
 }

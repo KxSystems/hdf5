@@ -13,6 +13,9 @@
 #define HDF5CHAR  H5T_C_S1
 #define HDF5BYTE  H5T_NATIVE_UCHAR
 
+// k datatypes
+typedef enum {NUMERIC, STRING, INVALID} kdata_t;
+
 // Retrieve hdf5 numeric types
 hid_t hdf5typ_from_k(K ktype);
 
@@ -49,6 +52,6 @@ hid_t isGroupData(hid_t file, char *dataname);
 void closeGroupData(hid_t file, char *dataname,hid_t data);
 
 // used to check what datatype is being passed in to make decisions on write path
-int checkvalid(char *ktype);
+kdata_t checkvalid(char ktype);
 
 #endif // HDF5_UTILS_H

@@ -13,7 +13,7 @@
 
 // Write data to an attribute
 EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
-  if(!kdbCheckType("[Cs][Cs][Cs][Ii][Ccs]", fname, dname, aname, kdims, ktype))
+  if(!kdbCheckType("[Cs][Cs][Cs][Ii]c", fname, dname, aname, kdims, ktype))
     return KNL;
   htri_t aexists;
   hid_t data, file,attr;
@@ -35,9 +35,8 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
     return(krr((S)"dataset or group to write attribute to does not exist"));
   }
   char *attrname = kdbGetString(aname);
-  char *ktyp = kdbGetString(ktype);
   // Check if type that is to be written to is numeric
-  if(1 == checkvalid(ktyp)){
+  if(NUMERIC == checkvalid(ktype->g)){
     // Does the attribute already exist
     aexists = isattr(file, attrname);
     if(aexists == 0)
@@ -49,7 +48,6 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
       free(attrname);
       free(dataname);
       free(filename);
-      free(ktyp);
       return(krr((S)"check to ensure that attribute exists failed"));
     }
     attr = H5Aopen(data, attrname, H5P_DEFAULT);
@@ -57,7 +55,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
     writenumeric(dset, attr, "a");
   }
   // Check if the type that is to be written to is character/symbol
-  else if(2 == checkvalid(ktyp)){
+  else if(STRING == checkvalid(ktype->g)){
     aexists = isattr(file, attrname);
     if(aexists == 0)
       createstrattr(data, attrname, kdims);
@@ -67,7 +65,6 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
       free(attrname);
       free(dataname);
       free(filename);
-      free(ktyp);
       return(krr((S)"check to ensure that attribute exists failed"));
     }
     attr = H5Aopen(data, attrname, H5P_DEFAULT);
@@ -79,7 +76,6 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
     free(attrname);
     free(dataname);
     free(filename);
-    free(ktyp);
     H5Fclose(file);
     return(krr((S)"Attempting to pass an unsupported datatype"));
   }
@@ -90,12 +86,11 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   free(attrname);
   free(dataname);
   free(filename);
-  free(ktyp);
   return 0;
 }
 
 EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
-  if(!kdbCheckType("[Cs][Cs][Ii][Ccs]", fname, dname, kdims, ktype))
+  if(!kdbCheckType("[Cs][Cs][Ii]c", fname, dname, kdims, ktype))
     return KNL;
   htri_t file_nm;
   int isdset;
@@ -111,17 +106,16 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   }
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   char *dataname = kdbGetString(dname);
-  char *ktyp = kdbGetString(ktype);
   // Create the appropriate dataset if it doesn't exist typed appropriately
   isdset = checkdataset(file, dataname);
-  if(1 == checkvalid(ktyp)){
+  if(NUMERIC == checkvalid(ktype->g)){
     if(isdset == 0)
       createsimpledataset(file, dataname, kdims, ktype);
     data = H5Dopen(file, dataname, H5P_DEFAULT);
     // write the kdb dset to the data file
     writenumeric(dset, data, "d");
   }
-  else if(2 == checkvalid(ktyp)){
+  else if(STRING == checkvalid(ktype->g)){
     if(isdset == 0)
       createstrdataset(file, dataname, kdims);
     data = H5Dopen(file, dataname, H5P_DEFAULT);
@@ -130,13 +124,11 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   else{
     free(dataname);
     free(filename);
-    free(ktyp);
     H5Fclose(file);
     return(krr((S)"Attempting to pass an unsupported datatype"));
   }
   free(dataname);
   free(filename);
-  free(ktyp);
   H5Dclose(data);
   H5Fclose(file);
   return 0;

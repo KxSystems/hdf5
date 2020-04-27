@@ -20,20 +20,20 @@ EXP K hdf5createFile(K fname){
 }
 
 EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
-  if(!kdbCheckType("[Cs][Cs][Ii][Ccs]", fname, dname, kdims, ktype))
+  if(!kdbCheckType("[Cs][Cs][Ii]c", fname, dname, kdims, ktype))
     return KNL;
   htri_t file_nm;
   hid_t file;
   char *filename = kdbGetString(fname);
   char *dataname = kdbGetString(dname);
-  int  dtype = checkvalid(kdbGetString(ktype));
+  kdata_t  dtype = checkvalid(ktype->g);
   // Create a file is it does not exist
   file_nm = ish5(filename);
   if((file_nm == 0) || file_nm < 0)
     createfile(filename);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   // Create a numerical dataset with relevant dimensionality and type
-  if(dtype == 1){
+  if(dtype == NUMERIC){
     // Check that the dataset can be created appropriately
     if(0==createsimpledataset(file, dataname, kdims, ktype)){
       // Clean up if dimensionality is not suited
@@ -44,7 +44,7 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
     }
   }
   // Create a string dataset with relevant dimensionality and type
-  else if(dtype == 2){
+  else if(dtype == STRING){
     if(0==createstrdataset(file, dataname, kdims)){
       free(filename);
       free(dataname);
@@ -60,12 +60,12 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
 }
 
 EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
-  if(!kdbCheckType("[Cs][Cs][Cs][Ii][Ccs]", fname, dname, aname, kdims, ktype))
+  if(!kdbCheckType("[Cs][Cs][Cs][Ii]c", fname, dname, aname, kdims, ktype))
     return KNL;
   hid_t file, data;
   htri_t aexists;
   // Determine the type which the attribute will have (symbol/char vs numeric)
-  int  dtype = checkvalid(kdbGetString(ktype));
+  kdata_t  dtype = checkvalid(ktype->g);
   char *filename = kdbGetString(fname);
   char *dataname = kdbGetString(dname);
   char *attrname = kdbGetString(aname);
