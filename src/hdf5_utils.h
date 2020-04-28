@@ -22,11 +22,11 @@ EXP K hdf5init(K UNUSED(dummy));
 // Disable errors from hdf5 side
 void disableErr(void);
 
-// ktype (char) to k typegroup
+// ktype (char) to k type
 ktype_t getKType(char ktype);
 
-// ktype (char) to hdf5 numeric types
-hid_t hdf5typ_from_k(char ktype);
+// ktype (char) to hdf5 numeric type
+hid_t getHDF5Type(char ktype);
 
 // create NUMERIC dataset
 int createNumericDataset(hid_t file, char *dataname, K kdims, K ktype);

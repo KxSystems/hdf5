@@ -16,7 +16,7 @@ EXP K hdf5init(K UNUSED(dummy)){
 // disable errors from hdf5 side
 void disableErr(void){H5Eset_auto1(NULL,NULL);}
 
-// ktype (char) to k typegroup
+// ktype (char) to k type
 ktype_t getKType(char ktype){
   if(NULL != strchr("hijfebxpmdznuvt", ktype))
     return NUMERIC;
@@ -25,8 +25,8 @@ ktype_t getKType(char ktype){
   return INVALID;
 }
 
-// ktype (char) to hdf5 numeric types
-hid_t hdf5typ_from_k(char ktype){
+// ktype (char) to hdf5 numeric type
+hid_t getHDF5Type(char ktype){
   switch(ktype){
     case 'h':
       return HDF5SHORT;
@@ -65,7 +65,7 @@ int createNumericDataset(hid_t file, char *dataname, K kdims, K ktype){
   for(i = 0; i < rank; ++i)
     dims[i] = kI(kdims)[i];
   space = H5Screate_simple(rank, dims, NULL);
-  dtype = hdf5typ_from_k(ktype->g);
+  dtype = getHDF5Type(ktype->g);
   H5Dcreate(file, dataname, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   H5Sclose(space);
   return 0;
@@ -97,7 +97,7 @@ int createNumericAttribute(hid_t data, char *attrname, K kdims, K ktype){
   for(i = 0; i < rank; ++i)
     dims[i] = kI(kdims)[i];
   space = H5Screate_simple(rank, dims, NULL);
-  dtype = hdf5typ_from_k(ktype->g);
+  dtype = getHDF5Type(ktype->g);
   H5Acreate(data, attrname, dtype, space, H5P_DEFAULT, H5P_DEFAULT);
   H5Sclose(space);
   return 0;
