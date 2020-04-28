@@ -15,6 +15,35 @@ EXP K hdf5createFile(K fname){
   return KNL;
 }
 
+EXP K hdf5createGroup(K fname, K gname){
+  if(!kdbCheckType("[Cs][Cs]", fname, gname))
+    return KNL;
+  hid_t file, group;
+  hid_t gcpl; // group creation property list
+  char *filename   = kdbGetString(fname);
+  char *groupnames = kdbGetString(gname);
+  htri_t filechk = H5Fis_hdf5(filename);
+  if(filechk < 0)
+    H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
+  if(filechk == 0){
+    free(filename);
+    return krr((S)"file is not hdf5");
+  }
+  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  gcpl = H5Pcreate(H5P_LINK_CREATE);
+  H5Pset_create_intermediate_group(gcpl, 1); // create intermediate groups
+  group = H5Gcreate(file, groupnames, gcpl, H5P_DEFAULT, H5P_DEFAULT);
+  if(group < 0)
+    krr((S)"Group could not be created");
+  // clean up
+  free(filename);
+  free(groupnames);
+  H5Gclose(group);
+  H5Pclose(gcpl);
+  H5Fclose(file);
+  return KNL;
+}
+
 EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs]Ic", fname, dname, kdims, ktype))
     return KNL;

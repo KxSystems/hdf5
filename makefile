@@ -20,7 +20,7 @@ OPTS      = -DKXVER=3 -fPIC
 
 MS        = $(shell getconf LONG_BIT)
 TGT       = hdf5.so
-OBJFILES  = src/kdb_utils.o src/hdf5_utils.o src/hdf5_create.o src/hdf5_general.o src/hdf5_read.o src/hdf5_write.o src/hdf5_ls.o src/hdf5_groups.o src/hdf5_links.o src/hdf5_del.o
+OBJFILES  = src/kdb_utils.o src/hdf5_utils.o src/hdf5_create.o src/hdf5_general.o src/hdf5_read.o src/hdf5_write.o src/hdf5_ls.o src/hdf5_links.o src/hdf5_del.o
 
 QARCH = $(OSFLAG)$(MS)
 QLIB  = $(QHOME)/$(QARCH)
