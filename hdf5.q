@@ -59,7 +59,11 @@ datamap:`b`p`m`d`z`n`u`v`t!`boolean`timestamp`month`date`datetime`timespan`minut
 writeData:{[fname;dname;dset]
   if[type[dset]in 98 99h;:writeDictTab[fname;dname;dset]];
   if[11h = abs type dset;dset:string dset];
-  if[10h = abs type dset;dset:enlist dset];
+  dset:$[10h=type dset;
+         enlist dset;
+         -10h=type dset;
+         enlist enlist dset;
+         dset];
   typ:i.fntyp dset;
   dims:"i"$i.shape dset;
   dset:$[typ in "csg";
@@ -74,7 +78,11 @@ writeData:{[fname;dname;dset]
 
 writeAttr:{[fname;dname;aname;dset]
   if[11h = abs type dset;dset:string dset];
-  if[10h = abs type dset;dset:enlist dset];
+  dset:$[10h=type dset;
+         enlist dset;
+         -10h=type dset;
+         enlist enlist dset;
+         dset];
   typ:i.fntyp dset;
   dims:"i"$i.shape dset;
   dset:$[typ in "csg";

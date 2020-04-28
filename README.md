@@ -1,4 +1,4 @@
-# `q_hdf5` – Interface for the conversion of between the hdf5 data format and kdb+ data 
+# `hdf5-kdb` – Interface for the conversion of between the hdf5 data format and kdb+ data 
 
 This is a thin wrapper for kdb+ around the [HDF Groups](https://support.hdfgroup.org/) C api for HDF5.
 
