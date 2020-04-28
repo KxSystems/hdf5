@@ -4,6 +4,20 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
+// Return the major/minor and release versions as a dictionary
+EXP K hdf5version(K UNUSED(x)){
+  unsigned int maj, min, rel;
+  if(H5get_libversion(&maj, &min, &rel) < 0)
+    return krr((S)"Error evaluating version of HDF5 C api");
+  else
+    return kdbCreateDict("Major", kj(maj), "Minor", kj(min), "Release", kj(rel));
+}
+
+// Garbage collection for hdf5 interface, return the data collected from free lists
+EXP K hdf5gc(K UNUSED(x)){
+  return ki(H5garbage_collect());
+}
+
 // Retrieve the shape of a dataspace
 K hdf5getShape(hid_t space){
   hsize_t *dims;
@@ -71,7 +85,7 @@ EXP K hdf5getDataPoints(K fname, K dname){
   }
   space  = H5Dget_space(data);
   points = H5Sget_simple_extent_npoints(space); // number of datapoints
-  // Clean up
+  // clean up
   free(filename);
   free(dataname);
   H5Fclose(file);
@@ -112,6 +126,7 @@ EXP K hdf5getAttrShape(K fname, K dname, K aname){
   }
   space = H5Aget_space(attr);
   kdims = hdf5getShape(space);
+  // clean up
   free(filename);
   free(dataname);
   free(attrname);
@@ -154,6 +169,7 @@ EXP K hdf5getAttrPoints(K fname, K dname, K aname){
   }
   space  = H5Aget_space(attr);
   points = H5Sget_simple_extent_npoints(space);
+  // clean up
   free(filename); 
   free(dataname);
   free(attrname);
@@ -172,7 +188,7 @@ EXP K hdf5ishdf5(K fname){
   char *filename = kdbGetString(fname);
   filechk = H5Fis_hdf5(filename);
   free(filename);
-  return (filechk > 0) ? kb(1) : kb(0);
+  return kb(filechk > 0 ? 1 : 0);
 }
 
 // Does the requested attribute exist
@@ -237,20 +253,6 @@ EXP K hdf5isObject(K fname, K oname){
     return kb(0);
   else
     return kb(1);
-}
-
-// Return the major/minor and release versions as a dictionary
-EXP K hdf5version(K UNUSED(x)){
-  unsigned int maj, min, rel;
-  if(H5get_libversion(&maj, &min, &rel)<0)
-    return krr((S)"Error evaluating version of HDF5 C api");
-  else
-    return kdbCreateDict("Major", kj(maj), "Minor", kj(min), "Release", kj(rel));
-}
-
-// Garbage collection for hdf5 interface, return the data collected from free lists
-EXP K hdf5gc(K UNUSED(x)){
-  return ki(H5garbage_collect());
 }
 
 // Return the rank, type, and dimensionality of the dataset
