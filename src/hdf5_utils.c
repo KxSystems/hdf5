@@ -13,6 +13,9 @@ EXP K hdf5init(K UNUSED(dummy)){
   return KNL;
 }
 
+// disable errors from hdf5 side
+void disableErr(void){H5Eset_auto1(NULL,NULL);}
+
 // ktype (char) to k typegroup
 kdata_t checkvalid(char ktype){
   if(NULL != strchr("hijfebxpmdznuvt", ktype))
@@ -49,9 +52,6 @@ hid_t hdf5typ_from_k(char ktype){
       return 0;
   }
 }
-
-// disable errors from hdf5 side
-void disableErr(void){H5Eset_auto1(NULL,NULL);}
 
 // create NUMERIC dataset
 int createNumericDataset(hid_t file, char *dataname, K kdims, K ktype){
@@ -117,6 +117,38 @@ int createStringAttribute(hid_t data, char *attrname, K kdims){
   return 0;
 }
 
+// open group/dataset object (depending on object type)
+hid_t openGroupData(hid_t file, char *dataname){
+  H5G_stat_t statbuf;
+  H5Gget_objinfo(file, dataname, 0, &statbuf);
+  switch(statbuf.type){
+  case H5G_GROUP:
+    return H5Gopen(file, dataname, H5P_DEFAULT);
+    break;
+  case H5G_DATASET:
+    return H5Dopen(file, dataname, H5P_DEFAULT);
+    break;
+  default:
+    return 0;
+  }
+}
+
+// close group/dataset object (depending on object type)
+void closeGroupData(hid_t file, char *dataname, hid_t data){
+  H5G_stat_t statbuf;
+  H5Gget_objinfo(file, dataname, 0, &statbuf);
+  switch(statbuf.type){
+    case H5G_GROUP:
+      H5Gclose(data);
+      break;
+    case H5G_DATASET:
+      H5Dclose(data);
+      break;
+    default:
+      break;
+  }
+}
+
 // Check that the dataset exists
 int checkdataset(hid_t file, char *dataname){
   // Create a buffer for datatype
@@ -137,39 +169,4 @@ int checkgroup(hid_t file, char *groupname){
     return 1;
   else
     return 0;
-}
-
-// open group/dataset object (depending on object type)
-hid_t openGroupData(hid_t file, char *dataname){
-  hid_t data;
-  H5G_stat_t statbuf;
-  H5Gget_objinfo(file, dataname, 0, &statbuf);
-  switch(statbuf.type){
-  case H5G_GROUP:
-    data = H5Gopen(file, dataname, H5P_DEFAULT);
-    break;
-  case H5G_DATASET:
-    data = H5Dopen(file, dataname, H5P_DEFAULT);
-    break;
-  default:
-    data = 0;
-    break;
-  }
-  return data;
-}
-
-// close group/dataset object (depending on object type)
-void closeGroupData(hid_t file, char *dataname, hid_t data){
-  H5G_stat_t statbuf;
-  H5Gget_objinfo(file, dataname, 0, &statbuf);
-  switch(statbuf.type){
-    case H5G_GROUP:
-      H5Gclose(data);
-      break;
-    case H5G_DATASET:
-      H5Dclose(data);
-      break;
-    default:
-      break;
-  }
 }

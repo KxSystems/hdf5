@@ -19,36 +19,36 @@ typedef enum {NUMERIC, STRING, INVALID} kdata_t;
 // initialize hdf5-kdb library
 EXP K hdf5init(K UNUSED(dummy));
 
+// Disable errors from hdf5 side
+void disableErr(void);
+
 // ktype (char) to k typegroup
 kdata_t checkvalid(char ktype);
 
 // ktype (char) to hdf5 numeric types
 hid_t hdf5typ_from_k(char ktype);
 
-// Disable errors from hdf5 side
-void disableErr(void);
-
-// Create NUMERIC dataset
+// create NUMERIC dataset
 int createNumericDataset(hid_t file, char *dataname, K kdims, K ktype);
 
-// Create STRING dataset
+// create STRING dataset
 int createStringDataset(hid_t file, char *dataname, K kdims);
 
-// Create NUMERIC attribute
+// create NUMERIC attribute
 int createNumericAttribute(hid_t data, char *attrname, K kdims, K ktype);
 
-// Create STRING attribute
+// create STRING attribute
 int createStringAttribute(hid_t data, char *attrname, K kdims);
-
-// Check that the dataset exists
-int checkdataset(hid_t file, char *dataname);
-
-int checkgroup(hid_t file, char *groupname);
 
 // open group/dataset object (depending on object type)
 hid_t openGroupData(hid_t file, char *dataname);
 
 // close group/dataset object (depending on object type)
 void closeGroupData(hid_t file, char *dataname, hid_t data);
+
+// Check that the dataset exists
+int checkdataset(hid_t file, char *dataname);
+
+int checkgroup(hid_t file, char *groupname);
 
 #endif // HDF5_UTILS_H
