@@ -22,13 +22,14 @@ EXP K hdf5getDataShape(K fname, K dname){
     return KNL;
   K shape;
   hid_t file, data, space;
-  char *filename = kdbGetString(fname);
+  char *filename, *dataname;
+  filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
     return krr((S)"file does not exist");
   }
-  char *dataname = kdbGetString(dname);
+  dataname = kdbGetString(dname);
   data = H5Dopen(file, dataname, H5P_DEFAULT);
   if(data < 0){
     free(filename);
@@ -38,7 +39,7 @@ EXP K hdf5getDataShape(K fname, K dname){
   }
   space = H5Dget_space(data);
   shape = hdf5getShape(space);
-  // Clean up
+  // clean up
   free(filename);
   free(dataname);
   H5Fclose(file);
@@ -50,29 +51,26 @@ EXP K hdf5getDataShape(K fname, K dname){
 EXP K hdf5getDataPoints(K fname, K dname){
   if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
-  // Assign appropriate elements
+  J points;
   hid_t file, data, space;
-  char *filename = kdbGetString(fname);
-  long points;
-  // Open relevant file, dataset and dataspace
+  char *filename, *dataname;
+  filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
     H5Fclose(file);
     return krr((S)"file does not exist");
   }
-  char *dataname = kdbGetString(dname);
+  dataname = kdbGetString(dname);
   data = H5Dopen(file, dataname, H5P_DEFAULT);
   if(data < 0){
     free(filename);
     free(dataname);
-    H5Dclose(data);
     H5Fclose(file);
-    return krr((S)"dataset not appropriate for problem");
+    return krr((S)"dataset does not exist");
   }
   space = H5Dget_space(data);
-  // Retrieve the number of datapoints in the dataset
-  points = (J)H5Sget_simple_extent_npoints(space);
+  points = H5Sget_simple_extent_npoints(space); // number of datapoints
   // Clean up
   free(filename);
   free(dataname);
