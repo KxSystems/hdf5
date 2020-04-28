@@ -13,7 +13,7 @@ EXP K hdf5createFile(K fname){
   if(!kdbCheckType("[Cs]", fname))
     return KNL;
   char *filename = kdbGetString(fname);
-  createfile(filename);
+  H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
   // Clean up
   free(filename);
   return 0;
@@ -27,7 +27,7 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   char *dataname = kdbGetString(dname);
   kdata_t  dtype = checkvalid(ktype->g);
   if(H5Fis_hdf5(filename) <= 0) // create file if it does not exist
-    createfile(filename);
+    H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(dtype == NUMERIC){ // create numerical dataset
     if(0==createsimpledataset(file, dataname, kdims, ktype)){

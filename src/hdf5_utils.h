@@ -22,9 +22,6 @@ hid_t hdf5typ_from_k(K ktype);
 // Disable errors from hdf5 side
 void disable_err(void);
 
-// Create a file based on name
-void createfile(char *filename);
-
 // Create a string attribute
 int createstrattr(hid_t data, char *attrname, K kdims);
 

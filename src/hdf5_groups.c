@@ -15,7 +15,7 @@ EXP K hdf5createGroup(K fname, K gname){
   // Create a file is it does not exist
   htri_t filechk = H5Fis_hdf5(filename);
   if(filechk < 0)
-    createfile(filename);
+    H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
   if(filechk == 0){
     free(filename);
     return krr((S)"This file already exists and is not a hdf5 file");

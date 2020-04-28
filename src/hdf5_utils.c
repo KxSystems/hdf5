@@ -55,9 +55,6 @@ hid_t hdf5typ_from_k(K ktype){
 // Disable errors from hdf5 side
 void disable_err(void){H5Eset_auto1(NULL,NULL);}
 
-// Create a file based on name
-void createfile(char *filename){H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);}
-
 // Create a string attribute
 int createstrattr(hid_t data, char *attrname, K kdims){
   hid_t space, filetype;
