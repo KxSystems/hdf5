@@ -34,7 +34,7 @@ EXP K hdf5createGroup(K fname, K gname){
   H5Pset_create_intermediate_group(gcpl, 1); // create intermediate groups
   group = H5Gcreate(file, groupnames, gcpl, H5P_DEFAULT, H5P_DEFAULT);
   if(group < 0)
-    krr((S)"Group could not be created");
+    krr((S)"unable to create group");
   // clean up
   free(filename);
   free(groupnames);
@@ -51,7 +51,7 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   ktype_t dtype;
   char *filename = kdbGetString(fname);
   char *dataname = kdbGetString(dname);
-  if(H5Fis_hdf5(filename) <= 0) // create file if it does not exist
+  if(H5Fis_hdf5(filename) <= 0)
     H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   dtype = getKType(ktype->g);
