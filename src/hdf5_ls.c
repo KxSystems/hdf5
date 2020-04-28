@@ -1,17 +1,14 @@
-/* --- ls like function ---
- * Function to display the structure of a file 
-*/
-
 #include <stdlib.h>
+#include <stdio.h>
 #include "k.h"
 #include "hdf5.h"
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
 struct opdata {
-    unsigned recurs;     // Recursion level.  0=root
-    struct opdata *prev; // Pointer to previous opdata
-    haddr_t addr;        // Group address
+  unsigned recurs;     // Recursion level (0=root)
+  struct opdata *prev; // Pointer to previous opdata
+  haddr_t addr;        // Group address
 };
 
 int group_check(struct opdata *od, haddr_t target_addr);
@@ -39,7 +36,7 @@ EXP K hdf5ls(K fname){
   printf("}\n");
   free(filename);
   H5Fclose(file);
-  return 0;
+  return KNL;
 }
 
 // Utility functions
