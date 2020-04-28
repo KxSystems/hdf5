@@ -14,7 +14,6 @@ EXP K hdf5createFile(K fname){
     return KNL;
   char *filename = kdbGetString(fname);
   H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
-  // Clean up
   free(filename);
   return 0;
 }
@@ -23,12 +22,13 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Ii]c", fname, dname, kdims, ktype))
     return KNL;
   hid_t file;
+  kdata_t dtype;
   char *filename = kdbGetString(fname);
   char *dataname = kdbGetString(dname);
-  kdata_t  dtype = checkvalid(ktype->g);
   if(H5Fis_hdf5(filename) <= 0) // create file if it does not exist
     H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  dtype = checkvalid(ktype->g);
   if(dtype == NUMERIC){ // create numerical dataset
     if(0==createsimpledataset(file, dataname, kdims, ktype)){
       // Clean up
@@ -58,8 +58,7 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Cs][Ii]c", fname, dname, aname, kdims, ktype))
     return KNL;
   hid_t file, data;
-  // Determine the type which the attribute will have (symbol/char vs numeric)
-  kdata_t  dtype = checkvalid(ktype->g);
+  kdata_t  dtype;
   char *filename = kdbGetString(fname);
   char *dataname = kdbGetString(dname);
   char *attrname = kdbGetString(aname);
@@ -89,10 +88,10 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
     free(attrname);
     return krr((S)"This attribute already exists for this dataset");
   }
-  // create either string or numeric dataset depending on how data is being passed 
-  if(dtype == 1)
+  dtype = checkvalid(ktype->g);
+  if(dtype == NUMERIC)
     createsimpleattr(data, attrname, kdims, ktype);
-  else if(dtype == 2)
+  else if(dtype == STRING)
     createstrattr(data, attrname, kdims);
   // Clean up
   closeGroupData(file,dataname,data);
