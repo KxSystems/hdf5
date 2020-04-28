@@ -1,9 +1,3 @@
-/* --- General use functions --- 
- * The functions contained in this file are related to the evaluation of
- * information about datasets/attributes, garbage collection etc. These functions in 
- * themselves do not relate to the other files within this code base explicitly.
-*/
-
 #include <stdlib.h>
 #include "k.h"
 #include "hdf5.h"
@@ -12,53 +6,45 @@
 
 // Retrieve the shape of a dataspace
 K hdf5getShape(hid_t space){
-  // Assign appropriate elements
-  K kdims;
-  int rank;
-  // Get # dimensions in the dataset and assign a space to hold these
-  rank = H5Sget_simple_extent_ndims(space);
-  hsize_t dims[rank];
-  // Assign the individual dimensions to assigned space
+  hsize_t *dims;
+  int rank = H5Sget_simple_extent_ndims(space);
+  K kdims = ktn(KJ, rank);
+  dims = calloc(rank, sizeof(hsize_t));
   H5Sget_simple_extent_dims(space, dims, NULL);
-  // Convert dimensions to appropriate kdb+ data
-  kdims = ktn(KJ,(J)rank);
-  for(int i=0;i<rank;i++)
+  for(int i = 0; i < rank; i++)
     kJ(kdims)[i] = dims[i];
+  free(dims);
   return(kdims);
 }
 
 EXP K hdf5getDataShape(K fname, K dname){
   if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
-  // Assign appropriate elements
-  K res;
+  K shape;
   hid_t file, data, space;
   char *filename = kdbGetString(fname);
-  // Open relevant files and datasets
-  file  = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
-    H5Fclose(file);
     return krr((S)"file does not exist");
   }
   char *dataname = kdbGetString(dname);
-  data  = H5Dopen(file, dataname, H5P_DEFAULT);
+  data = H5Dopen(file, dataname, H5P_DEFAULT);
   if(data < 0){
     free(filename);
     free(dataname);
-    H5Dclose(data);
     H5Fclose(file);
-    return krr((S)"dataset not appropriate for problem");
+    return krr((S)"dataset does not exist");
   }
   space = H5Dget_space(data);
-  res = hdf5getShape(space);
+  shape = hdf5getShape(space);
   // Clean up
   free(filename);
   free(dataname);
   H5Fclose(file);
   H5Dclose(data);
   H5Sclose(space);
-  return res;
+  return shape;
 }
 
 EXP K hdf5getDataPoints(K fname, K dname){
