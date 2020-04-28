@@ -55,9 +55,6 @@ hid_t hdf5typ_from_k(K ktype){
 // Disable errors from hdf5 side
 void disable_err(void){H5Eset_auto1(NULL,NULL);}
 
-// Check if an attribute exists
-htri_t isattr(hid_t data,char *attrname){return H5Aexists(data, attrname);}
-
 // Create a file based on name
 void createfile(char *filename){H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);}
 

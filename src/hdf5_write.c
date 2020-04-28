@@ -38,7 +38,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   // Check if type that is to be written to is numeric
   if(NUMERIC == checkvalid(ktype->g)){
     // Does the attribute already exist
-    aexists = isattr(file, attrname);
+    aexists = H5Aexists(file, attrname);
     if(aexists == 0)
       createsimpleattr(data, attrname, kdims, ktype);
     // Could not evaluate if the attribute exists error out
@@ -56,7 +56,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   }
   // Check if the type that is to be written to is character/symbol
   else if(STRING == checkvalid(ktype->g)){
-    aexists = isattr(file, attrname);
+    aexists = H5Aexists(file, attrname);
     if(aexists == 0)
       createstrattr(data, attrname, kdims);
     else if(aexists < 0){

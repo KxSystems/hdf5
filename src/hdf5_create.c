@@ -58,7 +58,6 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Cs][Ii]c", fname, dname, aname, kdims, ktype))
     return KNL;
   hid_t file, data;
-  htri_t aexists;
   // Determine the type which the attribute will have (symbol/char vs numeric)
   kdata_t  dtype = checkvalid(ktype->g);
   char *filename = kdbGetString(fname);
@@ -82,8 +81,7 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
     return krr((S)"dataset/group which attribute is to be written to does not exist");
   }
   // Check if attribute already exists, error if it does
-  aexists = isattr(data, attrname);
-  if(aexists > 0){
+  if(H5Aexists(data, attrname) > 0){
     closeGroupData(file,dataname,data);
     H5Fclose(file);
     free(filename);
