@@ -149,24 +149,9 @@ void closeGroupData(hid_t file, char *dataname, hid_t data){
   }
 }
 
-// Check that the dataset exists
-int checkdataset(hid_t file, char *dataname){
-  // Create a buffer for datatype
+// check if dataset exists
+int checkDataset(hid_t file, char *dataname){
   H5G_stat_t statbuf;
-  // Commit the data information to the buffer
   H5Gget_objinfo(file, dataname, 0, &statbuf);
-  // Check the type of data is a dataset
-  if(H5G_DATASET == statbuf.type)
-    return 1;
-  else
-    return 0;
-}
-
-int checkgroup(hid_t file, char *groupname){
-  H5G_stat_t statbuf;
-  H5Gget_objinfo(file, groupname, 0, &statbuf);
-  if(H5G_GROUP == statbuf.type)
-    return 1;
-  else
-    return 0;
+  return(H5G_DATASET == statbuf.type)? 1 : 0;
 }

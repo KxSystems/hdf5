@@ -106,7 +106,7 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   char *dataname = kdbGetString(dname);
   // Create the appropriate dataset if it doesn't exist typed appropriately
-  isdset = checkdataset(file, dataname);
+  isdset = checkDataset(file, dataname);
   if(NUMERIC == checkvalid(ktype->g)){
     if(isdset == 0)
       createNumericDataset(file, dataname, kdims, ktype);

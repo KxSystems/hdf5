@@ -47,8 +47,6 @@ hid_t openGroupData(hid_t file, char *dataname);
 void closeGroupData(hid_t file, char *dataname, hid_t data);
 
 // Check that the dataset exists
-int checkdataset(hid_t file, char *dataname);
-
-int checkgroup(hid_t file, char *groupname);
+int checkDataset(hid_t file, char *dataname);
 
 #endif // HDF5_UTILS_H
