@@ -29,16 +29,16 @@ hid_t hdf5typ_from_k(char ktype);
 void disable_err(void);
 
 // Create NUMERIC dataset
-int createsimpledataset(hid_t file, char *dataname, K kdims, K ktype);
+int createNumericDataset(hid_t file, char *dataname, K kdims, K ktype);
 
 // Create STRING dataset
-int createstrdataset(hid_t file, char *dataname, K kdims);
+int createStringDataset(hid_t file, char *dataname, K kdims);
 
 // Create NUMERIC attribute
-int createsimpleattr(hid_t data, char *attrname, K kdims, K ktype);
+int createNumericAttr(hid_t data, char *attrname, K kdims, K ktype);
 
 // Create STRING attribute
-int createstrattr(hid_t data, char *attrname, K kdims);
+int createStringAttr(hid_t data, char *attrname, K kdims);
 
 // Check that the dataset exists
 int checkdataset(hid_t file, char *dataname);

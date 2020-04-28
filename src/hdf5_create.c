@@ -30,7 +30,7 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   dtype = checkvalid(ktype->g);
   if(dtype == NUMERIC){ // create numerical dataset
-    if(0==createsimpledataset(file, dataname, kdims, ktype)){
+    if(0==createNumericDataset(file, dataname, kdims, ktype)){
       // Clean up
       free(filename);
       free(dataname);
@@ -39,7 +39,7 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
     }
   }
   else if(dtype == STRING){ // create string dataset
-    if(0==createstrdataset(file, dataname, kdims)){
+    if(0==createStringDataset(file, dataname, kdims)){
       // Clean up
       free(filename);
       free(dataname);
@@ -90,9 +90,9 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   }
   dtype = checkvalid(ktype->g);
   if(dtype == NUMERIC)
-    createsimpleattr(data, attrname, kdims, ktype);
+    createNumericAttr(data, attrname, kdims, ktype);
   else if(dtype == STRING)
-    createstrattr(data, attrname, kdims);
+    createStringAttr(data, attrname, kdims);
   // Clean up
   closeGroupData(file,dataname,data);
   H5Fclose(file);

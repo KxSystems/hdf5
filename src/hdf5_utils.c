@@ -54,7 +54,7 @@ hid_t hdf5typ_from_k(char ktype){
 void disable_err(void){H5Eset_auto1(NULL,NULL);}
 
 // Create NUMERIC dataset
-int createsimpledataset(hid_t file, char *dataname, K kdims, K ktype){
+int createNumericDataset(hid_t file, char *dataname, K kdims, K ktype){
   hsize_t dims[3];
   hid_t space, dtype;
   int i, rank = kdims->n;
@@ -71,7 +71,7 @@ int createsimpledataset(hid_t file, char *dataname, K kdims, K ktype){
 }
 
 // Create STRING dataset
-int createstrdataset(hid_t file, char *dataname, K kdims){
+int createStringDataset(hid_t file, char *dataname, K kdims){
   hsize_t dims[1];
   hid_t space, dtype;
   dims[0] = kI(kdims)[0];
@@ -85,7 +85,7 @@ int createstrdataset(hid_t file, char *dataname, K kdims){
 }
 
 // Create NUMERIC attribute
-int createsimpleattr(hid_t data, char *attrname, K kdims, K ktype){
+int createNumericAttr(hid_t data, char *attrname, K kdims, K ktype){
   int i, rank;
   hid_t space;
   if(-KI==kdims->t)
@@ -109,7 +109,7 @@ int createsimpleattr(hid_t data, char *attrname, K kdims, K ktype){
 }
 
 // Create STRING attribute
-int createstrattr(hid_t data, char *attrname, K kdims){
+int createStringAttr(hid_t data, char *attrname, K kdims){
   hid_t space, filetype;
   hsize_t dims[1];
   // Number of char arrays or symbols to within the string attribute
