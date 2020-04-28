@@ -139,8 +139,8 @@ int checkgroup(hid_t file, char *groupname){
     return 0;
 }
 
-// Returns group/data object depending on format of the file denoted in dataname
-hid_t isGroupData(hid_t file, char *dataname){
+// open group/dataset object (depending on object type)
+hid_t openGroupData(hid_t file, char *dataname){
   hid_t data;
   H5G_stat_t statbuf;
   H5Gget_objinfo(file, dataname, 0, &statbuf);
@@ -158,8 +158,8 @@ hid_t isGroupData(hid_t file, char *dataname){
   return data;
 }
 
-// Close the group or datatype depending on object type
-void closeGroupData(hid_t file, char *dataname,hid_t data){
+// close group/dataset object (depending on object type)
+void closeGroupData(hid_t file, char *dataname, hid_t data){
   H5G_stat_t statbuf;
   H5Gget_objinfo(file, dataname, 0, &statbuf);
   switch(statbuf.type){

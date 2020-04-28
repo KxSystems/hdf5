@@ -27,7 +27,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   }
   char *dataname = kdbGetString(dname);
   // is dname a group/dataset, error out on issue
-  data = isGroupData(file, dataname);
+  data = openGroupData(file, dataname);
   if(data < 0){
     free(filename);
     free(dataname);

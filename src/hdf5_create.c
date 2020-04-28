@@ -56,13 +56,13 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
     free(attrname);
     return krr((S)"file does not exist");
   }
-  data = isGroupData(file, dataname);
+  data = openGroupData(file, dataname);
   if(data < 0){
     free(filename);
     free(dataname);
     free(attrname);
     H5Fclose(file);
-    return krr((S)"group does not exist");
+    return krr((S)"group/dataset does not exist");
   }
   if(H5Aexists(data, attrname) > 0){
     closeGroupData(file, dataname, data);
@@ -70,7 +70,7 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
     free(dataname);
     free(attrname);
     H5Fclose(file);
-    return krr((S)"attribute already exists for this dataset");
+    return krr((S)"attribute already exists for group/dataset");
   }
   dtype = checkvalid(ktype->g);
   if(dtype == NUMERIC)

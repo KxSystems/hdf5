@@ -45,10 +45,10 @@ int checkdataset(hid_t file, char *dataname);
 
 int checkgroup(hid_t file, char *groupname);
 
-// Returns group/data object depending on format of the file denoted in dataname
-hid_t isGroupData(hid_t file, char *dataname);
+// open group/dataset object (depending on object type)
+hid_t openGroupData(hid_t file, char *dataname);
 
-// Close the group or datatype depending on object type
-void closeGroupData(hid_t file, char *dataname,hid_t data);
+// close group/dataset object (depending on object type)
+void closeGroupData(hid_t file, char *dataname, hid_t data);
 
 #endif // HDF5_UTILS_H

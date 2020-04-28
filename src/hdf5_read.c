@@ -37,7 +37,7 @@ EXP K hdf5readAttrDataset(K fname, K dname, K aname){
     free(attrname);
     return krr((S)"file does not exist");
   }
-  data = isGroupData(file, dataname);
+  data = openGroupData(file, dataname);
   if(data < 0){
     free(filename);
     free(dataname);

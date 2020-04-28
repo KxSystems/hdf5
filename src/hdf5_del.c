@@ -22,9 +22,9 @@ EXP K hdf5delAttr(K fname, K dname, K aname){
   char *dataname = kdbGetString(dname);
   char *attrname = kdbGetString(aname);
   // Is the object that you are deleting from an attribute or dataset
-  data = isGroupData(file,dataname);
+  data = openGroupData(file, dataname);
   if(data < 0){
-    closeGroupData(file,dataname,data);
+    closeGroupData(file, dataname, data);
     H5Fclose(file);
     free(filename);
     free(dataname);

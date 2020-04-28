@@ -109,7 +109,7 @@ EXP K hdf5getAttrShape(K fname, K dname, K aname){
     return krr((S)"file does not exist");
   }
   char *dataname = kdbGetString(dname);
-  data  = isGroupData(file, dataname);
+  data  = openGroupData(file, dataname);
   if(data < 0){
     closeGroupData(file, dataname, data);
     free(filename);
@@ -153,7 +153,7 @@ EXP K hdf5getAttrPoints(K fname, K dname, K aname){
     return krr((S)"file does not exist");
   }
   char *dataname = kdbGetString(dname);
-  data   = isGroupData(file, dataname);
+  data   = openGroupData(file, dataname);
   if(data < 0){
     free(filename);
     free(dataname);
@@ -210,7 +210,7 @@ EXP K hdf5isAttr(K fname, K dname, K aname){
     return krr((S)"file does not exist");
   }
   char *dataname = kdbGetString(dname);
-  data = isGroupData(file, dataname);
+  data = openGroupData(file, dataname);
   if(data < 0){
     free(filename);
     free(dataname);
