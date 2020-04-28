@@ -1,8 +1,9 @@
 #ifndef HDF5_UTILS_H
 #define HDF5_UTILS_H
 
-#include "hdf5.h"
 #include "k.h"
+#include "hdf5.h"
+#include "kdb_utils.h"
 
 // HDF5 Types
 #define HDF5FLOAT H5T_NATIVE_DOUBLE 

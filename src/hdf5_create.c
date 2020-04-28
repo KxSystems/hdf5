@@ -1,13 +1,9 @@
-/* --- Creation functionality ---
- * The functions contained within this script are used for creating
- * objects, links or h5 files using this interface.
-*/
+#include "hdf5_utils.h"
 
 #include <stdlib.h>
 #include "k.h"
 #include "hdf5.h"
 #include "kdb_utils.h"
-#include "hdf5_utils.h"
 
 EXP K hdf5createFile(K fname){
   if(!kdbCheckType("[Cs]", fname))
@@ -16,7 +12,7 @@ EXP K hdf5createFile(K fname){
   H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
   // clean up
   free(filename);
-  return 0;
+  return KNL;
 }
 
 EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
@@ -38,7 +34,7 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   free(filename);
   free(dataname);
   H5Fclose(file);
-  return 0;
+  return KNL;
 }
 
 EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
@@ -66,10 +62,10 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   }
   if(H5Aexists(data, attrname) > 0){
     closeGroupData(file, dataname, data);
+    H5Fclose(file);
     free(filename);
     free(dataname);
     free(attrname);
-    H5Fclose(file);
     return krr((S)"attribute already exists for group/dataset");
   }
   dtype = getKType(ktype->g);
@@ -83,5 +79,5 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   free(filename);
   free(dataname);
   free(attrname);
-  return 0;
+  return KNL;
 }

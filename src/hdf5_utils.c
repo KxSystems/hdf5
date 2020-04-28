@@ -1,5 +1,3 @@
-/* --- HDF5 utility functions --- */
-
 #include <stdlib.h>
 #include <string.h>
 #include "k.h"

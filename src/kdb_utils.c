@@ -1,9 +1,3 @@
-/*
- * General use utils for handling kdb objects
- * The purpose of this script is to house utility functions which are used here for
- * the hdf5 interface but are also generally applicable for other interfaces
- */
-
 #include "kdb_utils.h"
 
 #include <stdarg.h>
