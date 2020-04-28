@@ -82,7 +82,7 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
     return krr((S)"file does not exist");
   }
   dataname = kdbGetString(dname);
-  data = openGroupData(file, dataname);
+  data = H5Oopen(file, dataname, H5P_DEFAULT);
   if(data < 0){
     free(filename);
     free(dataname);
@@ -91,11 +91,11 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   }
   attrname = kdbGetString(aname);
   if(H5Aexists(data, attrname) > 0){
-    closeGroupData(file, dataname, data);
-    H5Fclose(file);
     free(filename);
     free(dataname);
     free(attrname);
+    H5Oclose(data);
+    H5Fclose(file);
     return krr((S)"attribute already exists for group/dataset");
   }
   dtype = getKType(ktype->g);
@@ -104,10 +104,10 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   else if(dtype == STRING)
     createStringAttribute(data, attrname, kdims);
   // clean up
-  closeGroupData(file,dataname,data);
-  H5Fclose(file);
   free(filename);
   free(dataname);
   free(attrname);
+  H5Oclose(data);
+  H5Fclose(file);
   return KNL;
 }

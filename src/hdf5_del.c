@@ -16,21 +16,21 @@ EXP K hdf5delAttr(K fname, K dname, K aname){
   }
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   dataname = kdbGetString(dname);
-  data = openGroupData(file, dataname);
+  data = H5Oopen(file, dataname, H5P_DEFAULT);
   if(data < 0){
-    closeGroupData(file, dataname, data);
-    H5Fclose(file);
     free(filename);
     free(dataname);
+    H5Oclose(data);
+    H5Fclose(file);
     return krr((S)"group/datset does not exist");
   }
   attrname = kdbGetString(aname);
   if(H5Adelete(data,attrname) < 0)
     krr((S)"attribute could not be deleted");
-  closeGroupData(file, dataname, data);
-  H5Fclose(file);
   free(filename);
   free(dataname);
   free(attrname);
+  H5Oclose(data);
+  H5Fclose(file);
   return KNL;
 }

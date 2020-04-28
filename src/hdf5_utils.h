@@ -41,12 +41,6 @@ int createNumericAttribute(hid_t data, char *attrname, K kdims, K ktype);
 // create STRING attribute
 int createStringAttribute(hid_t data, char *attrname, K kdims);
 
-// open group/dataset object (depending on object type)
-hid_t openGroupData(hid_t file, char *dataname);
-
-// close group/dataset object (depending on object type)
-void closeGroupData(hid_t file, char *dataname, hid_t data);
-
 // Check that the dataset exists
 int checkDataset(hid_t file, char *dataname);
 

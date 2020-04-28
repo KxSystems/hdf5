@@ -115,38 +115,6 @@ int createStringAttribute(hid_t data, char *attrname, K kdims){
   return 0;
 }
 
-// open group/dataset object (depending on object type)
-hid_t openGroupData(hid_t file, char *dataname){
-  H5G_stat_t statbuf;
-  H5Gget_objinfo(file, dataname, 0, &statbuf);
-  switch(statbuf.type){
-  case H5G_GROUP:
-    return H5Gopen(file, dataname, H5P_DEFAULT);
-    break;
-  case H5G_DATASET:
-    return H5Dopen(file, dataname, H5P_DEFAULT);
-    break;
-  default:
-    return 0;
-  }
-}
-
-// close group/dataset object (depending on object type)
-void closeGroupData(hid_t file, char *dataname, hid_t data){
-  H5G_stat_t statbuf;
-  H5Gget_objinfo(file, dataname, 0, &statbuf);
-  switch(statbuf.type){
-    case H5G_GROUP:
-      H5Gclose(data);
-      break;
-    case H5G_DATASET:
-      H5Dclose(data);
-      break;
-    default:
-      break;
-  }
-}
-
 // check if dataset exists
 int checkDataset(hid_t file, char *dataname){
   H5G_stat_t statbuf;

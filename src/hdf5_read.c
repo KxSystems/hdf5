@@ -37,7 +37,7 @@ EXP K hdf5readAttrDataset(K fname, K dname, K aname){
     free(attrname);
     return krr((S)"file does not exist");
   }
-  data = openGroupData(file, dataname);
+  data = H5Oopen(file, dataname, H5P_DEFAULT);
   if(data < 0){
     free(filename);
     free(dataname);
@@ -47,19 +47,19 @@ EXP K hdf5readAttrDataset(K fname, K dname, K aname){
   }
   attr = H5Aopen(data, attrname, H5P_DEFAULT);
   if(attr < 0){
-    closeGroupData(file,dataname,data);
-    H5Fclose(file);
     free(filename);
     free(dataname);
     free(attrname);
+    H5Oclose(data);
+    H5Fclose(file);
     return krr((S)"This attribute does not exist");
   }
   result = readData(attr, "a");
-  closeGroupData(file, dataname, data);
   free(filename);
   free(dataname);
-  H5Fclose(file);
+  H5Oclose(data);
   H5Aclose(attr);
+  H5Fclose(file);
   return result;
 }
 

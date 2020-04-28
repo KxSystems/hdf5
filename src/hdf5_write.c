@@ -1,7 +1,3 @@
-/* --- Write functionality for attributes and datasets ---
- * The following function is used in writing kdb+ data to hdf5 format.
- */
-
 #include <stdlib.h>
 #include <string.h>
 #include "k.h"
@@ -27,7 +23,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   }
   char *dataname = kdbGetString(dname);
   // is dname a group/dataset, error out on issue
-  data = openGroupData(file, dataname);
+  data = H5Oopen(file, dataname, H5P_DEFAULT);
   if(data < 0){
     free(filename);
     free(dataname);
@@ -43,11 +39,11 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
       createNumericAttribute(data, attrname, kdims, ktype);
     // Could not evaluate if the attribute exists error out
     else if(aexists < 0){
-      closeGroupData(file, dataname, data);
-      H5Fclose(file);
       free(attrname);
       free(dataname);
       free(filename);
+      H5Oclose(data);
+      H5Fclose(file);
       return(krr((S)"check to ensure that attribute exists failed"));
     }
     attr = H5Aopen(data, attrname, H5P_DEFAULT);
@@ -60,11 +56,11 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
     if(aexists == 0)
       createStringAttribute(data, attrname, kdims);
     else if(aexists < 0){
-      closeGroupData(file, dataname, data);
-      H5Fclose(file);
       free(attrname);
       free(dataname);
       free(filename);
+      H5Oclose(data);
+      H5Fclose(file);
       return(krr((S)"check to ensure that attribute exists failed"));
     }
     attr = H5Aopen(data, attrname, H5P_DEFAULT);
@@ -72,20 +68,20 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   }
   // error out if type is unsupported
   else{
-    closeGroupData(file, dataname, data);
     free(attrname);
     free(dataname);
     free(filename);
+    H5Oclose(data);
     H5Fclose(file);
     return(krr((S)"Attempting to pass an unsupported datatype"));
   }
   // Clean up
-  closeGroupData(file, dataname, data);
-  H5Fclose(file);
-  H5Aclose(attr);
   free(attrname);
   free(dataname);
   free(filename);
+  H5Oclose(data);
+  H5Aclose(attr);
+  H5Fclose(file);
   return 0;
 }
 
