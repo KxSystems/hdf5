@@ -92,15 +92,14 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
 EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Ii]c", fname, dname, kdims, ktype))
     return KNL;
-  htri_t file_nm;
   int isdset;
   hid_t data, file;
   char *filename = kdbGetString(fname);
   // Create a file is it does not exist
-  file_nm = ish5(filename);
-  if(file_nm < 0)
+  htri_t filechk = H5Fis_hdf5(filename);
+  if(filechk < 0)
     createfile(filename);
-  if(file_nm == 0){
+  if(filechk == 0){
     free(filename);
     return krr((S)"This file already exists and is not a hdf5 file");
   }

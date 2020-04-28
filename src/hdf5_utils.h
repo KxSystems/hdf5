@@ -22,8 +22,7 @@ hid_t hdf5typ_from_k(K ktype);
 // Disable errors from hdf5 side
 void disable_err(void);
 
-// check if a file/attribute exists
-htri_t ish5(char *filename);
+// check if an attribute exists
 htri_t isattr(hid_t data,char *attrname);
 
 // Create a file based on name

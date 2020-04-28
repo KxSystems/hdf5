@@ -188,17 +188,11 @@ EXP K hdf5getAttrPoints(K fname, K dname, K aname){
 EXP K hdf5ishdf5(K fname){
   if(!kdbCheckType("[Cs]", fname))
     return KNL;
-  htri_t file_nm;
+  htri_t filechk;
   char *filename = kdbGetString(fname);
-  // Check if the file is a hdf5 file
-  file_nm = ish5(filename);
+  filechk = H5Fis_hdf5(filename);
   free(filename);
-  // File being passed is not a hdf5
-  if(file_nm <= 0)
-    return kb(0);
-  // File exists and is hdf5
-  else
-    return kb(1);
+  return (filechk > 0) ? kb(1) : kb(0);
 }
 
 // Does the requested attribute exist

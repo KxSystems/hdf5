@@ -11,11 +11,9 @@ EXP K hdf5delAttr(K fname, K dname, K aname){
     return KNL;
   K res;
   hid_t file, data;
-  htri_t file_nm;
   herr_t adel;
   char *filename = kdbGetString(fname);
-  file_nm = ish5(filename);
-  if((file_nm == 0) || file_nm < 0){
+  if(H5Fis_hdf5(filename) <= 0){
     free(filename);
     return krr((S)"File does not exist or is not HDF5");
   }

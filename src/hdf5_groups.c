@@ -13,10 +13,10 @@ EXP K hdf5createGroup(K fname, K gname){
   hid_t file, group, gcpl;
   char *filename   = kdbGetString(fname);
   // Create a file is it does not exist
-  htri_t file_nm = ish5(filename);
-  if(file_nm < 0)
+  htri_t filechk = H5Fis_hdf5(filename);
+  if(filechk < 0)
     createfile(filename);
-  if(file_nm == 0){
+  if(filechk == 0){
     free(filename);
     return krr((S)"This file already exists and is not a hdf5 file");
   }

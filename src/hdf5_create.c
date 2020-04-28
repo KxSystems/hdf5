@@ -22,30 +22,25 @@ EXP K hdf5createFile(K fname){
 EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Ii]c", fname, dname, kdims, ktype))
     return KNL;
-  htri_t file_nm;
   hid_t file;
   char *filename = kdbGetString(fname);
   char *dataname = kdbGetString(dname);
   kdata_t  dtype = checkvalid(ktype->g);
-  // Create a file is it does not exist
-  file_nm = ish5(filename);
-  if((file_nm == 0) || file_nm < 0)
+  if(H5Fis_hdf5(filename) <= 0) // create file if it does not exist
     createfile(filename);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  // Create a numerical dataset with relevant dimensionality and type
-  if(dtype == NUMERIC){
-    // Check that the dataset can be created appropriately
+  if(dtype == NUMERIC){ // create numerical dataset
     if(0==createsimpledataset(file, dataname, kdims, ktype)){
-      // Clean up if dimensionality is not suited
+      // Clean up
       free(filename);
       free(dataname);
       H5Fclose(file);
       return krr((S)"Within the current numerical api datasets must have dimensionality < 3");
     }
   }
-  // Create a string dataset with relevant dimensionality and type
-  else if(dtype == STRING){
+  else if(dtype == STRING){ // create string dataset
     if(0==createstrdataset(file, dataname, kdims)){
+      // Clean up
       free(filename);
       free(dataname);
       H5Fclose(file);
