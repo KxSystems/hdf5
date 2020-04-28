@@ -40,7 +40,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
     // Does the attribute already exist
     aexists = H5Aexists(file, attrname);
     if(aexists == 0)
-      createNumericAttr(data, attrname, kdims, ktype);
+      createNumericAttribute(data, attrname, kdims, ktype);
     // Could not evaluate if the attribute exists error out
     else if(aexists < 0){
       closeGroupData(file, dataname, data);
@@ -58,7 +58,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   else if(STRING == checkvalid(ktype->g)){
     aexists = H5Aexists(file, attrname);
     if(aexists == 0)
-      createStringAttr(data, attrname, kdims);
+      createStringAttribute(data, attrname, kdims);
     else if(aexists < 0){
       closeGroupData(file, dataname, data);
       H5Fclose(file);

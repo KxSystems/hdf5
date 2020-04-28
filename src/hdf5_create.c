@@ -14,6 +14,7 @@ EXP K hdf5createFile(K fname){
     return KNL;
   char *filename = kdbGetString(fname);
   H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
+  // clean up
   free(filename);
   return 0;
 }
@@ -29,25 +30,11 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
     H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   dtype = checkvalid(ktype->g);
-  if(dtype == NUMERIC){ // create numerical dataset
-    if(0==createNumericDataset(file, dataname, kdims, ktype)){
-      // Clean up
-      free(filename);
-      free(dataname);
-      H5Fclose(file);
-      return krr((S)"Within the current numerical api datasets must have dimensionality < 3");
-    }
-  }
-  else if(dtype == STRING){ // create string dataset
-    if(0==createStringDataset(file, dataname, kdims)){
-      // Clean up
-      free(filename);
-      free(dataname);
-      H5Fclose(file);
-      return krr((S)"Within the current api string datasets must have dimensionality < 2");
-    }
-  }
-  // Clean up
+  if(dtype == NUMERIC)
+    createNumericDataset(file, dataname, kdims, ktype);
+  else if(dtype == STRING)
+    createStringDataset(file, dataname, kdims);
+  // clean up
   free(filename);
   free(dataname);
   H5Fclose(file);
@@ -55,7 +42,7 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
 }
 
 EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
-  if(!kdbCheckType("[Cs][Cs][Cs][Ii]c", fname, dname, aname, kdims, ktype))
+  if(!kdbCheckType("[Cs][Cs][Cs]Ic", fname, dname, aname, kdims, ktype))
     return KNL;
   hid_t file, data;
   kdata_t  dtype;
@@ -63,37 +50,34 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   char *dataname = kdbGetString(dname);
   char *attrname = kdbGetString(aname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  // Error if the file doesn't exist attributes only added to existing groups/dsets
   if(file < 0){
     free(filename);
     free(dataname);
     free(attrname);
     return krr((S)"file does not exist");
   }
-  // Retrieve the group/data to which the attr is to be written (error if it doesn't exist)
-  data = isGroupData(file,dataname);
+  data = isGroupData(file, dataname);
   if(data < 0){
     free(filename);
     free(dataname);
     free(attrname);
     H5Fclose(file);
-    return krr((S)"dataset/group which attribute is to be written to does not exist");
+    return krr((S)"group does not exist");
   }
-  // Check if attribute already exists, error if it does
   if(H5Aexists(data, attrname) > 0){
-    closeGroupData(file,dataname,data);
-    H5Fclose(file);
+    closeGroupData(file, dataname, data);
     free(filename);
     free(dataname);
     free(attrname);
-    return krr((S)"This attribute already exists for this dataset");
+    H5Fclose(file);
+    return krr((S)"attribute already exists for this dataset");
   }
   dtype = checkvalid(ktype->g);
   if(dtype == NUMERIC)
-    createNumericAttr(data, attrname, kdims, ktype);
+    createNumericAttribute(data, attrname, kdims, ktype);
   else if(dtype == STRING)
-    createStringAttr(data, attrname, kdims);
-  // Clean up
+    createStringAttribute(data, attrname, kdims);
+  // clean up
   closeGroupData(file,dataname,data);
   H5Fclose(file);
   free(filename);

@@ -9,7 +9,7 @@
 
 // initialize hdf5-kdb library
 EXP K hdf5init(K UNUSED(dummy)){
-  disable_err();
+  disableErr();
   return KNL;
 }
 
@@ -50,27 +50,28 @@ hid_t hdf5typ_from_k(char ktype){
   }
 }
 
-// Disable errors from hdf5 side
-void disable_err(void){H5Eset_auto1(NULL,NULL);}
+// disable errors from hdf5 side
+void disableErr(void){H5Eset_auto1(NULL,NULL);}
 
-// Create NUMERIC dataset
+// create NUMERIC dataset
 int createNumericDataset(hid_t file, char *dataname, K kdims, K ktype){
   hsize_t dims[3];
   hid_t space, dtype;
   int i, rank = kdims->n;
-  if(rank > 3)
-    return 0;
+  if(rank > 3){
+    krr("numerical datasets must have dimensionality <= 3");
+    return 1;
+  }
   for(i = 0; i < rank; ++i)
     dims[i] = kI(kdims)[i];
   space = H5Screate_simple(rank, dims, NULL);
   dtype = hdf5typ_from_k(ktype->g);
   H5Dcreate(file, dataname, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   H5Sclose(space);
-  H5Tclose(dtype);
-  return 1;
+  return 0;
 }
 
-// Create STRING dataset
+// create STRING dataset
 int createStringDataset(hid_t file, char *dataname, K kdims){
   hsize_t dims[1];
   hid_t space, dtype;
@@ -81,48 +82,39 @@ int createStringDataset(hid_t file, char *dataname, K kdims){
   H5Dcreate(file, dataname, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   H5Sclose(space);
   H5Tclose(dtype);
-  return 1;
+  return 0;
 }
 
-// Create NUMERIC attribute
-int createNumericAttr(hid_t data, char *attrname, K kdims, K ktype){
-  int i, rank;
-  hid_t space;
-  if(-KI==kdims->t)
-    rank = 1;
-  else
-    rank = (I)kdims->n;
-  // System limited to 3-D in current iteration
-  if(rank>3)
-    return 0;
-  hsize_t dims[rank];
-  for(i=0;i < rank;i++)
+// create NUMERIC attribute
+int createNumericAttribute(hid_t data, char *attrname, K kdims, K ktype){
+  hsize_t dims[3];
+  hid_t space, dtype;
+  int i, rank = kdims->n;
+  if(rank > 3){
+    krr("numerical attributes must have dimensionality <= 3");
+    return 1;
+  }
+  for(i = 0; i < rank; ++i)
     dims[i] = kI(kdims)[i];
-  // Define dimensionality of the space to be created
-  space = H5Screate(H5S_SIMPLE);
-  H5Sset_extent_simple(space, rank, dims, NULL);
-  // Create the attribute dataset of appropriate type
-  H5Acreate2(data, attrname, hdf5typ_from_k(ktype->g), space, H5P_DEFAULT, H5P_DEFAULT);
-  // Clean up
+  space = H5Screate_simple(rank, dims, NULL);
+  dtype = hdf5typ_from_k(ktype->g);
+  H5Acreate(data, attrname, dtype, space, H5P_DEFAULT, H5P_DEFAULT);
   H5Sclose(space);
-  return 1;
+  return 0;
 }
 
-// Create STRING attribute
-int createStringAttr(hid_t data, char *attrname, K kdims){
-  hid_t space, filetype;
+// create STRING attribute
+int createStringAttribute(hid_t data, char *attrname, K kdims){
   hsize_t dims[1];
-  // Number of char arrays or symbols to within the string attribute
-  int klen = kI(kdims)[0];
-  dims[0] = klen;
-  // Write data to FORTRAN type (this handles null termination)
-  filetype = H5Tcopy(H5T_FORTRAN_S1);
-  H5Tset_size(filetype, H5T_VARIABLE);
+  hid_t space, dtype;
+  dims[0] = kI(kdims)[0];
   space = H5Screate_simple(1, dims, NULL);
-  H5Acreate2(data, attrname, filetype, space, H5P_DEFAULT,  H5P_DEFAULT);
+  dtype = H5Tcopy(H5T_C_S1);
+  H5Tset_size(dtype, H5T_VARIABLE);
+  H5Acreate(data, attrname, dtype, space, H5P_DEFAULT,  H5P_DEFAULT);
   H5Sclose(space);
-  H5Tclose(filetype);
-  return 1;
+  H5Tclose(dtype);
+  return 0;
 }
 
 // Check that the dataset exists

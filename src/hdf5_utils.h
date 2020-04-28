@@ -26,7 +26,7 @@ kdata_t checkvalid(char ktype);
 hid_t hdf5typ_from_k(char ktype);
 
 // Disable errors from hdf5 side
-void disable_err(void);
+void disableErr(void);
 
 // Create NUMERIC dataset
 int createNumericDataset(hid_t file, char *dataname, K kdims, K ktype);
@@ -35,10 +35,10 @@ int createNumericDataset(hid_t file, char *dataname, K kdims, K ktype);
 int createStringDataset(hid_t file, char *dataname, K kdims);
 
 // Create NUMERIC attribute
-int createNumericAttr(hid_t data, char *attrname, K kdims, K ktype);
+int createNumericAttribute(hid_t data, char *attrname, K kdims, K ktype);
 
 // Create STRING attribute
-int createStringAttr(hid_t data, char *attrname, K kdims);
+int createStringAttribute(hid_t data, char *attrname, K kdims);
 
 // Check that the dataset exists
 int checkdataset(hid_t file, char *dataname);
