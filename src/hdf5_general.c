@@ -69,7 +69,7 @@ EXP K hdf5getDataPoints(K fname, K dname){
     H5Fclose(file);
     return krr((S)"dataset/group could not be opened");
   }
-  space = H5Dget_space(data);
+  space  = H5Dget_space(data);
   points = H5Sget_simple_extent_npoints(space); // number of datapoints
   // Clean up
   free(filename);
@@ -126,36 +126,34 @@ EXP K hdf5getAttrPoints(K fname, K dname, K aname){
   if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
     return KNL;
   hid_t file, data, attr, space;
-  char *filename = kdbGetString(fname);
-  long points;
-  file   = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  J points;
+  char *filename, *dataname, *attrname;
+  filename = kdbGetString(fname);
+  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
-    H5Fclose(file);
     return krr((S)"file does not exist");
   }
-  char *dataname = kdbGetString(dname);
+  dataname = kdbGetString(dname);
   data = H5Oopen(file, dataname, H5P_DEFAULT);
   if(data < 0){
     free(filename);
     free(dataname);
-    H5Oclose(data);
     H5Fclose(file);
     return krr((S)"dataset/group could not be opened");
   }
-  char *attrname = kdbGetString(aname);
+  attrname = kdbGetString(aname);
   attr   = H5Aopen(data, attrname, H5P_DEFAULT);
   if(attr < 0){
     free(attrname);
     free(dataname);
     free(filename);
     H5Oclose(data);
-    H5Aclose(attr);
     H5Fclose(file);
     return krr((S)"attribute could not be opened");
   }
   space  = H5Aget_space(attr);
-  points = (J)H5Sget_simple_extent_npoints(space);
+  points = H5Sget_simple_extent_npoints(space);
   free(filename); 
   free(dataname);
   free(attrname);
