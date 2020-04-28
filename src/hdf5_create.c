@@ -19,7 +19,7 @@ EXP K hdf5createFile(K fname){
 }
 
 EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
-  if(!kdbCheckType("[Cs][Cs][Ii]c", fname, dname, kdims, ktype))
+  if(!kdbCheckType("[Cs][Cs]Ic", fname, dname, kdims, ktype))
     return KNL;
   hid_t file;
   kdata_t dtype;

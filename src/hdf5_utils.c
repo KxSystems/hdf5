@@ -7,72 +7,86 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
-K hdf5init(K UNUSED(dummy)){
+// initialize hdf5-kdb library
+EXP K hdf5init(K UNUSED(dummy)){
   disable_err();
   return KNL;
 }
 
-// Retrieve hdf5 numeric types
-hid_t hdf5typ_from_k(K ktype){
-  hid_t val;
-  char* kstring = kdbGetString(ktype);
-  char typ = kstring[0];
-  switch(typ){
+// ktype (char) to k typegroup
+kdata_t checkvalid(char ktype){
+  if(NULL != strchr("hijfebxpmdznuvt", ktype))
+    return NUMERIC;
+  if(NULL != strchr("csg", ktype))
+    return STRING;
+  return INVALID;
+}
+
+// ktype (char) to hdf5 numeric types
+hid_t hdf5typ_from_k(char ktype){
+  switch(ktype){
+    case 'h':
+      return HDF5SHORT;
     case 'i':
     case 'b':
     case 'd':
     case 'u':
     case 'v':
     case 't':
-      val = HDF5INT;
-      break;
+      return HDF5INT;
     case 'j':
     case 'p':
     case 'n':
-      val = HDF5LONG;
-      break;
+      return HDF5LONG;
     case 'f':
     case 'z':
-      val = HDF5FLOAT;
-      break;
+      return HDF5FLOAT;
     case 'e':
-      val = HDF5REAL;
-      break;
-    case 'h':
-      val = HDF5SHORT;
-      break;
+      return HDF5REAL;
     case 'x':
-      val = H5T_NATIVE_UCHAR;
-      break;
+      return H5T_NATIVE_UCHAR;
     default:
-      val = 0;
+      return 0;
   }
-  // Clean up
-  free(kstring);
-  return val;
 }
 
 // Disable errors from hdf5 side
 void disable_err(void){H5Eset_auto1(NULL,NULL);}
 
-// Create a string attribute
-int createstrattr(hid_t data, char *attrname, K kdims){
+// Create NUMERIC dataset
+int createsimpledataset(hid_t file, char *dataname, K kdims, K ktype){
+  static hsize_t dims[3];
+  hid_t space, dtype;
+  int i, rank = kdims->n;
+  if(rank > 3)
+    return 0;
+  for(i = 0; i < rank; ++i)
+    dims[i] = kI(kdims)[i];
+  space = H5Screate_simple(rank, dims, NULL);
+  dtype = H5Tcopy(hdf5typ_from_k(ktype->g));
+  H5Tset_order(dtype, H5T_ORDER_LE);
+  H5Dcreate(file, dataname, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Sclose(space);
+  H5Tclose(dtype);
+  return 1;
+}
+
+// Create STRING dataset
+int createstrdataset(hid_t file, char *dataname, K kdims){
   hid_t space, filetype;
   hsize_t dims[1];
-  // Number of char arrays or symbols to within the string attribute
   int klen = kI(kdims)[0];
   dims[0] = klen;
-  // Write data to FORTRAN type (this handles null termination)
   filetype = H5Tcopy(H5T_FORTRAN_S1);
   H5Tset_size(filetype, H5T_VARIABLE);
   space = H5Screate_simple(1, dims, NULL);
-  H5Acreate2(data, attrname, filetype, space, H5P_DEFAULT,  H5P_DEFAULT);
+  H5Dcreate(file, dataname, filetype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   H5Sclose(space);
   H5Tclose(filetype);
   return 1;
 }
 
-// Used for the creation of simple attributes for types ijhef
+// Create NUMERIC attribute
 int createsimpleattr(hid_t data, char *attrname, K kdims, K ktype){
   int i, rank;
   hid_t space;
@@ -90,46 +104,26 @@ int createsimpleattr(hid_t data, char *attrname, K kdims, K ktype){
   space = H5Screate(H5S_SIMPLE);
   H5Sset_extent_simple(space, rank, dims, NULL);
   // Create the attribute dataset of appropriate type
-  H5Acreate2(data, attrname, hdf5typ_from_k(ktype), space, H5P_DEFAULT, H5P_DEFAULT);
+  H5Acreate2(data, attrname, hdf5typ_from_k(ktype->g), space, H5P_DEFAULT, H5P_DEFAULT);
   // Clean up
   H5Sclose(space);
   return 1;
 }
 
-int createstrdataset(hid_t file, char *dataname, K kdims){
+// Create STRING attribute
+int createstrattr(hid_t data, char *attrname, K kdims){
   hid_t space, filetype;
   hsize_t dims[1];
+  // Number of char arrays or symbols to within the string attribute
   int klen = kI(kdims)[0];
   dims[0] = klen;
+  // Write data to FORTRAN type (this handles null termination)
   filetype = H5Tcopy(H5T_FORTRAN_S1);
   H5Tset_size(filetype, H5T_VARIABLE);
   space = H5Screate_simple(1, dims, NULL);
-  H5Dcreate(file, dataname, filetype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Acreate2(data, attrname, filetype, space, H5P_DEFAULT,  H5P_DEFAULT);
   H5Sclose(space);
   H5Tclose(filetype);
-  return 1;
-}
-
-// Used for the creation of simple datasets of type ijhef
-int createsimpledataset(hid_t file, char *dataname, K kdims, K ktype){
-  int i, rank;
-  hid_t space, dtype;
-  // Handle if someone passes an individual elements for dimensionality
-  if(-KI==kdims->t)
-    rank = 1;
-  else
-    rank = (I)kdims->n;
-  if(rank>3)
-    return 0;
-  hsize_t dims[rank];
-  for(i=0;i < rank;i++)
-    dims[i] = kI(kdims)[i];
-  space = H5Screate_simple(rank, dims, NULL);
-  dtype = H5Tcopy(hdf5typ_from_k(ktype));
-  H5Tset_order(dtype, H5T_ORDER_LE);
-  H5Dcreate(file, dataname, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-  H5Sclose(space);
-  H5Tclose(dtype);
   return 1;
 }
 
@@ -188,13 +182,4 @@ void closeGroupData(hid_t file, char *dataname,hid_t data){
     default:
       break;
   }
-}
-
-// used to check what datatype is being passed in to make decisions on write path
-kdata_t checkvalid(char ktype){
-  if(NULL != strchr("hijfebxpmdznuvt", ktype))
-    return NUMERIC;
-  if(NULL != strchr("csg", ktype))
-    return STRING;
-  return INVALID;
 }

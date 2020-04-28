@@ -16,22 +16,29 @@
 // k datatypes
 typedef enum {NUMERIC, STRING, INVALID} kdata_t;
 
-// Retrieve hdf5 numeric types
-hid_t hdf5typ_from_k(K ktype);
+// initialize hdf5-kdb library
+EXP K hdf5init(K UNUSED(dummy));
+
+// ktype (char) to k typegroup
+kdata_t checkvalid(char ktype);
+
+// ktype (char) to hdf5 numeric types
+hid_t hdf5typ_from_k(char ktype);
 
 // Disable errors from hdf5 side
 void disable_err(void);
 
-// Create a string attribute
-int createstrattr(hid_t data, char *attrname, K kdims);
+// Create NUMERIC dataset
+int createsimpledataset(hid_t file, char *dataname, K kdims, K ktype);
 
-// Used for the creation of simple attributes for types ijhef
-int createsimpleattr(hid_t data, char *attrname, K kdims, K ktype);
-
+// Create STRING dataset
 int createstrdataset(hid_t file, char *dataname, K kdims);
 
-// Used for the creation of simple datasets of type ijhef
-int createsimpledataset(hid_t file, char *dataname, K kdims, K ktype);
+// Create NUMERIC attribute
+int createsimpleattr(hid_t data, char *attrname, K kdims, K ktype);
+
+// Create STRING attribute
+int createstrattr(hid_t data, char *attrname, K kdims);
 
 // Check that the dataset exists
 int checkdataset(hid_t file, char *dataname);
@@ -43,8 +50,5 @@ hid_t isGroupData(hid_t file, char *dataname);
 
 // Close the group or datatype depending on object type
 void closeGroupData(hid_t file, char *dataname,hid_t data);
-
-// used to check what datatype is being passed in to make decisions on write path
-kdata_t checkvalid(char ktype);
 
 #endif // HDF5_UTILS_H
