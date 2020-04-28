@@ -17,14 +17,14 @@
 
 #define KNL (K) 0
 
-// get k string or symbol name
-char * getkstring(K x);
+// get c string from kdb char, string or symbol
+char * kdbGetString(K x);
 
-// check types
-int checkType(const C* tc, ...);
+// check types of args vs typePattern
+int kdbCheckType(const char *typePattern, ...);
 
-// create dictionaries as key, val, key, val ...
-K xd0(I n, ...); 
-#define xd(...) xd0(0, __VA_ARGS__, (S) 0)
+// create dictionary (key, val, key, val, ...)
+K kdbCreateDict0(void *dummy, ...);
+#define kdbCreateDict(...) kdbCreateDict0(0, __VA_ARGS__, (S)0)
 
 #endif // KDB_UTILS_H

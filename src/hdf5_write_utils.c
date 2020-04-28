@@ -125,7 +125,7 @@ static void writeChar(K dset, hid_t data, char *data_attr){
   arr = dset->n;
   char **wdata = malloc(sizeof(char*) * arr);
   for(i=0;i<arr;i++)
-    wdata[i]= getkstring(kK(dset)[i]);
+    wdata[i]= kdbGetString(kK(dset)[i]);
   if(strcmp(data_attr,"d")==0)
     H5Dwrite(data, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
   else

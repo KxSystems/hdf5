@@ -20,16 +20,14 @@ K readCompound(hid_t dset, char *rdtyp);
 
 // Read data from an attribute associated with a group or dataset
 EXP K hdf5readAttrDataset(K fname, K dname, K aname){
-  disable_err();
-  // Type check inputs
-  if(!checkType("[Cs][Cs][Cs]", fname, dname,aname))
+  if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname,aname))
     return KNL;
   // Define required elements
   K result;
   hid_t file, data, attr;
-  char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
-  char *attrname = getkstring(aname);
+  char *filename = kdbGetString(fname);
+  char *dataname = kdbGetString(dname);
+  char *attrname = kdbGetString(aname);
   // Open file and dataset
   file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
   // error if file doesn't exist
@@ -67,15 +65,13 @@ EXP K hdf5readAttrDataset(K fname, K dname, K aname){
 
 // Read data from a signularly typed HDF5 dataset
 EXP K hdf5readDataset(K fname, K dname){
-  disable_err();
-  // Type check inputs
-  if(!checkType("[Cs][Cs]", fname, dname))
+  if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
   // Define required elements
   K result;
   hid_t file, data;
-  char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
+  char *filename = kdbGetString(fname);
+  char *dataname = kdbGetString(dname);
   // Open file and dataset
   file   = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
   if(file < 0){

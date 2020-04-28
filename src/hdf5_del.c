@@ -7,23 +7,20 @@
 #include "hdf5_utils.h"
 
 EXP K hdf5delAttr(K fname, K dname, K aname){
-  disable_err();
-  if(!checkType("[Cs][Cs][Cs]", fname, dname, aname))
+  if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
     return KNL;
   K res;
   hid_t file, data;
-  htri_t file_nm;
   herr_t adel;
-  char *filename = getkstring(fname);
-  file_nm = ish5(filename);
-  if((file_nm == 0) || file_nm < 0){
+  char *filename = kdbGetString(fname);
+  if(H5Fis_hdf5(filename) <= 0){
     free(filename);
     return krr((S)"File does not exist or is not HDF5");
   }
   // Open appropriate HDF5 file
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  char *dataname = getkstring(dname);
-  char *attrname = getkstring(aname);
+  char *dataname = kdbGetString(dname);
+  char *attrname = kdbGetString(aname);
   // Is the object that you are deleting from an attribute or dataset
   data = isGroupData(file,dataname);
   if(data < 0){

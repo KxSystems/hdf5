@@ -13,18 +13,14 @@
 #define HDF5CHAR  H5T_C_S1
 #define HDF5BYTE  H5T_NATIVE_UCHAR
 
+// k datatypes
+typedef enum {NUMERIC, STRING, INVALID} kdata_t;
+
 // Retrieve hdf5 numeric types
 hid_t hdf5typ_from_k(K ktype);
 
 // Disable errors from hdf5 side
 void disable_err(void);
-
-// check if a file/attribute exists
-htri_t ish5(char *filename);
-htri_t isattr(hid_t data,char *attrname);
-
-// Create a file based on name
-void createfile(char *filename);
 
 // Create a string attribute
 int createstrattr(hid_t data, char *attrname, K kdims);
@@ -49,6 +45,6 @@ hid_t isGroupData(hid_t file, char *dataname);
 void closeGroupData(hid_t file, char *dataname,hid_t data);
 
 // used to check what datatype is being passed in to make decisions on write path
-int checkvalid(char *ktype);
+kdata_t checkvalid(char ktype);
 
 #endif // HDF5_UTILS_H

@@ -15,21 +15,20 @@
 /* tname = target file path */
 /* tobj = object path in target file */
 EXP K hdf5createExternal(K fname, K lname, K tname, K tobj){
-  disable_err();
-  if(!checkType("[Cs][Cs][Cs][Cs]", fname, lname, tname, tobj))
+  if(!kdbCheckType("[Cs][Cs][Cs][Cs]", fname, lname, tname, tobj))
     return KNL;
   K res;
   hid_t file;
-  char *filename = getkstring(fname);
+  char *filename = kdbGetString(fname);
   file = H5Fopen(filename,  H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
     H5Fclose(file);
     return krr((S)"file does not exist");
   }
-  char *linkname = getkstring(lname);
-  char *targetnm = getkstring(tname);
-  char *tobjname = getkstring(tobj);
+  char *linkname = kdbGetString(lname);
+  char *targetnm = kdbGetString(tname);
+  char *tobjname = kdbGetString(tobj);
   // Create link to external location
   if(H5Lcreate_external(targetnm, tobjname, file, linkname, H5P_DEFAULT, H5P_DEFAULT)<0)
     res = krr((S)"Creation of external link unsuccessful");
@@ -49,20 +48,19 @@ EXP K hdf5createExternal(K fname, K lname, K tname, K tobj){
 /* oname = name of the object being linked to */
 /* lname = linking path name */
 EXP K hdf5createHard(K fname, K oname, K lname){
-  disable_err();
-  if(!checkType("[Cs][Cs][Cs]", fname, oname, lname))
+  if(!kdbCheckType("[Cs][Cs][Cs]", fname, oname, lname))
     return KNL;
   K res;
   hid_t file;
-  char *filename = getkstring(fname);
+  char *filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
     H5Fclose(file);
     return krr((S)"file does not exist");
   }
-  char *objname  = getkstring(oname);
-  char *linkname = getkstring(lname);
+  char *objname  = kdbGetString(oname);
+  char *linkname = kdbGetString(lname);
   // Create hard link between two physical locations within a file
   if(H5Lcreate_hard(file, objname, H5L_SAME_LOC, linkname, H5P_DEFAULT, H5P_DEFAULT)<0)
     res = krr((S)"Creation of hard link unsuccessful");
@@ -79,14 +77,13 @@ EXP K hdf5createHard(K fname, K oname, K lname){
 /* tpath = target path (may be dangling) */
 /* lpath = soft link path */
 EXP K hdf5createSoft(K fname,K tpath,K lname){
-  disable_err();
-  if(!checkType("[Cs][Cs][Cs]", fname, tpath, lname))
+  if(!kdbCheckType("[Cs][Cs][Cs]", fname, tpath, lname))
     return KNL;
   K res;
   hid_t file;
-  char *filename = getkstring(fname);
-  char *tarname  = getkstring(tpath);
-  char *linkname = getkstring(lname);
+  char *filename = kdbGetString(fname);
+  char *tarname  = kdbGetString(tpath);
+  char *linkname = kdbGetString(lname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
@@ -107,19 +104,18 @@ EXP K hdf5createSoft(K fname,K tpath,K lname){
 
 // Delete a hard/soft or external link
 EXP K hdf5delLink(K fname, K lname){
-  disable_err();
-  if(!checkType("[Cs][Cs]", fname, lname))
+  if(!kdbCheckType("[Cs][Cs]", fname, lname))
     return KNL;
   K res;
   hid_t file;
-  char *filename = getkstring(fname);
+  char *filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
     H5Fclose(file);
     return krr((S)"file does not exist");
   }
-  char *linkname = getkstring(lname);
+  char *linkname = kdbGetString(lname);
   if(H5Ldelete(file, linkname, H5P_DEFAULT)<0)
     res = krr("could not delete specified link");
   else

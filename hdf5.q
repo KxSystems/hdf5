@@ -1,6 +1,9 @@
 \d .hdf5
 LIBPATH:`:hdf5 2:
 funcs:(
+  /* initialization */
+  (`hdf5init;1);
+
   /* write functions */
   (`hdf5writeDataset;5);
   (`hdf5writeAttrDataset;6);
@@ -130,4 +133,5 @@ readDictTab:{[fname;dname;typ]
   r
   }
 
-
+// initialize
+init[];

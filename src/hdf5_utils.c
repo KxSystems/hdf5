@@ -1,15 +1,21 @@
 /* --- HDF5 utility functions --- */
 
 #include <stdlib.h>
+#include <string.h>
 #include "k.h"
 #include "hdf5.h"
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
+K hdf5init(K UNUSED(dummy)){
+  disable_err();
+  return KNL;
+}
+
 // Retrieve hdf5 numeric types
 hid_t hdf5typ_from_k(K ktype){
   hid_t val;
-  char* kstring = getkstring(ktype);
+  char* kstring = kdbGetString(ktype);
   char typ = kstring[0];
   switch(typ){
     case 'i':
@@ -48,13 +54,6 @@ hid_t hdf5typ_from_k(K ktype){
 
 // Disable errors from hdf5 side
 void disable_err(void){H5Eset_auto1(NULL,NULL);}
-
-// check if a file/attribute exists
-htri_t ish5(char *filename){return H5Fis_hdf5(filename);}
-htri_t isattr(hid_t data,char *attrname){return H5Aexists(data, attrname);}
-
-// Create a file based on name
-void createfile(char *filename){H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);}
 
 // Create a string attribute
 int createstrattr(hid_t data, char *attrname, K kdims){
@@ -192,22 +191,10 @@ void closeGroupData(hid_t file, char *dataname,hid_t data){
 }
 
 // used to check what datatype is being passed in to make decisions on write path
-int checkvalid(char *ktype){
-  int flag=0;
-  int i,j;
-  char num[15] = "hijfebxpmdznuvt";
-  char str[3] = "csg";
-  for(i=0;i<15;i++){
-    if(ktype[0] == num[i]){
-      flag = 1;
-      break;
-    }
-  }
-  for(j=0;j<3;j++){
-    if(ktype[0] == str[j]){
-      flag = 2;
-      break;
-    }
-  }
-  return(flag);
+kdata_t checkvalid(char ktype){
+  if(NULL != strchr("hijfebxpmdznuvt", ktype))
+    return NUMERIC;
+  if(NULL != strchr("csg", ktype))
+    return STRING;
+  return INVALID;
 }

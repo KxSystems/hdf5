@@ -18,10 +18,9 @@ int group_check(struct opdata *od, haddr_t target_addr);
 herr_t opfunc(hid_t loc_id, const char *name, const H5L_info_t *info, void *operator_data);
 
 EXP K hdf5ls(K fname){
-  disable_err();
-  if(!checkType("[Cs]",fname))
+  if(!kdbCheckType("[Cs]", fname))
     return KNL;
-  char *filename = getkstring(fname);
+  char *filename = kdbGetString(fname);
   hid_t file;
   H5O_info_t infobuf;
   struct opdata od;

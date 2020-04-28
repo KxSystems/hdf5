@@ -9,19 +9,60 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
+EXP K hdf5createFile(K fname){
+  if(!kdbCheckType("[Cs]", fname))
+    return KNL;
+  char *filename = kdbGetString(fname);
+  H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
+  // Clean up
+  free(filename);
+  return 0;
+}
+
+EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
+  if(!kdbCheckType("[Cs][Cs][Ii]c", fname, dname, kdims, ktype))
+    return KNL;
+  hid_t file;
+  char *filename = kdbGetString(fname);
+  char *dataname = kdbGetString(dname);
+  kdata_t  dtype = checkvalid(ktype->g);
+  if(H5Fis_hdf5(filename) <= 0) // create file if it does not exist
+    H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
+  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if(dtype == NUMERIC){ // create numerical dataset
+    if(0==createsimpledataset(file, dataname, kdims, ktype)){
+      // Clean up
+      free(filename);
+      free(dataname);
+      H5Fclose(file);
+      return krr((S)"Within the current numerical api datasets must have dimensionality < 3");
+    }
+  }
+  else if(dtype == STRING){ // create string dataset
+    if(0==createstrdataset(file, dataname, kdims)){
+      // Clean up
+      free(filename);
+      free(dataname);
+      H5Fclose(file);
+      return krr((S)"Within the current api string datasets must have dimensionality < 2");
+    }
+  }
+  // Clean up
+  free(filename);
+  free(dataname);
+  H5Fclose(file);
+  return 0;
+}
+
 EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
-  // Disable the in built hdf5 errors
-  disable_err();
-  // Check types 
-  if(!checkType("[Cs][Cs][Cs][Ii][Ccs]", fname, dname, aname, kdims, ktype))
+  if(!kdbCheckType("[Cs][Cs][Cs][Ii]c", fname, dname, aname, kdims, ktype))
     return KNL;
   hid_t file, data;
-  htri_t aexists;
   // Determine the type which the attribute will have (symbol/char vs numeric)
-  int  dtype = checkvalid(getkstring(ktype));
-  char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
-  char *attrname = getkstring(aname);
+  kdata_t  dtype = checkvalid(ktype->g);
+  char *filename = kdbGetString(fname);
+  char *dataname = kdbGetString(dname);
+  char *attrname = kdbGetString(aname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   // Error if the file doesn't exist attributes only added to existing groups/dsets
   if(file < 0){
@@ -40,8 +81,7 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
     return krr((S)"dataset/group which attribute is to be written to does not exist");
   }
   // Check if attribute already exists, error if it does
-  aexists = isattr(data, attrname);
-  if(aexists > 0){
+  if(H5Aexists(data, attrname) > 0){
     closeGroupData(file,dataname,data);
     H5Fclose(file);
     free(filename);
@@ -60,61 +100,5 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   free(filename);
   free(dataname);
   free(attrname);
-  return 0;
-}
-
-
-EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
-  // Disable errors from hdf5
-  disable_err();
-  if(!checkType("[Cs][Cs][Ii][Ccs]", fname, dname, kdims, ktype))
-    return KNL;
-  htri_t file_nm;
-  hid_t file;
-  char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
-  int  dtype = checkvalid(getkstring(ktype));
-  // Create a file is it does not exist
-  file_nm = ish5(filename);
-  if((file_nm == 0) || file_nm < 0)
-    createfile(filename);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  // Create a numerical dataset with relevant dimensionality and type
-  if(dtype == 1){
-    // Check that the dataset can be created appropriately
-    if(0==createsimpledataset(file, dataname, kdims, ktype)){
-      // Clean up if dimensionality is not suited
-      free(filename);
-      free(dataname);
-      H5Fclose(file);
-      return krr((S)"Within the current numerical api datasets must have dimensionality < 3");
-    }
-  }
-  // Create a string dataset with relevant dimensionality and type
-  else if(dtype == 2){
-    if(0==createstrdataset(file, dataname, kdims)){
-      free(filename);
-      free(dataname);
-      H5Fclose(file);
-      return krr((S)"Within the current api string datasets must have dimensionality < 2");
-    }
-  }
-  // Clean up
-  free(filename);
-  free(dataname);
-  H5Fclose(file);
-  return 0;
-}
-
-
-EXP K hdf5createFile(K fname){
-  // Disable errors from hdf5
-  disable_err();
-  if(!checkType("[Cs]",fname))
-    return KNL;
-  char *filename = getkstring(fname);
-  createfile(filename);
-  // Clean up
-  free(filename);
   return 0;
 }
