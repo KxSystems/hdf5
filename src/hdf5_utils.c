@@ -55,7 +55,7 @@ void disable_err(void){H5Eset_auto1(NULL,NULL);}
 
 // Create NUMERIC dataset
 int createsimpledataset(hid_t file, char *dataname, K kdims, K ktype){
-  static hsize_t dims[3];
+  hsize_t dims[3];
   hid_t space, dtype;
   int i, rank = kdims->n;
   if(rank > 3)
@@ -63,8 +63,7 @@ int createsimpledataset(hid_t file, char *dataname, K kdims, K ktype){
   for(i = 0; i < rank; ++i)
     dims[i] = kI(kdims)[i];
   space = H5Screate_simple(rank, dims, NULL);
-  dtype = H5Tcopy(hdf5typ_from_k(ktype->g));
-  H5Tset_order(dtype, H5T_ORDER_LE);
+  dtype = hdf5typ_from_k(ktype->g);
   H5Dcreate(file, dataname, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   H5Sclose(space);
   H5Tclose(dtype);
@@ -73,16 +72,15 @@ int createsimpledataset(hid_t file, char *dataname, K kdims, K ktype){
 
 // Create STRING dataset
 int createstrdataset(hid_t file, char *dataname, K kdims){
-  hid_t space, filetype;
   hsize_t dims[1];
-  int klen = kI(kdims)[0];
-  dims[0] = klen;
-  filetype = H5Tcopy(H5T_FORTRAN_S1);
-  H5Tset_size(filetype, H5T_VARIABLE);
+  hid_t space, dtype;
+  dims[0] = kI(kdims)[0];
   space = H5Screate_simple(1, dims, NULL);
-  H5Dcreate(file, dataname, filetype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  dtype = H5Tcopy(H5T_C_S1);
+  H5Tset_size(dtype, H5T_VARIABLE);
+  H5Dcreate(file, dataname, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   H5Sclose(space);
-  H5Tclose(filetype);
+  H5Tclose(dtype);
   return 1;
 }
 
