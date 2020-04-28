@@ -36,7 +36,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   }
   char *attrname = kdbGetString(aname);
   // Check if type that is to be written to is numeric
-  if(NUMERIC == checkvalid(ktype->g)){
+  if(NUMERIC == getKType(ktype->g)){
     // Does the attribute already exist
     aexists = H5Aexists(file, attrname);
     if(aexists == 0)
@@ -55,7 +55,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
     writenumeric(dset, attr, "a");
   }
   // Check if the type that is to be written to is character/symbol
-  else if(STRING == checkvalid(ktype->g)){
+  else if(STRING == getKType(ktype->g)){
     aexists = H5Aexists(file, attrname);
     if(aexists == 0)
       createStringAttribute(data, attrname, kdims);
@@ -107,14 +107,14 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   char *dataname = kdbGetString(dname);
   // Create the appropriate dataset if it doesn't exist typed appropriately
   isdset = checkDataset(file, dataname);
-  if(NUMERIC == checkvalid(ktype->g)){
+  if(NUMERIC == getKType(ktype->g)){
     if(isdset == 0)
       createNumericDataset(file, dataname, kdims, ktype);
     data = H5Dopen(file, dataname, H5P_DEFAULT);
     // write the kdb dset to the data file
     writenumeric(dset, data, "d");
   }
-  else if(STRING == checkvalid(ktype->g)){
+  else if(STRING == getKType(ktype->g)){
     if(isdset == 0)
       createStringDataset(file, dataname, kdims);
     data = H5Dopen(file, dataname, H5P_DEFAULT);

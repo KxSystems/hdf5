@@ -17,7 +17,7 @@ EXP K hdf5init(K UNUSED(dummy)){
 void disableErr(void){H5Eset_auto1(NULL,NULL);}
 
 // ktype (char) to k typegroup
-kdata_t checkvalid(char ktype){
+ktype_t getKType(char ktype){
   if(NULL != strchr("hijfebxpmdznuvt", ktype))
     return NUMERIC;
   if(NULL != strchr("csg", ktype))

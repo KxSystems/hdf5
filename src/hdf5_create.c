@@ -23,13 +23,13 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs]Ic", fname, dname, kdims, ktype))
     return KNL;
   hid_t file;
-  kdata_t dtype;
+  ktype_t dtype;
   char *filename = kdbGetString(fname);
   char *dataname = kdbGetString(dname);
   if(H5Fis_hdf5(filename) <= 0) // create file if it does not exist
     H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  dtype = checkvalid(ktype->g);
+  dtype = getKType(ktype->g);
   if(dtype == NUMERIC)
     createNumericDataset(file, dataname, kdims, ktype);
   else if(dtype == STRING)
@@ -45,7 +45,7 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Cs]Ic", fname, dname, aname, kdims, ktype))
     return KNL;
   hid_t file, data;
-  kdata_t  dtype;
+  ktype_t  dtype;
   char *filename = kdbGetString(fname);
   char *dataname = kdbGetString(dname);
   char *attrname = kdbGetString(aname);
@@ -72,7 +72,7 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
     H5Fclose(file);
     return krr((S)"attribute already exists for group/dataset");
   }
-  dtype = checkvalid(ktype->g);
+  dtype = getKType(ktype->g);
   if(dtype == NUMERIC)
     createNumericAttribute(data, attrname, kdims, ktype);
   else if(dtype == STRING)

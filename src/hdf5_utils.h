@@ -14,7 +14,7 @@
 #define HDF5BYTE  H5T_NATIVE_UCHAR
 
 // k datatypes
-typedef enum {NUMERIC, STRING, INVALID} kdata_t;
+typedef enum {NUMERIC, STRING, INVALID} ktype_t;
 
 // initialize hdf5-kdb library
 EXP K hdf5init(K UNUSED(dummy));
@@ -23,7 +23,7 @@ EXP K hdf5init(K UNUSED(dummy));
 void disableErr(void);
 
 // ktype (char) to k typegroup
-kdata_t checkvalid(char ktype);
+ktype_t getKType(char ktype);
 
 // ktype (char) to hdf5 numeric types
 hid_t hdf5typ_from_k(char ktype);
