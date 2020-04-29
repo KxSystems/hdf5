@@ -348,19 +348,19 @@ EXP K hdf5datasetInfo(K fname, K dname){
   return kdbCreateDict("type", kdtype, "ndims", ki(rank), "dims", kdims);
 }
 
-// Copy the contents of one object to another location within a file or in a completely different file
-/* oname = object name
+/*
+ * Copy the contents of one object to another location within a file or in a completely different file
+ * oname = object name
  * fdest = destination folder
  * odest = destination object
-*/
+ */
 EXP K hdf5copyObject(K fname, K oname, K fdest, K odest){
   if(!kdbCheckType("[Cs][Cs][Cs][Cs]", fname, oname, fdest, odest))
     return KNL;
-  char *filename = kdbGetString(fname);
-  char *destname = kdbGetString(fdest);
-  K res;
+  char *filename, *destname, *objname, *destobj;
   hid_t file, dest;
-  // Open files (can be the same) and copy object reference from one point to another
+  filename = kdbGetString(fname);
+  destname = kdbGetString(fdest);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   dest = H5Fopen(destname, H5F_ACC_RDWR, H5P_DEFAULT);
   if((file < 0) || dest < 0){
@@ -368,20 +368,18 @@ EXP K hdf5copyObject(K fname, K oname, K fdest, K odest){
     free(destname);
     H5Fclose(file);
     H5Fclose(dest);
-    return krr((S)"Opening of files unsuccessful");
+    return krr((S)"opening files unsuccessful");
   }
-  char *objname  = kdbGetString(oname);
-  char *destobj  = kdbGetString(odest);
+  objname = kdbGetString(oname);
+  destobj = kdbGetString(odest);
   if(H5Ocopy(file, objname, dest, destobj, H5P_DEFAULT, H5P_DEFAULT)<0)
-    res = krr((S)"Error while copying the object");
-  else
-    res = 0;
-  // Clean up
+    krr((S)"copying object unsuccessful");
+  // clean up
   free(filename);
   free(objname);
   free(destname);
   free(destobj);
-  H5Fclose(file);
   H5Fclose(dest);
-  return res;
+  H5Fclose(file);
+  return KNL;
 }
