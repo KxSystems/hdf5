@@ -31,6 +31,51 @@ K hdf5getShape(hid_t space){
   return(kdims);
 }
 
+EXP K hdf5fileSize(K fname){
+  if(!kdbCheckType("[Cs]", fname))
+    return KNL;
+  hsize_t fsize;
+  hid_t file;
+  char *filename = kdbGetString(fname);
+  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if(file < 0){
+    free(filename);
+    return krr((S)"file does not exist");
+  }
+  H5Fget_filesize(file, &fsize);
+  free(filename);
+  H5Fclose(file);
+  return(kf(fsize / 1000000.0));
+}
+
+EXP K hdf5dataSize(K fname, K dname){
+  if(!kdbCheckType("[Cs][Cs]", fname, dname))
+    return KNL;
+  hsize_t dsize;
+  hid_t file, data;
+  char *filename, *dataname;
+  filename = kdbGetString(fname);
+  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if(file < 0){
+    free(filename);
+    return krr((S)"file does not exist");
+  }
+  dataname = kdbGetString(dname);
+  data = H5Dopen(file, dataname, H5P_DEFAULT);
+  if(data < 0){
+    free(filename);
+    free(dataname);
+    H5Fclose(file);
+    return krr((S)"dataset could not be opened");
+  }
+  dsize = H5Dget_storage_size(data);
+  free(filename);
+  free(dataname);
+  H5Fclose(file);
+  H5Dclose(data);
+  return(kf(dsize / 1000000.0));
+}
+
 EXP K hdf5getDataShape(K fname, K dname){
   if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
@@ -349,56 +394,4 @@ EXP K hdf5copyObject(K fname, K oname, K fdest, K odest){
   H5Fclose(file);
   H5Fclose(dest);
   return res;
-}
-
-// Get the size of a hdf5 file in megabytes
-EXP K hdf5fileSize(K fname){
-  if(!kdbCheckType("[Cs]", fname))
-    return KNL;
-  char *filename = kdbGetString(fname);
-  double megab;
-  hid_t file;
-  hsize_t fsize;
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  if(file < 0){
-    free(filename);
-    H5Fclose(file);
-    return krr((S)"file does not exist");
-  }
-  H5Fget_filesize(file, &fsize);
-  megab = (double)fsize / 1000000; 
-  free(filename);
-  H5Fclose(file);
-  return(kf(megab));
-}
-
-EXP K hdf5dataSize(K fname, K dname){
-  if(!kdbCheckType("[Cs][Cs]", fname, dname))
-    return KNL;
-  char *filename = kdbGetString(fname);
-  char *dataname = kdbGetString(dname);
-  hid_t file, data;
-  hsize_t dsize;
-  double megab;
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  if(file < 0){
-    free(filename);
-    H5Fclose(file); 
-    return krr((S)"file does not exist");
-  }
-  data = H5Dopen(file, dataname, H5P_DEFAULT);
-  if(data < 0){
-    free(filename);
-    free(dataname);
-    H5Dclose(data);
-    H5Fclose(file);
-    return krr((S)"dataset could not be opened");
-  }
-  dsize = H5Dget_storage_size(data);
-  megab = (double)dsize / 1000000;
-  free(filename);
-  free(dataname);
-  H5Fclose(file);
-  H5Dclose(data);
-  return(kf(megab));
 }
