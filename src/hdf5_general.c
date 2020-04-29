@@ -98,7 +98,7 @@ EXP K hdf5getDataShape(K fname, K dname){
     free(filename);
     free(dataname);
     H5Fclose(file);
-    return krr((S)"dataset does not exist");
+    return krr((S)"dataset could not be opened");
   }
   space = H5Dget_space(data);
   kdims = getShape(space);
@@ -294,61 +294,59 @@ EXP K hdf5isAttr(K fname, K dname, K aname){
   return kb(aexists > 0 ? 1 : 0);
 }
 
-// Return the rank, type, and dimensionality of the dataset
+// return type, ndims, dims
 EXP K hdf5datasetInfo(K fname, K dname){
   if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
+  int rank;
+  hsize_t *dims;
   K kdims, kdtype;
   hid_t file, data, dtype, ntype, space;
-  char *filename = kdbGetString(fname);
-  int rank;
-  // Open files and dataset and retrieve the dataspace
-  file  = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  char *filename, *dataname;
+  filename = kdbGetString(fname);
+  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
-    H5Fclose(file);
     return krr((S)"file does not exist");
   }
-  char *dataname = kdbGetString(dname);
-  data  = H5Dopen(file, dataname, H5P_DEFAULT);
+  dataname = kdbGetString(dname);
+  data = H5Dopen(file, dataname, H5P_DEFAULT);
   if(data < 0){
     free(filename);
     free(dataname);
-    H5Dclose(data);
     H5Fclose(file);
     return krr((S)"dataset could not be opened");
   }
   space = H5Dget_space(data);
-  // Retrieve dimensionality information
-  rank = H5Sget_simple_extent_ndims(space);
-  hsize_t dims[rank];
+  rank = H5Sget_simple_extent_ndims(space); // number of dimensions
+  dims = calloc(rank, sizeof(hsize_t));
   H5Sget_simple_extent_dims(space, dims, NULL);
-  kdims = ktn(KI,rank);
-  for(int i=0;i<rank;i++)
+  kdims = ktn(KI, rank);
+  for(int i = 0; i < rank; ++i)
     kI(kdims)[i] = dims[i];
-  // Retrieve the type of the dataset 
   dtype = H5Dget_type(data);
-  ntype = H5Tget_native_type(dtype,H5T_DIR_ASCEND);
-  // Assign the correct k-symbol as return
-  if(H5Tequal(ntype, HDF5INT))
+  ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
+  if     (H5Tequal(ntype, HDF5SHORT))
+    kdtype = ks((S)"short");
+  else if(H5Tequal(ntype, HDF5INT))
     kdtype = ks((S)"integer");
   else if(H5Tequal(ntype, HDF5LONG))
     kdtype = ks((S)"long");
-  else if(H5Tequal(ntype, HDF5FLOAT))
-    kdtype = ks((S)"float");
   else if(H5Tequal(ntype, HDF5REAL))
     kdtype = ks((S)"real");
-  else if(H5Tequal(ntype, HDF5SHORT))
-    kdtype = ks((S)"short");
+  else if(H5Tequal(ntype, HDF5FLOAT))
+    kdtype = ks((S)"float");
   else 
     kdtype = ks((S)"char");
-  // Clean up
+  // clean up
+  free(dims);
   free(filename);
   free(dataname);
   H5Dclose(data);
-  H5Fclose(file);
   H5Tclose(dtype);
   H5Tclose(ntype);
+  H5Sclose(space);
+  H5Fclose(file);
   return kdbCreateDict("type", kdtype, "ndims", ki(rank), "dims", kdims);
 }
 
