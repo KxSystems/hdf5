@@ -41,68 +41,21 @@ K readAttrData(hid_t attr, hid_t htype){
   return(data);
 }
 
-// Read data from an attribute associated with a group or dataset
-EXP K hdf5readAttrDataset(K fname, K dname, K aname){
-  if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname,aname))
-    return KNL;
-  // Define required elements
-  K result;
-  hid_t file, data, attr;
-  char *filename = kdbGetString(fname);
-  char *dataname = kdbGetString(dname);
-  char *attrname = kdbGetString(aname);
-  // Open file and dataset
-  file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-  // error if file doesn't exist
-  if(file < 0){
-    free(filename);
-    free(dataname);
-    free(attrname);
-    return krr((S)"file does not exist");
-  }
-  data = H5Oopen(file, dataname, H5P_DEFAULT);
-  if(data < 0){
-    free(filename);
-    free(dataname);
-    free(attrname);
-    H5Fclose(file);
-    return krr((S)"dataset/group from which attribute is to be read to does not exist");
-  }
-  attr = H5Aopen(data, attrname, H5P_DEFAULT);
-  if(attr < 0){
-    free(filename);
-    free(dataname);
-    free(attrname);
-    H5Oclose(data);
-    H5Fclose(file);
-    return krr((S)"This attribute does not exist");
-  }
-  result = readData(attr, "a");
-  free(filename);
-  free(dataname);
-  H5Oclose(data);
-  H5Aclose(attr);
-  H5Fclose(file);
-  return result;
-}
-
-// Read data from a signularly typed HDF5 dataset
+// read data from a dataset
 EXP K hdf5readDataset(K fname, K dname){
   if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
-  // Define required elements
   K result;
   hid_t file, data;
-  char *filename = kdbGetString(fname);
-  char *dataname = kdbGetString(dname);
-  // Open file and dataset
-  file   = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
+  char *filename, *dataname;
+  filename = kdbGetString(fname);
+  file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
   if(file < 0){
     free(filename);
-    free(dataname);
     return krr((S)"file does not exist");
   }
-  data   = H5Dopen(file, dataname, H5P_DEFAULT);
+  dataname = kdbGetString(dname);
+  data = H5Dopen(file, dataname, H5P_DEFAULT);
   if(data < 0){
     free(filename);
     free(dataname);
@@ -117,6 +70,46 @@ EXP K hdf5readDataset(K fname, K dname){
   return result;
 }
 
+// read data from an attribute
+EXP K hdf5readAttrDataset(K fname, K dname, K aname){
+  if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
+    return KNL;
+  K result;
+  hid_t file, data, attr;
+  char *filename, *dataname, *attrname;
+  filename = kdbGetString(fname);
+  file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
+  if(file < 0){
+    free(filename);
+    return krr((S)"file does not exist");
+  }
+  dataname = kdbGetString(dname);
+  data = H5Oopen(file, dataname, H5P_DEFAULT);
+  if(data < 0){
+    free(filename);
+    free(dataname);
+    H5Fclose(file);
+    return krr((S)"dataset/group does not exist");
+  }
+  attrname = kdbGetString(aname);
+  attr = H5Aopen(data, attrname, H5P_DEFAULT);
+  if(attr < 0){
+    free(filename);
+    free(dataname);
+    free(attrname);
+    H5Oclose(data);
+    H5Fclose(file);
+    return krr((S)"attribute does not exist");
+  }
+  result = readData(attr, "a");
+  free(filename);
+  free(dataname);
+  free(attrname);
+  H5Oclose(data);
+  H5Aclose(attr);
+  H5Fclose(file);
+  return result;
+}
 
 // Read numerical data to kdb from a hdf5 object
 K readData(hid_t data,char *rdtyp){
