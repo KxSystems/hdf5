@@ -5,12 +5,6 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
-// initialize hdf5-kdb library
-EXP K hdf5init(K UNUSED(dummy)){
-  disableErr();
-  return KNL;
-}
-
 // disable errors from hdf5 side
 void disableErr(void){H5Eset_auto1(NULL,NULL);}
 

@@ -17,9 +17,6 @@
 // k datatypes
 typedef enum {NUMERIC, STRING, INVALID} ktype_t;
 
-// initialize hdf5-kdb library
-EXP K hdf5init(K UNUSED(dummy));
-
 // Disable errors from hdf5 side
 void disableErr(void);
 

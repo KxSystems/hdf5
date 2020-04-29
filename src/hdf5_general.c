@@ -4,7 +4,12 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
-// Return the major/minor and release versions as a dictionary
+// initialize hdf5-kdb library
+EXP K hdf5init(K UNUSED(dummy)){
+  disableErr();
+  return KNL;
+}
+
 EXP K hdf5version(K UNUSED(x)){
   unsigned int maj, min, rel;
   if(H5get_libversion(&maj, &min, &rel) < 0)
@@ -13,13 +18,12 @@ EXP K hdf5version(K UNUSED(x)){
     return kdbCreateDict("Major", kj(maj), "Minor", kj(min), "Release", kj(rel));
 }
 
-// Garbage collection for hdf5 interface, return the data collected from free lists
 EXP K hdf5gc(K UNUSED(x)){
   return ki(H5garbage_collect());
 }
 
 // Retrieve the shape of a dataspace
-K hdf5getShape(hid_t space){
+K getShape(hid_t space){
   hsize_t *dims;
   int rank = H5Sget_simple_extent_ndims(space);
   K kdims = ktn(KJ, rank);
@@ -97,7 +101,7 @@ EXP K hdf5getDataShape(K fname, K dname){
     return krr((S)"dataset does not exist");
   }
   space = H5Dget_space(data);
-  kdims = hdf5getShape(space);
+  kdims = getShape(space);
   // clean up
   free(filename);
   free(dataname);
@@ -170,7 +174,7 @@ EXP K hdf5getAttrShape(K fname, K dname, K aname){
     return krr((S)"attribute could not be opened");
   }
   space = H5Aget_space(attr);
-  kdims = hdf5getShape(space);
+  kdims = getShape(space);
   // clean up
   free(filename);
   free(dataname);
