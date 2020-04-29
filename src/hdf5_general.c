@@ -236,68 +236,58 @@ EXP K hdf5ishdf5(K fname){
   return kb(filechk > 0 ? 1 : 0);
 }
 
+// Does the requested object (group/dataset) exist
+EXP K hdf5isObject(K fname, K oname){
+  if(!kdbCheckType("[Cs][Cs]", fname, oname))
+    return KNL;
+  htri_t oexists;
+  hid_t file;
+  char *filename, *objname;
+  filename = kdbGetString(fname);
+  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if(file < 0){
+    free(filename);
+    return krr((S)"file does not exist");
+  }
+  objname = kdbGetString(oname);
+  oexists = H5Oexists_by_name(file,objname, H5P_DEFAULT);
+  // clean up
+  free(filename);
+  free(objname);
+  H5Fclose(file);
+  return kb(oexists > 0 ? 1 : 0);
+}
+
 // Does the requested attribute exist
 EXP K hdf5isAttr(K fname, K dname, K aname){
   if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
     return KNL;
-  hid_t file, data;
   htri_t aexists;
-  char *filename = kdbGetString(fname);
-  // Open file and dataset, check if a named attribute exists
+  hid_t file, data;
+  char *filename, *dataname, *attrname;
+  filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0){
     free(filename);
-    H5Fclose(file);
     return krr((S)"file does not exist");
   }
-  char *dataname = kdbGetString(dname);
+  dataname = kdbGetString(dname);
   data = H5Oopen(file, dataname, H5P_DEFAULT);
   if(data < 0){
     free(filename);
     free(dataname);
-    H5Oclose(data);
     H5Fclose(file);
     return krr((S)"dataset/group could not be opened");
   }
-  char *attrname = kdbGetString(aname);
+  attrname = kdbGetString(aname);
   aexists = H5Aexists(data, attrname);
-  // Clean up
+  // clean up
   free(filename);
   free(dataname);
   free(attrname);
   H5Oclose(data);
   H5Fclose(file);
-  // Attribute does not exist
-  if(aexists <= 0)
-    return kb(0);
-  else
-    return kb(1);
-}
-
-// Does the requested object (group/dataset exist)
-/* oname = object name */ 
-EXP K hdf5isObject(K fname, K oname){
-  if(!kdbCheckType("[Cs][Cs]", fname, oname))
-    return KNL;
-  hid_t file;
-  htri_t isobj;
-  char *filename = kdbGetString(fname);
-  file  = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  if(file < 0){
-    free(filename);
-    H5Fclose(file);
-    return krr((S)"file does not exist");
-  }
-  char *objname  = kdbGetString(oname);
-  isobj = H5Oexists_by_name(file,objname, H5P_DEFAULT);
-  free(filename);
-  free(objname);
-  H5Fclose(file);
-  // Attribute does not exist
-  if(isobj <= 0)
-    return kb(0);
-  else
-    return kb(1);
+  return kb(aexists > 0 ? 1 : 0);
 }
 
 // Return the rank, type, and dimensionality of the dataset
