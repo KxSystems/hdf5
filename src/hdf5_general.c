@@ -350,38 +350,32 @@ EXP K hdf5datasetInfo(K fname, K dname){
   return kdbCreateDict("type", kdtype, "ndims", ki(rank), "dims", kdims);
 }
 
-/*
- * Copy the contents of one object to another location within a file or in a completely different file
- * oname = object name
- * fdest = destination folder
- * odest = destination object
- */
-EXP K hdf5copyObject(K fname, K oname, K fdest, K odest){
-  if(!kdbCheckType("[Cs][Cs][Cs][Cs]", fname, oname, fdest, odest))
+EXP K hdf5copyObject(K srcfile, K src_obj, K dstfile, K dst_obj){
+  if(!kdbCheckType("[Cs][Cs][Cs][Cs]", srcfile, src_obj, dstfile, dst_obj))
     return KNL;
-  char *filename, *destname, *objname, *destobj;
-  hid_t file, dest;
-  filename = kdbGetString(fname);
-  destname = kdbGetString(fdest);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  dest = H5Fopen(destname, H5F_ACC_RDWR, H5P_DEFAULT);
-  if((file < 0) || dest < 0){
-    free(filename);
-    free(destname);
-    H5Fclose(file);
-    H5Fclose(dest);
+  hid_t src, dst;
+  char *srcfilename, *dstfilename, *src_objname, *dst_objname;
+  srcfilename = kdbGetString(srcfile);
+  dstfilename = kdbGetString(dstfile);
+  src = H5Fopen(srcfilename, H5F_ACC_RDWR, H5P_DEFAULT);
+  dst = H5Fopen(dstfilename, H5F_ACC_RDWR, H5P_DEFAULT);
+  if((src < 0) || (dst < 0)){
+    free(srcfilename);
+    free(dstfilename);
+    H5Fclose(src);
+    H5Fclose(dst);
     return krr((S)"opening files unsuccessful");
   }
-  objname = kdbGetString(oname);
-  destobj = kdbGetString(odest);
-  if(H5Ocopy(file, objname, dest, destobj, H5P_DEFAULT, H5P_DEFAULT)<0)
+  src_objname = kdbGetString(src_obj);
+  dst_objname = kdbGetString(dst_obj);
+  if(H5Ocopy(src, src_objname, dst, dst_objname, H5P_DEFAULT, H5P_DEFAULT)<0)
     krr((S)"copying object unsuccessful");
   // clean up
-  free(filename);
-  free(objname);
-  free(destname);
-  free(destobj);
-  H5Fclose(dest);
-  H5Fclose(file);
+  free(srcfilename);
+  free(dstfilename);
+  free(src_objname);
+  free(dst_objname);
+  H5Fclose(src);
+  H5Fclose(dst);
   return KNL;
 }
