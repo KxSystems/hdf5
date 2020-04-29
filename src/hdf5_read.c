@@ -13,10 +13,33 @@
 
 #include "hdf5_read_utils.c"
 
-// Function prototypes for utility functions relating to reading of hdf5 data 
-// these are defined later in this script
+// utility functions for reading hdf5 data 
 K readData(hid_t data, char *rdtyp);
 K readCompound(hid_t dset, char *rdtyp);
+
+K readDatasetData(hid_t dset, hid_t htype){
+  hid_t space;
+  hssize_t npoints;
+  K data;
+  space = H5Dget_space(dset);
+  npoints = H5Sget_simple_extent_npoints(space);
+  data = ktn(h2kType(htype), npoints);
+  H5Dread(dset, htype, H5S_ALL, H5S_ALL, H5P_DEFAULT, kG(data));
+  H5Sclose(space);
+  return(data);
+}
+
+K readAttrData(hid_t attr, hid_t htype){
+  hid_t space;
+  hssize_t npoints;
+  K data;
+  space = H5Aget_space(attr);
+  npoints = H5Sget_simple_extent_npoints(space);
+  data = ktn(h2kType(htype), npoints);
+  H5Aread(attr, htype, kG(data));
+  H5Sclose(space);
+  return(data);
+}
 
 // Read data from an attribute associated with a group or dataset
 EXP K hdf5readAttrDataset(K fname, K dname, K aname){
