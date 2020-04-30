@@ -29,9 +29,6 @@ hid_t k2hType(char ktype);
 // ktype (char) to ktypegroup (ktypegroup_t)
 ktypegroup_t getKTypeGroup(char ktype);
 
-// ktype (char) to hdf5 numeric type
-hid_t getHDF5Type(char ktype);
-
 // create NUMERIC dataset
 int createNumericDataset(hid_t file, char *dataname, K kdims, K ktype);
 

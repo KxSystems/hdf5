@@ -11,7 +11,6 @@ EXP K hdf5createFile(K fname){
   char *filename;
   filename = kdbGetString(fname);
   H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
-  // clean up
   free(filename);
   return KNL;
 }
