@@ -5,7 +5,7 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
-#include "hdf5_write_utils.c"
+#include "utils/hdf5_write_utils.c"
 
 // Write data to an attribute
 EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
