@@ -23,32 +23,29 @@ EXP K hdf5readDataset(K fname, K dname){
   if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
   K result;
-  hid_t file, data;
+  hid_t file, data, space, dtype;
   char *filename, *dataname;
   filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-  if(file < 0){
-    free(filename);
-    return krr((S)"file does not exist");
-  }
+  free(filename);
+  if(file < 0)
+    return krr((S)"error opening file");
   dataname = kdbGetString(dname);
   data = H5Dopen(file, dataname, H5P_DEFAULT);
-  if(data < 0){
-    free(filename);
-    free(dataname);
-    H5Fclose(file);
-    return krr((S)"dataset does not exist");
-  }
-  hid_t space, dtype;
+  free(dataname);
+  H5Fclose(file);
+  if(data < 0)
+    return krr((S)"error opening dataset");
   space = H5Dget_space(data);
+  if(space < 0){
+    H5Dclose(data);
+    return krr((S)"error opening dataspace");
+  }
   dtype = H5Dget_type(data);
   result = readData(data, space, dtype, H5Dread);
-  free(filename);
-  free(dataname);
+  H5Dclose(data);
   H5Sclose(space);
   H5Tclose(dtype);
-  H5Fclose(file);
-  H5Dclose(data);
   return result;
 }
 
@@ -57,44 +54,35 @@ EXP K hdf5readAttrDataset(K fname, K dname, K aname){
   if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
     return KNL;
   K result;
-  hid_t file, data, attr;
+  hid_t file, data, attr, space, dtype;
   char *filename, *dataname, *attrname;
   filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-  if(file < 0){
-    free(filename);
-    return krr((S)"file does not exist");
-  }
+  free(filename);
+  if(file < 0)
+    return krr((S)"error opening file");
   dataname = kdbGetString(dname);
   data = H5Oopen(file, dataname, H5P_DEFAULT);
-  if(data < 0){
-    free(filename);
-    free(dataname);
-    H5Fclose(file);
-    return krr((S)"dataset/group does not exist");
-  }
+  free(dataname);
+  H5Fclose(file);
+  if(data < 0)
+    return krr((S)"error opening dataset/group");
   attrname = kdbGetString(aname);
   attr = H5Aopen(data, attrname, H5P_DEFAULT);
-  if(attr < 0){
-    free(filename);
-    free(dataname);
-    free(attrname);
-    H5Oclose(data);
-    H5Fclose(file);
-    return krr((S)"attribute does not exist");
-  }
-  hid_t space, dtype;
+  free(attrname);
+  H5Oclose(data);
+  if(attr < 0)
+    return krr((S)"error opening attribute");
   space = H5Aget_space(attr);
+  if(space < 0){
+    H5Aclose(attr);
+    return krr((S)"error opening dataspace");
+  }
   dtype = H5Aget_type(attr);
   result = readData(attr, space, dtype, kdbH5Aread);
-  free(filename);
-  free(dataname);
-  free(attrname);
+  H5Aclose(attr);
   H5Sclose(space);
   H5Tclose(dtype);
-  H5Oclose(data);
-  H5Aclose(attr);
-  H5Fclose(file);
   return result;
 }
 

@@ -24,7 +24,7 @@ H h2kType(hid_t htype){
   else if(H5Tequal(ntype, H5T_NATIVE_LLONG))
     result = KJ;
   else if(H5Tequal(ntype, H5T_NATIVE_UCHAR))
-    result = KC;
+    result = KG;
   else if(H5Tequal(ntype, H5T_NATIVE_USHORT))
     result = KH;
   else if(H5Tequal(ntype, H5T_NATIVE_UINT))
@@ -40,11 +40,11 @@ H h2kType(hid_t htype){
   else if(H5Tequal(ntype, H5T_NATIVE_B8))
     result = KF;
   else if(H5Tequal(ntype, H5T_NATIVE_B16))
-    result = KF;
+    result = KH;
   else if(H5Tequal(ntype, H5T_NATIVE_B32))
-    result = KF;
+    result = KI;
   else if(H5Tequal(ntype, H5T_NATIVE_B64))
-    result = KF;
+    result = KJ;
    else
      result = 0;
   H5Tclose(ntype);
