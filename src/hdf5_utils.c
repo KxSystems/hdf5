@@ -89,67 +89,93 @@ ktypegroup_t getKTypeGroup(char ktype){
 }
 
 // create NUMERIC dataset
-int createNumericDataset(hid_t file, char *dataname, K kdims, K ktype){
+K createNumericDataset(hid_t file, char *dataname, K kdims, K ktype){
+  hid_t space, dset, dtype;
   hsize_t dims[3];
-  hid_t space, dtype;
-  int i, rank = kdims->n;
-  if(rank > 3){
-    krr("numerical datasets must have dimensionality <= 3");
-    return 1;
-  }
+  int rank, i;
+  rank = kdims->n;
+  if(rank > 3)
+    return krr((S)"numerical datasets must have dimensionality <= 3");
   for(i = 0; i < rank; ++i)
     dims[i] = kI(kdims)[i];
   space = H5Screate_simple(rank, dims, NULL);
+  if(space < 0)
+    return krr((S)"error creating dataspace");
   dtype = k2hType(ktype->g);
-  H5Dcreate(file, dataname, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  dset = H5Dcreate(file, dataname, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   H5Sclose(space);
-  return 0;
+  if(dset < 0)
+    return krr((S)"error creating dataset");
+  H5Dclose(dset);
+  return KNL;
 }
 
 // create STRING dataset
-int createStringDataset(hid_t file, char *dataname, K kdims){
+K createStringDataset(hid_t file, char *dataname, K kdims){
+  hid_t space, dset, dtype;
   hsize_t dims[1];
-  hid_t space, dtype;
+  int rank;
+  rank = kdims->n;
+  if(rank != 1)
+    return krr((S)"string datasets must have dimensionality 1");
   dims[0] = kI(kdims)[0];
   space = H5Screate_simple(1, dims, NULL);
+  if(space < 0)
+    return krr((S)"error creating dataspace");
   dtype = H5Tcopy(H5T_C_S1);
   H5Tset_size(dtype, H5T_VARIABLE);
-  H5Dcreate(file, dataname, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-  H5Sclose(space);
+  dset = H5Dcreate(file, dataname, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   H5Tclose(dtype);
-  return 0;
+  H5Sclose(space);
+  if(dset < 0)
+    return krr((S)"error creating dataset");
+  H5Dclose(dset);
+  return KNL;
 }
 
 // create NUMERIC attribute
-int createNumericAttribute(hid_t data, char *attrname, K kdims, K ktype){
+K createNumericAttribute(hid_t data, char *attrname, K kdims, K ktype){
+  hid_t space, attr, dtype;
   hsize_t dims[3];
-  hid_t space, dtype;
-  int i, rank = kdims->n;
-  if(rank > 3){
-    krr("numerical attributes must have dimensionality <= 3");
-    return 1;
-  }
+  int rank, i;
+  rank = kdims->n;
+  if(rank > 3)
+    return krr((S)"numerical attributes must have dimensionality <= 3");
   for(i = 0; i < rank; ++i)
     dims[i] = kI(kdims)[i];
   space = H5Screate_simple(rank, dims, NULL);
+  if(space < 0)
+    return krr((S)"error creating dataspace");
   dtype = k2hType(ktype->g);
-  H5Acreate(data, attrname, dtype, space, H5P_DEFAULT, H5P_DEFAULT);
+  attr = H5Acreate(data, attrname, dtype, space, H5P_DEFAULT, H5P_DEFAULT);
   H5Sclose(space);
-  return 0;
+  if(attr < 0)
+    return krr((S)"error creating attribute");
+  H5Dclose(attr);
+  return KNL;
 }
 
 // create STRING attribute
-int createStringAttribute(hid_t data, char *attrname, K kdims){
+K createStringAttribute(hid_t data, char *attrname, K kdims){
+  hid_t space, attr, dtype;
   hsize_t dims[1];
-  hid_t space, dtype;
+  int rank;
+  rank = kdims->n;
+  if(rank != 1)
+    return krr((S)"string attributes must have dimensionality 1");
   dims[0] = kI(kdims)[0];
   space = H5Screate_simple(1, dims, NULL);
+  if(space < 0)
+    return krr((S)"error creating dataspace");
   dtype = H5Tcopy(H5T_C_S1);
   H5Tset_size(dtype, H5T_VARIABLE);
-  H5Acreate(data, attrname, dtype, space, H5P_DEFAULT,  H5P_DEFAULT);
-  H5Sclose(space);
+  attr = H5Acreate(data, attrname, dtype, space, H5P_DEFAULT,  H5P_DEFAULT);
   H5Tclose(dtype);
-  return 0;
+  H5Sclose(space);
+  if(attr < 0)
+    return krr((S)"error creating attribute");
+  H5Aclose(attr);
+  return KNL;
 }
 
 // check if dataset exists

@@ -30,16 +30,16 @@ hid_t k2hType(char ktype);
 ktypegroup_t getKTypeGroup(char ktype);
 
 // create NUMERIC dataset
-int createNumericDataset(hid_t file, char *dataname, K kdims, K ktype);
+K createNumericDataset(hid_t file, char *dataname, K kdims, K ktype);
 
 // create STRING dataset
-int createStringDataset(hid_t file, char *dataname, K kdims);
+K createStringDataset(hid_t file, char *dataname, K kdims);
 
 // create NUMERIC attribute
-int createNumericAttribute(hid_t data, char *attrname, K kdims, K ktype);
+K createNumericAttribute(hid_t data, char *attrname, K kdims, K ktype);
 
 // create STRING attribute
-int createStringAttribute(hid_t data, char *attrname, K kdims);
+K createStringAttribute(hid_t data, char *attrname, K kdims);
 
 // Check that the dataset exists
 int checkDataset(hid_t file, char *dataname);
