@@ -151,7 +151,7 @@ K createNumericAttribute(hid_t data, char *attrname, K kdims, K ktype){
   H5Sclose(space);
   if(attr < 0)
     return krr((S)"error creating attribute");
-  H5Dclose(attr);
+  H5Aclose(attr);
   return KNL;
 }
 
