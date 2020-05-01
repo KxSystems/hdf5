@@ -117,7 +117,7 @@ EXP K hdf5delLink(K fname, K lname){
   }
   char *linkname = kdbGetString(lname);
   if(H5Ldelete(file, linkname, H5P_DEFAULT)<0)
-    res = krr("could not delete specified link");
+    res = krr((S)"could not delete specified link");
   else
     res = kp("successfully deleted the link");
   free(filename);
