@@ -1,5 +1,5 @@
 \d .hdf5
-LIBPATH:`:hdf5 2:
+LIBPATH:`:libhdf5 2:
 funcs:(
   /* initialization */
   (`hdf5init;1);

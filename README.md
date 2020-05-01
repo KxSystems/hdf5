@@ -14,18 +14,20 @@ This interface is supported for the following platforms
 ## Installation
 
 
-The following sections outline the instructions for building the interface for various architectures. In each case please ensure that `$QHOME/%QHOME%` is set in order to ensure make/bat files install the required binaries in an appropriate location
+The following sections outline the instructions for building the interface for various architectures. In each case please ensure that `$QHOME` is set in order to ensure cmake file installs the required binary in an appropriate location.
 
-### Linux
-1. Download a release of hdf5 and install, instructions are provided [here](https://support.hdfgroup.org/HDF5/HDF5-FAQ.html#10) but left as an exercise for a user.
-2. Ensure that both the `.h` and `.lib` files are placed on your `LD_LIBRARY_PATH` such that they can be included within the build.
-3. From this directory run `make && make install && make clean`.
+### Installing HDF5
 
-### MacOs
-1. To install hdf5 run `brew install hdf5`
-2. From this directory run `make && make install && make clean`
+**Linux**
+- Download a release of hdf5 and install, instructions are provided [here](https://support.hdfgroup.org/HDF5/HDF5-FAQ.html#10) but left as an exercise for a user.
 
-**Note:** There may be a need to run `export HDF5_DISABLE_VERSION_CHECK=2` in cases where there is a clash between the header file and functionality which can manifest at install. If this arises with personal/production builds please open an issue within the repository.
+**MacOS**
+- To install hdf5 run `brew install hdf5`
+
+### Creating binaries and install
+1. Ensure you have set a environment variable `HDF5_HOME` which is the location of the `include/` and `lib/` directories needed for the `HDF5` C api.
+2. From the root directory of this library create a directory named `build` and move into this directory `cd build`
+3. From the `build` directory run `cmake .. && make install && make clean`.
 
 ## Examples
 
