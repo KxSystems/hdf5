@@ -32,6 +32,7 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
     return krr((S)"unsupported datatype");
     H5Dclose(data);
   }
+  H5Dclose(data);
   return KNL;
 }
 
