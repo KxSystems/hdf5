@@ -5,18 +5,11 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
-// declare read utils
-typedef herr_t (*readfunc_t)(hid_t, hid_t, hid_t, hid_t, hid_t, void *);
-
 K readData(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc);
 K readDataSimple(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc);
 K readDataCompound(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc);
 K readDataCompoundValue(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, hid_t space, readfunc_t readfunc);
 K readDataCompoundString(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, hid_t space, readfunc_t readfunc);
-
-herr_t kdbH5Aread(hid_t data, hid_t memtype, hid_t UNUSED(ms), hid_t UNUSED(fs), hid_t UNUSED(pl), void *buf){
-  return H5Aread(data, memtype, buf);
-}
 
 // read data from a dataset
 EXP K hdf5readDataset(K fname, K dname){

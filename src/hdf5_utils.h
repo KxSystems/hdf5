@@ -5,6 +5,16 @@
 #include "hdf5.h"
 #include "kdb_utils.h"
 
+// manipulate attribute functions to have the same signature as equivalent dataset functions
+typedef hid_t (*createfunc_t)(hid_t, const char *, hid_t, hid_t, hid_t, hid_t, hid_t);
+typedef herr_t (*readfunc_t)(hid_t, hid_t, hid_t, hid_t, hid_t, void *);
+typedef herr_t (*writefunc_t)(hid_t, hid_t, hid_t, hid_t, hid_t, const void *);
+typedef herr_t (*closefunc_t)(hid_t);
+
+hid_t kdbH5Acreate(hid_t, const char *, hid_t, hid_t, hid_t, hid_t, hid_t);
+herr_t kdbH5Aread(hid_t, hid_t, hid_t, hid_t, hid_t, void *);
+herr_t kdbH5Awrite(hid_t, hid_t, hid_t, hid_t, hid_t, const void *);
+
 // HDF5 Types
 #define HDF5FLOAT H5T_NATIVE_DOUBLE 
 #define HDF5INT   H5T_NATIVE_INT

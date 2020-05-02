@@ -5,6 +5,19 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
+// manipulate attribute functions to have the same signature as equivalent dataset functions
+hid_t kdbH5Acreate(hid_t attr, const char *name, hid_t type, hid_t space, hid_t UNUSED(lcpl), hid_t cpl, hid_t apl){
+  return H5Acreate(attr, name, type, space, cpl, apl);
+}
+
+herr_t kdbH5Aread(hid_t attr, hid_t memtype, hid_t UNUSED(mspace), hid_t UNUSED(fspace), hid_t UNUSED(pl), void *buf){
+  return H5Aread(attr, memtype, buf);
+}
+
+herr_t kdbH5Awrite(hid_t attr, hid_t memtype, hid_t UNUSED(mpace), hid_t UNUSED(fspace), hid_t UNUSED(pl), const void *buf){
+  return H5Awrite(attr, memtype, buf);
+}
+
 // disable errors from hdf5 side
 void disableErr(void){H5Eset_auto1(NULL,NULL);}
 
