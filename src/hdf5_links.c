@@ -1,9 +1,3 @@
-/* --- Linking functionality
- * The functions contained in this file are used for the creation of link paths
- * internally within a file or externally between files, these are analogous to unix
- * soft/hard and symbolic links
-*/
-
 #include <stdlib.h>
 #include "k.h"
 #include "hdf5.h"

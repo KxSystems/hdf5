@@ -15,7 +15,7 @@
 #  define EXP
 #endif
 
-#define KNL (K) 0
+#define KNL (K)0
 
 // get c string from kdb char, string or symbol
 char * kdbGetString(K x);
