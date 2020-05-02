@@ -9,17 +9,12 @@
 hid_t kdbH5Acreate(hid_t attr, const char *name, hid_t type, hid_t space, hid_t UNUSED(lcpl), hid_t cpl, hid_t apl){
   return H5Acreate(attr, name, type, space, cpl, apl);
 }
-
 herr_t kdbH5Aread(hid_t attr, hid_t memtype, hid_t UNUSED(mspace), hid_t UNUSED(fspace), hid_t UNUSED(pl), void *buf){
   return H5Aread(attr, memtype, buf);
 }
-
 herr_t kdbH5Awrite(hid_t attr, hid_t memtype, hid_t UNUSED(mspace), hid_t UNUSED(fspace), hid_t UNUSED(pl), const void *buf){
   return H5Awrite(attr, memtype, buf);
 }
-
-// disable errors from hdf5 side
-void disableErr(void){H5Eset_auto1(NULL,NULL);}
 
 // htype (hid_t) to ktype (H)
 H h2kType(hid_t htype){
@@ -99,51 +94,6 @@ ktypegroup_t getKTypeGroup(char ktype){
   if(NULL != strchr("csg", ktype))
     return STRING;
   return INVALID;
-}
-
-// create NUMERIC dataset/attribute
-K createNumeric(hid_t loc, char *name, K kdims, K ktype, createfunc_t create, closefunc_t close){
-  hid_t space, obj, dtype;
-  hsize_t dims[3];
-  int rank, i;
-  rank = kdims->n;
-  if(rank > 3)
-    return krr((S)"numerical datasets must have dimensionality <= 3");
-  for(i = 0; i < rank; ++i)
-    dims[i] = kI(kdims)[i];
-  space = H5Screate_simple(rank, dims, NULL);
-  if(space < 0)
-    return krr((S)"error creating dataspace");
-  dtype = k2hType(ktype->g);
-  obj = create(loc, name, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-  H5Sclose(space);
-  if(obj < 0)
-    return krr((S)"error creating dataset");
-  close(obj);
-  return KNL;
-}
-
-// create STRING dataset/attribute
-K createString(hid_t loc, char *name, K kdims, createfunc_t create, closefunc_t close){
-  hid_t space, obj, dtype;
-  hsize_t dims[1];
-  int rank;
-  rank = kdims->n;
-  if(rank != 1)
-    return krr((S)"string datasets must have dimensionality 1");
-  dims[0] = kI(kdims)[0];
-  space = H5Screate_simple(1, dims, NULL);
-  if(space < 0)
-    return krr((S)"error creating dataspace");
-  dtype = H5Tcopy(H5T_C_S1);
-  H5Tset_size(dtype, H5T_VARIABLE);
-  obj = create(loc, name, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-  H5Tclose(dtype);
-  H5Sclose(space);
-  if(obj < 0)
-    return krr((S)"error creating dataset");
-  close(obj);
-  return KNL;
 }
 
 // check if dataset exists

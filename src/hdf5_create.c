@@ -1,9 +1,12 @@
-#include "hdf5_utils.h"
-
 #include <stdlib.h>
 #include "k.h"
 #include "hdf5.h"
 #include "kdb_utils.h"
+#include "hdf5_utils.h"
+
+// declare create utils
+K createNumeric(hid_t loc, char *name, K kdims, K ktype, createfunc_t create, closefunc_t close);
+K createString(hid_t loc, char *name, K kdims, createfunc_t create, closefunc_t close);
 
 EXP K hdf5createFile(K fname){
   if(!kdbCheckType("[Cs]", fname))
@@ -94,5 +97,50 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
     krr((S)"unsupported datatype");
   free(attrname);
   H5Oclose(data);
+  return KNL;
+}
+
+// define create utils
+
+K createNumeric(hid_t loc, char *name, K kdims, K ktype, createfunc_t create, closefunc_t close){
+  hid_t space, obj, dtype;
+  hsize_t dims[3];
+  int rank, i;
+  rank = kdims->n;
+  if(rank > 3)
+    return krr((S)"numerical datasets must have dimensionality <= 3");
+  for(i = 0; i < rank; ++i)
+    dims[i] = kI(kdims)[i];
+  space = H5Screate_simple(rank, dims, NULL);
+  if(space < 0)
+    return krr((S)"error creating dataspace");
+  dtype = k2hType(ktype->g);
+  obj = create(loc, name, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Sclose(space);
+  if(obj < 0)
+    return krr((S)"error creating dataset");
+  close(obj);
+  return KNL;
+}
+
+K createString(hid_t loc, char *name, K kdims, createfunc_t create, closefunc_t close){
+  hid_t space, obj, dtype;
+  hsize_t dims[1];
+  int rank;
+  rank = kdims->n;
+  if(rank != 1)
+    return krr((S)"string datasets must have dimensionality 1");
+  dims[0] = kI(kdims)[0];
+  space = H5Screate_simple(1, dims, NULL);
+  if(space < 0)
+    return krr((S)"error creating dataspace");
+  dtype = H5Tcopy(H5T_C_S1);
+  H5Tset_size(dtype, H5T_VARIABLE);
+  obj = create(loc, name, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Tclose(dtype);
+  H5Sclose(space);
+  if(obj < 0)
+    return krr((S)"error creating dataset");
+  close(obj);
   return KNL;
 }

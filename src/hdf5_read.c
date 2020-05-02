@@ -5,13 +5,13 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
+// declare read utils
 K readData(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc);
 K readDataSimple(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc);
 K readDataCompound(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc);
-K readDataCompoundValue(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, hid_t space, readfunc_t readfunc);
+K readDataCompoundNumeric(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, hid_t space, readfunc_t readfunc);
 K readDataCompoundString(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, hid_t space, readfunc_t readfunc);
 
-// read data from a dataset
 EXP K hdf5readDataset(K fname, K dname){
   if(!kdbCheckType("[Cs][Cs]", fname, dname))
     return KNL;
@@ -42,7 +42,6 @@ EXP K hdf5readDataset(K fname, K dname){
   return result;
 }
 
-// read data from an attribute
 EXP K hdf5readAttrDataset(K fname, K dname, K aname){
   if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
     return KNL;
@@ -120,7 +119,7 @@ K readDataCompound(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc){
     mtype  = H5Tget_member_type(dtype, i);
     mval = (mclass == H5T_STRING) ?
       readDataCompoundString(dset, mname, dims[0], mtype, space, readfunc):
-      readDataCompoundValue (dset, mname, dims[0], mtype, space, readfunc);
+      readDataCompoundNumeric (dset, mname, dims[0], mtype, space, readfunc);
     jk(&vals, mval);
     H5free_memory(mname);
   }
@@ -130,7 +129,7 @@ K readDataCompound(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc){
   return(xT(xD(keys,vals)));
 }
 
-K readDataCompoundValue(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, hid_t UNUSED(space), readfunc_t readfunc){
+K readDataCompoundNumeric(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, hid_t UNUSED(space), readfunc_t readfunc){
   K result;
   hid_t memtype;
   memtype = H5Tcreate(H5T_COMPOUND, H5Tget_size(mtype));

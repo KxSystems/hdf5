@@ -6,7 +6,7 @@
 
 // initialize hdf5-kdb library
 EXP K hdf5init(K UNUSED(dummy)){
-  disableErr();
+  H5Eset_auto1(NULL,NULL); // disable errors from hdf5 side
   return KNL;
 }
 
