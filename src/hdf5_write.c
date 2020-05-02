@@ -39,13 +39,13 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
 EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Cs][Ii]c", fname, dname, aname, kdims, ktype))
     return KNL;
-  hid_t data, file,attr;
+  hid_t data, file, attr;
   char *filename, *dataname, *attrname;
   filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   free(filename);
   if(file < 0)
-    return krr((S)"error opening file does not exist");
+    return krr((S)"error opening file");
   dataname = kdbGetString(dname);
   data = H5Oopen(file, dataname, H5P_DEFAULT);
   free(dataname);
