@@ -49,6 +49,12 @@ funcs:(
 // Add all functions read from C to the hdf5 namespace
 .hdf5,:(`$4_'string funcs[;0])!LIBPATH@/:funcs
 
+i.checkdata:{
+  r:{$[0=type x;count[x],'distinct raze .z.s each x;10h=type x;10h;enlist(count x;neg type x)]}x;
+  if[1<count r;'`$"invalid ",$[1<count distinct last each r;"type";"shape"]];
+  if[10h~r:first r ;r:count[x],-10h];
+  `dims`type!(-1_;last)@\:r}
+
 // Find the appropriate type for a dataset being written to hdf5
 i.self_type:{$[any 0h in type each x;.z.s each x;raze type each x]}
 i.nlist_types:{$[1=count distinct l:i.self_type x;(abs distinct raze l)0;'"mixed list detected"]}
