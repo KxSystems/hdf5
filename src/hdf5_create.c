@@ -57,9 +57,9 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   dataname = kdbGetString(dname);
   dtype = getKTypeGroup(ktype->g);
   if(dtype == NUMERIC)
-    createNumericDataset(file, dataname, kdims, ktype);
+    createNumeric(file, dataname, kdims, ktype, H5Dcreate, H5Dclose);
   else if(dtype == STRING)
-    createStringDataset(file, dataname, kdims);
+    createString(file, dataname, kdims, H5Dcreate, H5Dclose);
   else
     krr((S)"unsupported datatype");
   free(dataname);
@@ -87,9 +87,9 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   attrname = kdbGetString(aname);
   dtype = getKTypeGroup(ktype->g);
   if(dtype == NUMERIC)
-    createNumericAttribute(data, attrname, kdims, ktype);
+    createNumeric(data, attrname, kdims, ktype, kdbH5Acreate, H5Aclose);
   else if(dtype == STRING)
-    createStringAttribute(data, attrname, kdims);
+    createString(data, attrname, kdims, kdbH5Acreate, H5Aclose);
   else
     krr((S)"unsupported datatype");
   free(attrname);
