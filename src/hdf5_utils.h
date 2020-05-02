@@ -15,14 +15,6 @@ hid_t kdbH5Acreate(hid_t attr, const char *name, hid_t type, hid_t space, hid_t 
 herr_t kdbH5Aread(hid_t attr, hid_t memtype, hid_t mspace, hid_t fspace, hid_t pl, void *buf);
 herr_t kdbH5Awrite(hid_t attr, hid_t memtype, hid_t mspace, hid_t fspace, hid_t pl, const void *buf);
 
-// HDF5 Types
-#define HDF5FLOAT H5T_NATIVE_DOUBLE 
-#define HDF5INT   H5T_NATIVE_INT
-#define HDF5LONG  H5T_NATIVE_LONG
-#define HDF5REAL  H5T_NATIVE_FLOAT
-#define HDF5SHORT H5T_NATIVE_SHORT
-#define HDF5BYTE  H5T_NATIVE_UCHAR
-
 // k datatypes
 typedef enum {NUMERIC, STRING, INVALID} ktypegroup_t;
 
@@ -34,8 +26,5 @@ hid_t k2hType(char ktype);
 
 // ktype (char) to ktypegroup (ktypegroup_t)
 ktypegroup_t getKTypeGroup(char ktype);
-
-// Check that the dataset exists
-int checkDataset(hid_t file, char *dataname);
 
 #endif // HDF5_UTILS_H

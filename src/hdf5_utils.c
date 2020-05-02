@@ -95,10 +95,3 @@ ktypegroup_t getKTypeGroup(char ktype){
     return STRING;
   return INVALID;
 }
-
-// check if dataset exists
-int checkDataset(hid_t file, char *dataname){
-  H5G_stat_t statbuf;
-  H5Gget_objinfo(file, dataname, 0, &statbuf);
-  return(H5G_DATASET == statbuf.type)? 1 : 0;
-}
