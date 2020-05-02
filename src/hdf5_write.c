@@ -5,15 +5,20 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
-static void writeNumeric(K dset, hid_t data, char *data_attr);
-static void writeString(K dset, hid_t data, char *data_attr);
+// declare write utils
+K writeNumeric(K dset, hid_t space);
+K writeString(K dset, hid_t space);
 
 EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Ii]c", fname, dname, kdims, ktype))
     return KNL;
-  hid_t data, file;
-  ktypegroup_t dtype;
+  hid_t file, data, space;
+  hid_t htype, dtype, ntype;
+  ktypegroup_t gtype;
   char *filename, *dataname;
+  hssize_t rank, i;
+  hsize_t *dims;
+
   filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   free(filename);
@@ -25,24 +30,48 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset");
-  dtype = getKTypeGroup(ktype->g);
-  if(dtype == NUMERIC)
-    writeNumeric(dset, data, "d");
-  else if(dtype == STRING)
-    writeString(dset, data, "d");
+  // check datatypes
+  htype = k2hType(ktype->g);
+  dtype = H5Dget_type(data);
+  ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
+  if(htype != ntype)
+    return krr((S)"type does not match");
+  space = H5Dget_space(data);
+  if(space < 0)
+    return krr((S)"error opening dataspace");
+  H5Dclose(data);
+  // check rank
+  rank = kdims->n;
+  if(rank != H5Sget_simple_extent_npoints(space))
+    return krr((S)"rank does no match");
+  // check dims
+  dims = calloc(rank, sizeof(hssize_t));
+  H5Sget_simple_extent_dims(space, dims, NULL);
+  for(i = 0; i < rank; i++)
+    if(kJ(kdims)[i] != (J)dims[i])
+      return krr((S)"dimensions do not match");
+  gtype = getKTypeGroup(ktype->g);
+  if(gtype == NUMERIC)
+    writeNumeric(dset, space);
+  else if(gtype == STRING)
+    writeString(dset, space);
   else{
     krr((S)"unsupported datatype");
   }
-  H5Dclose(data);
+  H5Sclose(space);
   return KNL;
 }
 
 EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Cs][Ii]c", fname, dname, aname, kdims, ktype))
     return KNL;
-  hid_t data, file, attr;
-  ktypegroup_t dtype;
+  hid_t file, data, attr, space;
+  hid_t htype, dtype, ntype;
+  ktypegroup_t gtype;
   char *filename, *dataname, *attrname;
+  hssize_t rank, i;
+  hsize_t *dims;
+
   filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   free(filename);
@@ -60,11 +89,31 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   H5Oclose(data);
   if(attr < 0)
     return krr((S)"error opening attribute");
-  dtype = getKTypeGroup(ktype->g);
-  if(dtype == NUMERIC)
-    writeNumeric(dset, attr, "a");
-  else if(dtype == STRING)
-    writeString(dset, attr, "a");
+  // check datatypes
+  htype = k2hType(ktype->g);
+  dtype = H5Dget_type(attr);
+  ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
+  if(htype != ntype)
+    return krr((S)"type does not match");
+  space = H5Aget_space(attr);
+  if(space < 0)
+    return krr((S)"error opening dataspace");
+  H5Aclose(attr);
+  // check rank
+  rank = kdims->n;
+  if(rank != H5Sget_simple_extent_npoints(space))
+    return krr((S)"rank does no match");
+  // check dims
+  dims = calloc(rank, sizeof(hssize_t));
+  H5Sget_simple_extent_dims(space, dims, NULL);
+  for(i = 0; i < rank; i++)
+    if(kJ(kdims)[i] != (J)dims[i])
+      return krr((S)"dimensions do not match");
+  gtype = getKTypeGroup(ktype->g);
+  if(gtype == NUMERIC)
+    writeNumeric(dset, space);
+  else if(gtype == STRING)
+    writeString(dset, space);
   else{
     krr((S)"unsupported datatype");
   }
@@ -72,9 +121,20 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   return KNL;
 }
 
+// define write utils
+
+K writeNumeric(K UNUSED(dset), hid_t UNUSED(space)){
+  return KNL;
+}
+
+K writeString(K UNUSED(dset), hid_t UNUSED(space)){
+  return KNL;
+}
+
+/*
+
 // utils
 
-/* Function prototypes for writes */
 int longwrite (hid_t h5data, K dset, long   *data, char *rdtype, long points, int idx);
 int intwrite  (hid_t h5data, K dset, int    *data, char *rdtype, long points, int idx);
 int shortwrite(hid_t h5data, K dset, short  *data, char *rdtype, long points, int idx);
@@ -82,7 +142,6 @@ int realwrite (hid_t h5data, K dset, float  *data, char *rdtype, long points, in
 int floatwrite(hid_t h5data, K dset, double *data, char *rdtype, long points, int idx);
 int bytewrite (hid_t h5data, K dset, unsigned char *data, char *rdtype, long points,int idx);
 
-/* Writing to numeric datatypes */
 
 static void writeFloat(K dset, hid_t data, char *rdtype){
   hid_t space;
@@ -190,7 +249,6 @@ static void writeNumeric(K dset, hid_t data, char *data_attr){
   H5Tclose(ntype);
 }
 
-/* Write character data to HDF5 */
 static void writeString(K dset, hid_t data, char *data_attr){
   long i,arr;
   // Create a variable length memory space to store the K chars
@@ -207,8 +265,6 @@ static void writeString(K dset, hid_t data, char *data_attr){
   free(wdata);
   H5Tclose(memtype);
 }
-
-/* Functionality for writing iteratively writing to numeric types*/
 
 int intwrite(hid_t h5data, K dset, int *data, char *rdtype, long points,int idx){
   int i=0, j;
@@ -413,3 +469,5 @@ int bytewrite(hid_t h5data, K dset, unsigned char *data, char *rdtype, long poin
   }
   return idx;
 }
+
+*/
