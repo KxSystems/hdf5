@@ -5,13 +5,14 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
-static void writenumeric(K dset, hid_t data, char *data_attr);
-static void writeChar(K dset, hid_t data, char *data_attr);
+static void writeNumeric(K dset, hid_t data, char *data_attr);
+static void writeString(K dset, hid_t data, char *data_attr);
 
 EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Ii]c", fname, dname, kdims, ktype))
     return KNL;
   hid_t data, file;
+  ktypegroup_t dtype;
   char *filename, *dataname;
   filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
@@ -24,13 +25,13 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset");
-  if     (NUMERIC == getKTypeGroup(ktype->g))
-    writenumeric(dset, data, "d");
-  else if(STRING == getKTypeGroup(ktype->g))
-    writeChar(dset, data, "d");
+  dtype = getKTypeGroup(ktype->g);
+  if(dtype == NUMERIC)
+    writeNumeric(dset, data, "d");
+  else if(dtype == STRING)
+    writeString(dset, data, "d");
   else{
-    return krr((S)"unsupported datatype");
-    H5Dclose(data);
+    krr((S)"unsupported datatype");
   }
   H5Dclose(data);
   return KNL;
@@ -40,6 +41,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Cs][Ii]c", fname, dname, aname, kdims, ktype))
     return KNL;
   hid_t data, file, attr;
+  ktypegroup_t dtype;
   char *filename, *dataname, *attrname;
   filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
@@ -58,13 +60,13 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   H5Oclose(data);
   if(attr < 0)
     return krr((S)"error opening attribute");
-  if(NUMERIC == getKTypeGroup(ktype->g))
-    writenumeric(dset, attr, "a");
-  else if(STRING == getKTypeGroup(ktype->g))
-    writeChar(dset, attr, "a");
+  dtype = getKTypeGroup(ktype->g);
+  if(dtype == NUMERIC)
+    writeNumeric(dset, attr, "a");
+  else if(dtype == STRING)
+    writeString(dset, attr, "a");
   else{
-    return krr((S)"unsupported datatype");
-    H5Aclose(attr);
+    krr((S)"unsupported datatype");
   }
   H5Aclose(attr);
   return KNL;
@@ -163,7 +165,7 @@ static void writeShort(K dset, hid_t data, char *rdtype){
   free(dset_data);
 }
 
-static void writenumeric(K dset, hid_t data, char *data_attr){
+static void writeNumeric(K dset, hid_t data, char *data_attr){
   hid_t dtype,ntype;
   // Retrieve an identifier to the dataset type
   if(strcmp("d",data_attr)==0)
@@ -189,7 +191,7 @@ static void writenumeric(K dset, hid_t data, char *data_attr){
 }
 
 /* Write character data to HDF5 */
-static void writeChar(K dset, hid_t data, char *data_attr){
+static void writeString(K dset, hid_t data, char *data_attr){
   long i,arr;
   // Create a variable length memory space to store the K chars
   hid_t memtype = H5Tcopy(H5T_C_S1);
