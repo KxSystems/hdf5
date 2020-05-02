@@ -14,7 +14,7 @@ herr_t kdbH5Aread(hid_t attr, hid_t memtype, hid_t UNUSED(mspace), hid_t UNUSED(
   return H5Aread(attr, memtype, buf);
 }
 
-herr_t kdbH5Awrite(hid_t attr, hid_t memtype, hid_t UNUSED(mpace), hid_t UNUSED(fspace), hid_t UNUSED(pl), const void *buf){
+herr_t kdbH5Awrite(hid_t attr, hid_t memtype, hid_t UNUSED(mspace), hid_t UNUSED(fspace), hid_t UNUSED(pl), const void *buf){
   return H5Awrite(attr, memtype, buf);
 }
 

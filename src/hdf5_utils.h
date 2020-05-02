@@ -11,9 +11,9 @@ typedef herr_t (*readfunc_t)(hid_t, hid_t, hid_t, hid_t, hid_t, void *);
 typedef herr_t (*writefunc_t)(hid_t, hid_t, hid_t, hid_t, hid_t, const void *);
 typedef herr_t (*closefunc_t)(hid_t);
 
-hid_t kdbH5Acreate(hid_t, const char *, hid_t, hid_t, hid_t, hid_t, hid_t);
-herr_t kdbH5Aread(hid_t, hid_t, hid_t, hid_t, hid_t, void *);
-herr_t kdbH5Awrite(hid_t, hid_t, hid_t, hid_t, hid_t, const void *);
+hid_t kdbH5Acreate(hid_t attr, const char *name, hid_t type, hid_t space, hid_t UNUSED(lcpl), hid_t cpl, hid_t apl);
+herr_t kdbH5Aread(hid_t attr, hid_t memtype, hid_t mspace, hid_t fspace, hid_t pl, void *buf);
+herr_t kdbH5Awrite(hid_t attr, hid_t memtype, hid_t mspace, hid_t fspace, hid_t pl, const void *buf);
 
 // HDF5 Types
 #define HDF5FLOAT H5T_NATIVE_DOUBLE 
