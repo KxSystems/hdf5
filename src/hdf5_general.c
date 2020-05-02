@@ -23,12 +23,12 @@ EXP K hdf5gc(K UNUSED(x)){
 }
 
 K getShape(hid_t space){
-  hsize_t *dims;
-  int rank = H5Sget_simple_extent_ndims(space);
+  hsize_t rank, *dims, i;
+  rank = H5Sget_simple_extent_ndims(space);
   K kdims = ktn(KJ, rank);
   dims = calloc(rank, sizeof(hsize_t));
   H5Sget_simple_extent_dims(space, dims, NULL);
-  for(int i = 0; i < rank; i++)
+  for(i = 0; i < rank; i++)
     kJ(kdims)[i] = dims[i];
   free(dims);
   return(kdims);
