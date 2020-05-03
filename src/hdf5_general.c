@@ -324,7 +324,9 @@ EXP K hdf5datasetInfo(K fname, K dname){
   K ktype, kdims, kndims;
   ktype  = hdf5datasetType(fname, dname);
   kdims  = hdf5getDataShape(fname, dname);
-  kndims = ki(kdims->n);
+  if(!kdims)
+    return KNL;
+  kndims = kj(kdims->n);
   return kdbCreateDict("type", ktype, "ndims", kndims, "dims", kdims);
 }
 
