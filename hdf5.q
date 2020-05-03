@@ -29,6 +29,10 @@ funcs:(
   // general-use functions
      (`hdf5version;1);
          // .hdf5.version[]:S!J
+     (`hdf5errorOn;1);
+         // .hdf5.errorOn[]:_
+     (`hdf5errorOff;1);
+         // .hdf5.errorOff[]:_
      (`hdf5ishdf5;1);
          // .hdf5.ishdf5[fname:Cs]:b
      (`hdf5isObject;2);
