@@ -3,71 +3,70 @@ LIBPATH:`:libhdf5 2:
 funcs:(
   // initialize
      (`hdf5init;1);
-       // .hdf5.init[]_
+         // .hdf5.init[]_
   // create
      (`hdf5createFile;1);
-       // .hdf5.createFile[fname:Cs]:_
+         // .hdf5.createFile[fname:Cs]:_
      (`hdf5createGroup;2);
-       // .hdf5.createGroup[fname:Cs; gname:Cs]:_
+         // .hdf5.createGroup[fname:Cs; gname:Cs]:_
      (`hdf5createDataset;4);
-       // .hdf5.createDataset[fname:Cs;dname:Cs;kdims:I;ktype:c]:_
+         // .hdf5.createDataset[fname:Cs; dname:Cs; kdims:I; ktype:c]:_
      (`hdf5createAttr;5);
-       // .hdf5.createAttr[fname:Cs;dname:Cs;aname:Cs;kdims:I;ktype:c]:_
+         // .hdf5.createAttr[fname:Cs; dname:Cs; aname:Cs; kdims:I; ktype:c]:_
   // delete
      (`hdf5delAttr;3);
-       // .hdf5.delAttr[fname:Cs;dname:Cs;aname:Cs]:_
+         // .hdf5.delAttr[fname:Cs; dname:Cs; aname:Cs]:_
   // read
      (`hdf5readDataset;2);
-       // .hdf5.readDataset[fname:Cs;dname:Cs]:*
+         // .hdf5.readDataset[fname:Cs; dname:Cs]:*
      (`hdf5readAttrDataset;3);
-       // .hdf5.readAttrDataset[fname:Cs;dname:Cs;aname:Cs]:*
+         // .hdf5.readAttrDataset[fname:Cs; dname:Cs; aname:Cs]:*
   // write
      (`hdf5writeDataset;5);
-       // .hdf5.writeDataset[fname:CS;dname:Cs;dset:*;kdims:I;ktype:c]:_
+         // .hdf5.writeDataset[fname:CS; dname:Cs; dset:*; kdims:I; ktype:c]:_
      (`hdf5writeAttrDataset;6);
-       // .hdf5.writeAttrDataset[fname:Cs;dname:Cs;aname:Cs;dset:*;kdims:I;ktype:c]:_
+         // .hdf5.writeAttrDataset[fname:Cs; dname:Cs; aname:Cs; dset:*; kdims:I; ktype:c]:_
   // general-use functions
      (`hdf5version;1);
-       // .hdf5.version[]:S!J
+         // .hdf5.version[]:S!J
      (`hdf5ishdf5;1);
-       // .hdf5.ishdf5;1
+         // .hdf5.ishdf5[fname:Cs]:b
      (`hdf5isObject;2);
-       // .hdf5.isObject;2
+         // .hdf5.isObject[fname:Cs; oname:Cs]:b
      (`hdf5isAttr;3);
-       // .hdf5.isAttr;3
+         // .hdf5.isAttr[fname:Cs; dname:Cs; aname:Cs]:b
      (`hdf5fileSize;1);
-       // .hdf5.fileSize[fname:Cs]:f
+         // .hdf5.fileSize[fname:Cs]:f
      (`hdf5dataSize;2);
-       // .hdf5.dataSize[fname:Cs;dname:Cs]:f
+         // .hdf5.dataSize[fname:Cs; dname:Cs]:f
      (`hdf5getDataShape;2);
-       // .hdf5.getDataShape[fname:Cs;dname:Cs]:J
+         // .hdf5.getDataShape[fname:Cs; dname:Cs]:J
      (`hdf5getDataPoints;2);
-       // .hdf5.getDataPoints[fname:Cs;dname:Cs]:j
+         // .hdf5.getDataPoints[fname:Cs; dname:Cs]:j
      (`hdf5getAttrShape;3);
-       // .hdf5.getAttrShape[fname:Cs;dname:Cs;aname:Cs]:J
+         // .hdf5.getAttrShape[fname:Cs; dname:Cs; aname:Cs]:J
      (`hdf5getAttrPoints;3);
-       // .hdf5.getAttrPoints[fname:Cs;dname:Cs;aname:Cs]:j
+         // .hdf5.getAttrPoints[fname:Cs; dname:Cs; aname:Cs]:j
      (`hdf5datasetType;2);
-       // .hdf5.datasetType[fname:Cs;dname:Cs]:s
+         // .hdf5.datasetType[fname:Cs; dname:Cs]:s
      (`hdf5datasetInfo;2);
-       // .hdf5.datasetInfo[fname:Cs;dname:Cs]:S!*
+         // .hdf5.datasetInfo[fname:Cs; dname:Cs]:S!*
      (`hdf5copyObject;4);
-       // .hdf5.copyObject[srcfile:CS;src_obj:Cs;dstfile:Cs;dst_obj:Cs]:_
+         // .hdf5.copyObject[srcfile:CS; src_obj:Cs; dstfile:Cs; dst_obj:Cs]:_
      (`hdf5ls;1);
-       // .hdf5.ls[fname:Cs]:_
+         // .hdf5.ls[fname:Cs]:_
      (`hdf5gc;1);
-       // .hdf5.gc[]:i
+         // .hdf5.gc[]:i
   // links
      (`hdf5createExternal;4);
-       // .hdf5.createExternal[fname:Cs;lname:Cs;tname:Cs;tobj:Cs]:_
+         // .hdf5.createExternal[fname:Cs; lname:Cs; tname:Cs; tobj:Cs]:_
      (`hdf5createHard;3);
-       // .hdf5.createHard[fname:Cs;oname:Cs;lname:Cs]:_
+         // .hdf5.createHard[fname:Cs; oname:Cs; lname:Cs]:_
      (`hdf5createSoft;3);
-       // .hdf5.createSoft[fname,K tpath,K lname]:_
+         // .hdf5.createSoft[fname:Cs; tpath:Cs; lname:Cs]:_
      (`hdf5delLink;2)
-       // .hdf5.delLink[fname:Cs;lname:Cs]:C
-  );
-
+         // .hdf5.delLink[fname:Cs; lname:Cs]:C
+ );
 // binding functions from c to q
 // hdf5<Name> -> .hdf5.<Name>
 .hdf5,:(`$4_'string funcs[;0])!LIBPATH@/:funcs
