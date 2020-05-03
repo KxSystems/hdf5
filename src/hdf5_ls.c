@@ -17,25 +17,23 @@ herr_t opfunc(hid_t loc_id, const char *name, const H5L_info_t *info, void *oper
 EXP K hdf5ls(K fname){
   if(!kdbCheckType("[Cs]", fname))
     return KNL;
-  char *filename = kdbGetString(fname);
   hid_t file;
   H5O_info_t infobuf;
   struct opdata od;
+  char *filename;
+  filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-  if(file<0){
-    free(filename);
-    H5Fclose(file);
+  free(filename);
+  if(file < 0)
     return krr((S)"file does not exist");
-  }
   H5Oget_info1(file,&infobuf);
   od.recurs = 0;
   od.prev = NULL;
   od.addr = infobuf.addr;
   printf("/ {\n");
   H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, NULL, opfunc, (void *)&od);
-  printf("}\n");
-  free(filename);
   H5Fclose(file);
+  printf("}\n");
   return KNL;
 }
 

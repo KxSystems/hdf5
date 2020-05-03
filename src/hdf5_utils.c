@@ -46,7 +46,7 @@ H h2kType(hid_t htype){
   else if(H5Tequal(ntype, H5T_NATIVE_DOUBLE))
     result = KF;
   else if(H5Tequal(ntype, H5T_NATIVE_B8))
-    result = KF;
+    result = KG;
   else if(H5Tequal(ntype, H5T_NATIVE_B16))
     result = KH;
   else if(H5Tequal(ntype, H5T_NATIVE_B32))
