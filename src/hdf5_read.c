@@ -13,7 +13,7 @@ K readDataCompoundNumeric(hid_t dset, char* mname, hsize_t npoints, hid_t mtype,
 K readDataCompoundString(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, hid_t space, readfunc_t readfunc);
 
 EXP K hdf5readDataset(K fname, K dname){
-  if(!kdbCheckType("[Cs][Cs]", fname, dname))
+  if(!kdbCheckType("CC", fname, dname))
     return KNL;
   K result;
   hid_t file, data, space, dtype;
@@ -43,7 +43,7 @@ EXP K hdf5readDataset(K fname, K dname){
 }
 
 EXP K hdf5readAttrDataset(K fname, K dname, K aname){
-  if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
+  if(!kdbCheckType("CCC", fname, dname, aname))
     return KNL;
   K result;
   hid_t file, data, attr, space, dtype;

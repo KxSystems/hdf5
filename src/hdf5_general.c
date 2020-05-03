@@ -25,7 +25,7 @@ EXP K hdf5init(K UNUSED(dummy)){
   return KNL;
 }
 
-EXP K hdf5version(K UNUSED(x)){
+EXP K hdf5version(K UNUSED(dummy)){
   unsigned int maj, min, rel;
   if(H5get_libversion(&maj, &min, &rel) < 0)
     return krr((S)"error evaluating hdf5 version");
@@ -33,7 +33,7 @@ EXP K hdf5version(K UNUSED(x)){
     return kdbCreateDict("Major", kj(maj), "Minor", kj(min), "Release", kj(rel));
 }
 
-EXP K hdf5gc(K UNUSED(x)){
+EXP K hdf5gc(K UNUSED(dummy)){
   return ki(H5garbage_collect());
 }
 
@@ -50,7 +50,7 @@ K getShape(hid_t space){
 }
 
 EXP K hdf5fileSize(K fname){
-  if(!kdbCheckType("[Cs]", fname))
+  if(!kdbCheckType("C", fname))
     return KNL;
   hsize_t fsize;
   hid_t file;
@@ -66,7 +66,7 @@ EXP K hdf5fileSize(K fname){
 }
 
 EXP K hdf5dataSize(K fname, K dname){
-  if(!kdbCheckType("[Cs][Cs]", fname, dname))
+  if(!kdbCheckType("CC", fname, dname))
     return KNL;
   hsize_t dsize;
   hid_t file, data;
@@ -88,7 +88,7 @@ EXP K hdf5dataSize(K fname, K dname){
 }
 
 EXP K hdf5getDataShape(K fname, K dname){
-  if(!kdbCheckType("[Cs][Cs]", fname, dname))
+  if(!kdbCheckType("CC", fname, dname))
     return KNL;
   K kdims;
   hid_t file, data, space;
@@ -114,7 +114,7 @@ EXP K hdf5getDataShape(K fname, K dname){
 }
 
 EXP K hdf5getDataPoints(K fname, K dname){
-  if(!kdbCheckType("[Cs][Cs]", fname, dname))
+  if(!kdbCheckType("CC", fname, dname))
     return KNL;
   J npoints;
   hid_t file, data, space;
@@ -140,7 +140,7 @@ EXP K hdf5getDataPoints(K fname, K dname){
 }
 
 EXP K hdf5getAttrShape(K fname, K dname, K aname){
-  if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
+  if(!kdbCheckType("CCC", fname, dname, aname))
     return KNL;
   K kdims;
   hid_t file, data, attr, space;
@@ -172,7 +172,7 @@ EXP K hdf5getAttrShape(K fname, K dname, K aname){
 }
 
 EXP K hdf5getAttrPoints(K fname, K dname, K aname){
-  if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
+  if(!kdbCheckType("CCC", fname, dname, aname))
     return KNL;
   hid_t file, data, attr, space;
   J npoints;
@@ -205,7 +205,7 @@ EXP K hdf5getAttrPoints(K fname, K dname, K aname){
 
 // is file a hdf5 file
 EXP K hdf5ishdf5(K fname){
-  if(!kdbCheckType("[Cs]", fname))
+  if(!kdbCheckType("C", fname))
     return KNL;
   htri_t filechk;
   char *filename = kdbGetString(fname);
@@ -216,7 +216,7 @@ EXP K hdf5ishdf5(K fname){
 
 // does requested object (group/dataset) exist
 EXP K hdf5isObject(K fname, K oname){
-  if(!kdbCheckType("[Cs][Cs]", fname, oname))
+  if(!kdbCheckType("CC", fname, oname))
     return KNL;
   htri_t oexists;
   hid_t file;
@@ -235,7 +235,7 @@ EXP K hdf5isObject(K fname, K oname){
 
 // does requested attribute exist
 EXP K hdf5isAttr(K fname, K dname, K aname){
-  if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
+  if(!kdbCheckType("CCC", fname, dname, aname))
     return KNL;
   htri_t aexists;
   hid_t file, data;
@@ -259,7 +259,7 @@ EXP K hdf5isAttr(K fname, K dname, K aname){
 }
 
 EXP K hdf5datasetType(K fname, K dname){
-  if(!kdbCheckType("[Cs][Cs]", fname, dname))
+  if(!kdbCheckType("CC", fname, dname))
     return KNL;
   K ktype;
   hid_t file, data, dtype, ntype;
@@ -319,7 +319,7 @@ EXP K hdf5datasetType(K fname, K dname){
 
 // return type, ndims, dims
 EXP K hdf5datasetInfo(K fname, K dname){
-  if(!kdbCheckType("[Cs][Cs]", fname, dname))
+  if(!kdbCheckType("CC", fname, dname))
     return KNL;
   K ktype, kdims, kndims;
   ktype  = hdf5datasetType(fname, dname);
@@ -329,7 +329,7 @@ EXP K hdf5datasetInfo(K fname, K dname){
 }
 
 EXP K hdf5copyObject(K srcfile, K src_obj, K dstfile, K dst_obj){
-  if(!kdbCheckType("[Cs][Cs][Cs][Cs]", srcfile, src_obj, dstfile, dst_obj))
+  if(!kdbCheckType("CCCC", srcfile, src_obj, dstfile, dst_obj))
     return KNL;
   hid_t src, dst, status;
   char *srcfilename, *dstfilename, *src_objname, *dst_objname;

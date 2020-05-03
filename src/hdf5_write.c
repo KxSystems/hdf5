@@ -9,7 +9,7 @@
 hid_t writeString(K dset, hid_t loc, writefunc_t write);
 
 EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
-  if(!kdbCheckType("[Cs][Cs]Ic", fname, dname, kdims, ktype))
+  if(!kdbCheckType("CCIc", fname, dname, kdims, ktype))
     return KNL;
   hid_t file, data, space, status = -1;
   hid_t htype, dtype, ntype;
@@ -76,7 +76,7 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
 }
 
 EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
-  if(!kdbCheckType("[Cs][Cs][Cs]Ic", fname, dname, aname, kdims, ktype))
+  if(!kdbCheckType("CCCIc", fname, dname, aname, kdims, ktype))
     return KNL;
   hid_t file, data, attr, space, status = -1;
   hid_t htype, dtype, ntype;

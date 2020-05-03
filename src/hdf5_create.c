@@ -9,7 +9,7 @@ K createNumeric(hid_t loc, char *name, K kdims, K ktype, createfunc_t create, cl
 K createString(hid_t loc, char *name, K kdims, createfunc_t create, closefunc_t close);
 
 EXP K hdf5createFile(K fname){
-  if(!kdbCheckType("[Cs]", fname))
+  if(!kdbCheckType("C", fname))
     return KNL;
   hid_t file;
   char *filename;
@@ -23,7 +23,7 @@ EXP K hdf5createFile(K fname){
 }
 
 EXP K hdf5createGroup(K fname, K gname){
-  if(!kdbCheckType("[Cs][Cs]", fname, gname))
+  if(!kdbCheckType("CC", fname, gname))
     return KNL;
   hid_t file, group;
   hid_t gcpl; // group creation property list
@@ -47,7 +47,7 @@ EXP K hdf5createGroup(K fname, K gname){
 }
 
 EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
-  if(!kdbCheckType("[Cs][Cs]Ic", fname, dname, kdims, ktype))
+  if(!kdbCheckType("CCIc", fname, dname, kdims, ktype))
     return KNL;
   hid_t file;
   ktypegroup_t dtype;
@@ -71,7 +71,7 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
 }
 
 EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
-  if(!kdbCheckType("[Cs][Cs][Cs]Ic", fname, dname, aname, kdims, ktype))
+  if(!kdbCheckType("CCCIc", fname, dname, aname, kdims, ktype))
     return KNL;
   hid_t file, data;
   ktypegroup_t dtype;
