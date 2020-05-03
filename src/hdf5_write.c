@@ -6,13 +6,12 @@
 #include "hdf5_utils.h"
 
 // declare write utils
-K writeNumeric(K dset, hid_t loc, hid_t space, hid_t ntype, writefunc_t write);
-K writeString(K dset, hid_t loc, hid_t space, hid_t ntype, writefunc_t write);
+hid_t writeString(K dset, hid_t loc, writefunc_t write);
 
 EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Ii]c", fname, dname, kdims, ktype))
     return KNL;
-  hid_t file, data, space;
+  hid_t file, data, space, status = -1;
   hid_t htype, dtype, ntype;
   ktypegroup_t gtype;
   char *filename, *dataname;
@@ -51,12 +50,16 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
       return krr((S)"dimensions do not match");
   gtype = getKTypeGroup(ktype->g);
   if(gtype == NUMERIC)
-    writeNumeric(dset, data, space, ntype, H5Dwrite);
+    status = H5Dwrite(data, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, kG(dset));
   else if(gtype == STRING)
-    writeString(dset, data, space, ntype, H5Dwrite);
+    writeString(dset, data, H5Dwrite);
   else{
+    H5Dclose(data);
+    H5Sclose(space);
     krr((S)"unsupported datatype");
   }
+  if(status < 0)
+    krr((S)"error writing data");
   H5Dclose(data);
   H5Sclose(space);
   return KNL;
@@ -65,7 +68,7 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
 EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Cs][Ii]c", fname, dname, aname, kdims, ktype))
     return KNL;
-  hid_t file, data, attr, space;
+  hid_t file, data, attr, space, status = -1;
   hid_t htype, dtype, ntype;
   ktypegroup_t gtype;
   char *filename, *dataname, *attrname;
@@ -110,12 +113,16 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
       return krr((S)"dimensions do not match");
   gtype = getKTypeGroup(ktype->g);
   if(gtype == NUMERIC)
-    writeNumeric(dset, attr, space, ntype, kdbH5Awrite);
+    status = kdbH5Awrite(attr, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, kG(dset));
   else if(gtype == STRING)
-    writeString(dset, attr, space, ntype, kdbH5Awrite);
+    status = writeString(dset, attr, kdbH5Awrite);
   else{
-    krr((S)"unsupported datatype");
+    H5Aclose(attr);
+    H5Sclose(space);
+    return krr((S)"unsupported datatype");
   }
+  if(status < 0)
+    krr((S)"error writing data");
   H5Aclose(attr);
   H5Sclose(space);
   return KNL;
@@ -123,59 +130,18 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
 
 // define write utils
 
-long copyNumeric(hid_t UNUSED(loc), K UNUSED(dset), void *UNUSED(dset_data), hid_t UNUSED(ntype), long idx){
-/*
-  int i, j;
-  if(idx < 0)
-    return idx;
-  if(dset->t == KG){
-    for(i = 0; i < dset->n; ++i)
-      dset_data[idx + i] = kG(dset)[i];
-    idx += dset->n;
-  }
-  else if(dset->t == 0){
-    for(i = 0; i < dset->n; ++i)
-  }
-  else
-    return -1;
-*/
-  return idx;
-}
-
-K writeNumeric(K dset, hid_t loc, hid_t space, hid_t ntype, writefunc_t write){
-  hid_t status;
-  long npoints, idx;
-  size_t nsize;
-  void *dset_data;
-  npoints = H5Sget_simple_extent_npoints(space);
-  nsize = H5Tget_size(ntype);
-  dset_data = calloc(npoints, nsize);
-  idx = copyNumeric(loc, dset, dset_data, ntype, 0);
-  if(idx != npoints)
-    return krr("invalid data");
-  status = write(loc, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, dset_data); 
-  if(status < 0)
-    return krr("error writing to dataset");
-  free(dset_data);
-  return KNL;
-}
-
-K writeString(K UNUSED(dset), hid_t UNUSED(loc), hid_t UNUSED(space), hid_t UNUSED(ntype), writefunc_t UNUSED(write)){
-/*
-  long i,arr;
-  // Create a variable length memory space to store the K chars
-  hid_t memtype = H5Tcopy(H5T_C_S1);
-  H5Tset_size(memtype, H5T_VARIABLE);
-  arr = dset->n;
-  char **wdata = malloc(sizeof(char*) * arr);
-  for(i=0;i<arr;i++)
-    wdata[i]= kdbGetString(kK(dset)[i]);
-  if(strcmp(data_attr,"d")==0)
-    H5Dwrite(data, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
-  else
-    H5Awrite(data, memtype, wdata);
+hid_t writeString(K dset, hid_t loc, writefunc_t write){
+  hid_t stype, status;
+  int i;
+  stype = H5Tcopy(H5T_C_S1);
+  H5Tset_size(stype, H5T_VARIABLE);
+  char **wdata = calloc(dset->n, sizeof(char*));
+  for(i = 0; i < dset->n; ++i)
+    wdata[i] = kdbGetString(kK(dset)[i]);
+  status = write(loc, stype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
+  for(i = 0; i < dset->n; ++i)
+    free(wdata[i]);
   free(wdata);
-  H5Tclose(memtype);
-*/
-  return KNL;
+  H5Tclose(stype);
+  return status;
 }
