@@ -4,9 +4,24 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
+// error handler info
+herr_t (*err_func)(void*);
+void *err_data;
+
+EXP K hdf5errorOn(K UNUSED(dummy)){
+  H5Eset_auto1(err_func, err_data);
+  return KNL;
+}
+
+EXP K hdf5errorOff(K UNUSED(dummy)){
+  H5Eset_auto1(NULL, NULL);
+  return KNL;
+}
+
 // initialize hdf5-kdb library
 EXP K hdf5init(K UNUSED(dummy)){
-  H5Eset_auto1(NULL,NULL); // disable errors from hdf5 side
+  H5Eget_auto1(&err_func, &err_data);
+  hdf5errorOff(KNL);
   return KNL;
 }
 
