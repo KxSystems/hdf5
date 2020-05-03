@@ -33,19 +33,25 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   htype = k2hType(ktype->g);
   dtype = H5Dget_type(data);
   ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
+  H5Tclose(dtype);
   if(!H5Tequal(htype, ntype)){
     H5Dclose(data);
+    H5Tclose(ntype);
     return krr((S)"type does not match");
   }
   space = H5Dget_space(data);
-  if(space < 0)
+  if(space < 0){
+    H5Dclose(data);
+    H5Tclose(ntype);
     return krr((S)"error opening dataspace");
+  }
   // check dims
   dims = calloc(kdims->n, sizeof(hssize_t));
   H5Sget_simple_extent_dims(space, dims, NULL);
   for(i = 0; i < kdims->n; i++){
     if(kI(kdims)[i] != (J)dims[i]){
       H5Dclose(data);
+      H5Tclose(ntype);
       H5Sclose(space);
       return krr((S)"dimensions do not match");
     }
@@ -57,12 +63,14 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
     writeString(dset, data, H5Dwrite);
   else{
     H5Dclose(data);
+    H5Tclose(ntype);
     H5Sclose(space);
     krr((S)"unsupported datatype");
   }
   if(status < 0)
     krr((S)"error writing data");
   H5Dclose(data);
+  H5Tclose(ntype);
   H5Sclose(space);
   return KNL;
 }
@@ -98,19 +106,25 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   htype = k2hType(ktype->g);
   dtype = H5Dget_type(attr);
   ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
+  H5Tclose(dtype);
   if(!H5Tequal(htype, ntype)){
     H5Aclose(attr);
+    H5Tclose(ntype);
     return krr((S)"type does not match");
   }
   space = H5Aget_space(attr);
-  if(space < 0)
+  if(space < 0){
+    H5Aclose(attr);
+    H5Tclose(ntype);
     return krr((S)"error opening dataspace");
+  }
   // check dims
   dims = calloc(kdims->n, sizeof(hssize_t));
   H5Sget_simple_extent_dims(space, dims, NULL);
   for(i = 0; i < kdims->n; i++){
     if(kI(kdims)[i] != (J)dims[i]){
       H5Aclose(attr);
+      H5Tclose(ntype);
       H5Sclose(space);
       return krr((S)"dimensions do not match");
     }
@@ -122,12 +136,14 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
     status = writeString(dset, attr, kdbH5Awrite);
   else{
     H5Aclose(attr);
+    H5Tclose(ntype);
     H5Sclose(space);
     return krr((S)"unsupported datatype");
   }
   if(status < 0)
     krr((S)"error writing data");
   H5Aclose(attr);
+  H5Tclose(ntype);
   H5Sclose(space);
   return KNL;
 }
