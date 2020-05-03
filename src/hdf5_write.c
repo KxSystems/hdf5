@@ -9,7 +9,7 @@
 hid_t writeString(K dset, hid_t loc, writefunc_t write);
 
 EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
-  if(!kdbCheckType("CCIc", fname, dname, kdims, ktype))
+  if(!kdbCheckType("CCJc", fname, dname, kdims, ktype))
     return KNL;
   hid_t file, data, space, status = -1;
   hid_t htype, dtype, ntype;
@@ -49,7 +49,7 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   dims = calloc(kdims->n, sizeof(hssize_t));
   H5Sget_simple_extent_dims(space, dims, NULL);
   for(i = 0; i < kdims->n; i++){
-    if(kI(kdims)[i] != (J)dims[i]){
+    if(kJ(kdims)[i] != (J)dims[i]){
       H5Dclose(data);
       H5Tclose(ntype);
       H5Sclose(space);
@@ -76,7 +76,7 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
 }
 
 EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
-  if(!kdbCheckType("CCCIc", fname, dname, aname, kdims, ktype))
+  if(!kdbCheckType("CCCJc", fname, dname, aname, kdims, ktype))
     return KNL;
   hid_t file, data, attr, space, status = -1;
   hid_t htype, dtype, ntype;
@@ -122,7 +122,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   dims = calloc(kdims->n, sizeof(hssize_t));
   H5Sget_simple_extent_dims(space, dims, NULL);
   for(i = 0; i < kdims->n; i++){
-    if(kI(kdims)[i] != (J)dims[i]){
+    if(kJ(kdims)[i] != (J)dims[i]){
       H5Aclose(attr);
       H5Tclose(ntype);
       H5Sclose(space);
