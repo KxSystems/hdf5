@@ -104,7 +104,7 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
     return krr((S)"error opening attribute");
   // check datatypes
   htype = k2hType(ktype->g);
-  dtype = H5Dget_type(attr);
+  dtype = H5Aget_type(attr);
   ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
   H5Tclose(dtype);
   if(!H5Tequal(htype, ntype)){
