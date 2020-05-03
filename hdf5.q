@@ -55,6 +55,8 @@ i.checkdata:{
   if[10h~r:first r ;r:count[x],-10h];
   `dims`type!(-1_;last)@\:r}
 
+i.razedata:{(count[checkdata[x]`dims]-1)raze/x}
+
 // Find the appropriate type for a dataset being written to hdf5
 i.self_type:{$[any 0h in type each x;.z.s each x;raze type each x]}
 i.nlist_types:{$[1=count distinct l:i.self_type x;(abs distinct raze l)0;'"mixed list detected"]}
