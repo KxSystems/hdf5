@@ -91,6 +91,8 @@ EXP K hdf5getDataShape(K fname, K dname){
     return krr((S)"error opening dataset");
   space = H5Dget_space(data);
   H5Dclose(data);
+  if(space < 0)
+    return krr((S)"error opening data space");
   kdims = getShape(space);
   H5Sclose(space);
   return kdims;
@@ -115,6 +117,8 @@ EXP K hdf5getDataPoints(K fname, K dname){
     return krr((S)"error opening dataset/group");
   space  = H5Dget_space(data);
   H5Dclose(data);
+  if(space < 0)
+    return krr((S)"error opening data space");
   npoints = H5Sget_simple_extent_npoints(space);
   H5Sclose(space);
   return kj(npoints);
@@ -145,6 +149,8 @@ EXP K hdf5getAttrShape(K fname, K dname, K aname){
     return krr((S)"error opening attribute");
   space = H5Aget_space(attr);
   H5Aclose(attr);
+  if(space < 0)
+    return krr((S)"error opening attribute space");
   kdims = getShape(space);
   H5Sclose(space);
   return kdims;
@@ -175,6 +181,8 @@ EXP K hdf5getAttrPoints(K fname, K dname, K aname){
     return krr((S)"error opening attribute");
   space  = H5Aget_space(attr);
   H5Aclose(attr);
+  if(space < 0)
+    return krr((S)"error opening attribute space");
   npoints = H5Sget_simple_extent_npoints(space);
   H5Sclose(space);
   return kj(npoints);
@@ -205,6 +213,7 @@ EXP K hdf5isObject(K fname, K oname){
     return krr((S)"error opening file");
   objname = kdbGetString(oname);
   oexists = H5Oexists_by_name(file, objname, H5P_DEFAULT);
+  H5Fclose(file);
   free(objname);
   return kb(oexists > 0 ? 1 : 0);
 }
@@ -255,7 +264,7 @@ EXP K hdf5datasetType(K fname, K dname){
   H5Dclose(data);
   ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
   H5Tclose(dtype);
-         if(H5Tequal(ntype, H5T_NATIVE_CHAR))
+       if(H5Tequal(ntype, H5T_NATIVE_CHAR))
     ktype = ks((S)"char");
   else if(H5Tequal(ntype, H5T_NATIVE_SHORT))
     ktype = ks((S)"short");
