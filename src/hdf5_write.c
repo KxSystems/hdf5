@@ -6,8 +6,8 @@
 #include "hdf5_utils.h"
 
 // declare write utils
-K writeNumeric(K dset, hid_t space);
-K writeString(K dset, hid_t space);
+K writeNumeric(K dset, hid_t loc, hid_t space, hid_t ntype);
+K writeString(K dset, hid_t loc, hid_t space, hid_t ntype);
 
 EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   if(!kdbCheckType("[Cs][Cs][Ii]c", fname, dname, kdims, ktype))
@@ -39,7 +39,6 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   space = H5Dget_space(data);
   if(space < 0)
     return krr((S)"error opening dataspace");
-  H5Dclose(data);
   // check rank
   rank = kdims->n;
   if(rank != H5Sget_simple_extent_npoints(space))
@@ -52,12 +51,13 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
       return krr((S)"dimensions do not match");
   gtype = getKTypeGroup(ktype->g);
   if(gtype == NUMERIC)
-    writeNumeric(dset, space);
+    writeNumeric(dset, data, space, ntype);
   else if(gtype == STRING)
-    writeString(dset, space);
+    writeString(dset, data, space, ntype);
   else{
     krr((S)"unsupported datatype");
   }
+  H5Dclose(data);
   H5Sclose(space);
   return KNL;
 }
@@ -98,7 +98,6 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   space = H5Aget_space(attr);
   if(space < 0)
     return krr((S)"error opening dataspace");
-  H5Aclose(attr);
   // check rank
   rank = kdims->n;
   if(rank != H5Sget_simple_extent_npoints(space))
@@ -111,31 +110,93 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
       return krr((S)"dimensions do not match");
   gtype = getKTypeGroup(ktype->g);
   if(gtype == NUMERIC)
-    writeNumeric(dset, space);
+    writeNumeric(dset, attr, space, ntype);
   else if(gtype == STRING)
-    writeString(dset, space);
+    writeString(dset, attr, space, ntype);
   else{
     krr((S)"unsupported datatype");
   }
   H5Aclose(attr);
+  H5Sclose(space);
   return KNL;
 }
+
+// declare write utils
+K writeNumeric(K dset, hid_t loc, hid_t space, hid_t ntype);
+K writeString(K dset, hid_t loc, hid_t space, hid_t ntype);
 
 // define write utils
 
-K writeNumeric(K UNUSED(dset), hid_t UNUSED(space)){
+long copyNumeric(hid_t UNUSED(loc), K UNUSED(dset), void *UNUSED(dset_data), hid_t UNUSED(ntype), long UNUSED(idx)){
+  return 0;
+}
+
+K writeNumeric(K dset, hid_t loc, hid_t space, hid_t ntype){
+  hid_t status;
+  long npoints, idx;
+  void *dset_data;
+  npoints = H5Sget_simple_extent_npoints(space);
+  dset_data = calloc(npoints, sizeof(double)); // need size of ntype
+  idx = copyNumeric(loc, dset, dset_data, ntype, 0);
+  if(idx != npoints)
+    return krr("invalid data");
+  status = H5Dwrite(loc, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, dset_data); // need generic write func
+  if(status < 0)
+    return krr("error writing to dataset");
+  free(dset_data);
   return KNL;
 }
 
-K writeString(K UNUSED(dset), hid_t UNUSED(space)){
+K writeString(K UNUSED(dset), hid_t UNUSED(loc), hid_t UNUSED(space), hid_t UNUSED(ntype)){
   return KNL;
 }
+
+
+
+
 
 /*
 
+  int i, j;
+  if(idx < 0)
+    return idx;
+  if(dset->t == KG){
+    for(i = 0; i < dset->n; ++i)
+      dset_data[idx + i] = kG(dset)[i];
+    idx += dset->n;
+  }
+  else if(dset->t == 0){
+    for(i = 0; i < dset->n; ++i)
+  }
+  else
+    return -1;
+  return idx;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // utils
 
-int longwrite (hid_t h5data, K dset, long   *data, char *rdtype, long points, int idx);
+int longwrite (hid_t h5data, K dset, long   *data, char *rdtRype, long points, int idx);
 int intwrite  (hid_t h5data, K dset, int    *data, char *rdtype, long points, int idx);
 int shortwrite(hid_t h5data, K dset, short  *data, char *rdtype, long points, int idx);
 int realwrite (hid_t h5data, K dset, float  *data, char *rdtype, long points, int idx);
@@ -151,12 +212,6 @@ static void writeFloat(K dset, hid_t data, char *rdtype){
   else
     space = H5Aget_space(data);
   // Allocate the memory needed for writing to hdf5
-  long points = H5Sget_simple_extent_npoints(space);
-  double *dset_data = (double *)malloc(points *sizeof(double));
-  floatwrite(data, dset, dset_data, rdtype, points, 0);
-  // Clean up
-  free(dset_data);
-  H5Sclose(space);
 }
 
 static void writeByte(K dset, hid_t data, char *rdtype){
