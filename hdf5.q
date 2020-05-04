@@ -69,12 +69,12 @@ funcs:(
 // hdf5<Name> -> .hdf5.<Name>
 .hdf5,:(`$4_'string funcs[;0])!LIBPATH@/:funcs
 
-i.typeConv:{$["s"=t:"*"^("bmduvtpnz"!"iiiiiijjf")x;string;t$]}
+i.typeConv:{$["s"=x;string;("*"^("bmduvtpnz"!"iiiiiijjf")x)$]}
 i.typeChar:{$[0>x;.Q.t abs x;upper .Q.t x]}
 i.checkDimsType:{$[0=t:type x;count[x],'distinct raze .z.s each x;10=t;t;enlist(count x;neg t)]}
 i.checkData:{
   if[1<count dt:i.checkDimsType x;`$"invalid ",$[1<count distinct last each dt;"type";"shape"]];
-  if[10h~dt:first dt;dt:count[x],dt];
+  if[10h~dt:first dt;dt:count[x],-10h];
   kdims:-1_dt;
   ktype:i.typeChar last dt;
   kdata:i.typeConv[ktype](count[kdims]-1)raze/x;
@@ -83,12 +83,15 @@ i.checkData:{
 writeData:{[fname;dname;dset]
   if[type[dset]in 98 99h;:writeDictTab[fname;dname;dset]];
   chk:i.checkData dset;
+  createDataset[fname;dname] . chk`kdims`ktype;
   writeDataset[fname;dname] . chk`kdata`kdims`ktype;
-  if[chk[`ktype]in"bmduvtpnz";writeAttr[fname;dname;"datatype_kdb"]enlist chk`ktype];
+  if[chk[`ktype]in"bmduvtpnz";
+    writeAttr[fname;dname;"datatype_kdb"]enlist chk`ktype];
   }
 writeAttr:{[fname;dname;aname;dset]
   if[type[dset]in 98 99h;:writeDictTab[fname;dname;dset]];
   chk:i.checkData dset;
+  createAttr[fname;dname;aname] . chk`kdims`ktype;
   writeAttrDataset[fname;dname;aname] . chk`kdata`kdims`ktype;
   }
 writeDictTab:{[fname;dname;dset]
@@ -106,11 +109,9 @@ writeDictTab:{[fname;dname;dset]
   }
 
 readData:{[fname;dname]
-  if[isAttr[fname;dname;"datatype_kdb"];
-    typ:readAttr[fname;dname;"datatype_kdb"]0;
-    if[(typ~"table")|typ~"dict";:readDictTab[fname;dname;typ]]];
-  data:getDataShape[fname;dname]#readDataset[fname;dname];
-  $[isAttr[fname;dname;"datatype_kdb"];(first `$readAttr[fname;dname;"datatype_kdb"])$;]data
+  typ:$[isAttr[fname;dname;"datatype_kdb"];readAttr[fname;dname;"datatype_kdb"];"*"];
+  if[(typ~"table")|typ~"dict";:readDictTab[fname;dname;typ]];
+  first[typ]$getDataShape[fname;dname]#readDataset[fname;dname]
   }
 readAttr:{[fname;dname;aname]
   getAttrShape[fname;dname;aname]#readAttrDataset[fname;dname;aname]
