@@ -35,6 +35,11 @@ EXP K hdf5readDataset(K fname, K dname){
     return krr((S)"error opening dataspace");
   }
   dtype = H5Dget_type(data);
+  if(dtype < 0){
+    H5Dclose(data);
+    H5Sclose(space);
+    return krr((S)"error retrieving dataset type");
+  }
   result = readData(data, space, dtype, H5Dread);
   H5Dclose(data);
   H5Sclose(space);
@@ -71,6 +76,11 @@ EXP K hdf5readAttrDataset(K fname, K dname, K aname){
     return krr((S)"error opening dataspace");
   }
   dtype = H5Aget_type(attr);
+  if(dtype < 0){
+    H5Aclose(attr);
+    H5Sclose(space);
+    return krr((S)"error retrieving attribute type");
+  }
   result = readData(attr, space, dtype, kdbH5Aread);
   H5Aclose(attr);
   H5Sclose(space);
