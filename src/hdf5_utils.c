@@ -62,6 +62,8 @@ H h2kType(hid_t htype){
 // ktype (char) to htype (hid_t)
 hid_t k2hType(char ktype){
   switch(ktype){
+    case 'c':
+      return H5T_NATIVE_CHAR;
     case 'b':
     case 'x':
       return H5T_NATIVE_UCHAR;
