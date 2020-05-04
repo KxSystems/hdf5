@@ -5,7 +5,7 @@
 #include "hdf5_utils.h"
 
 EXP K hdf5delAttr(K fname, K dname, K aname){
-  if(!kdbCheckType("[Cs][Cs][Cs]", fname, dname, aname))
+  if(!kdbCheckType("CCC", fname, dname, aname))
     return KNL;
   hid_t file, data, status;
   char *filename, *dataname, *attrname;

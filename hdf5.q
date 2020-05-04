@@ -29,6 +29,10 @@ funcs:(
   // general-use functions
      (`hdf5version;1);
          // .hdf5.version[]:S!J
+     (`hdf5errorOn;1);
+         // .hdf5.errorOn[]:_
+     (`hdf5errorOff;1);
+         // .hdf5.errorOff[]:_
      (`hdf5ishdf5;1);
          // .hdf5.ishdf5[fname:Cs]:b
      (`hdf5isObject;2);
@@ -65,17 +69,18 @@ funcs:(
      (`hdf5createSoft;3);
          // .hdf5.createSoft[fname:Cs; tpath:Cs; lname:Cs]:_
      (`hdf5delLink;2)
-         // .hdf5.delLink[fname:Cs; lname:Cs]:C
+         // .hdf5.delLink[fname:Cs; lname:Cs]:_
  );
 // binding functions from c to q
 // hdf5<Name> -> .hdf5.<Name>
 .hdf5,:(`$4_'string funcs[;0])!LIBPATH@/:funcs
 
+i.ktypes:reverse[1_20#.Q.t],upper 20#.Q.t
 i.checkdata:{
   r:{$[0=type x;count[x],'distinct raze .z.s each x;10h=type x;10h;enlist(count x;neg type x)]}x;
   if[1<count r;'`$"invalid ",$[1<count distinct last each r;"type";"shape"]];
   if[10h~r:first r ;r:count[x],-10h];
-  `dims`type`flat!(-1_r;last r;(count[r]-2)raze/x)}
+  `kdims`ktype`flatdata!(-1_r;i.ktypes 19+last r;(count[r]-2)raze/x)}
 
 // Find the appropriate type for a dataset being written to hdf5
 i.self_type:{$[any 0h in type each x;.z.s each x;raze type each x]}
