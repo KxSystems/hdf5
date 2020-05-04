@@ -58,6 +58,7 @@ EXP K hdf5createSoft(K linkfile, K linkpath, K targetpath){
   char *linkfilename, *linkpathname, *targetpathname;
   linkfilename = kdbGetString(linkfile);
   file = H5Fopen(linkfilename, H5F_ACC_RDWR, H5P_DEFAULT);
+  free(linkfilename);
   if(file < 0)
     return krr((S)"error opening file");
   linkpathname = kdbGetString(linkpath);
