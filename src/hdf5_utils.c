@@ -89,9 +89,9 @@ hid_t k2hType(char ktype){
 
 // ktype (char) to ktypegroup (ktypegroup_t)
 ktypegroup_t getKTypeGroup(char ktype){
-  if(NULL != strchr("hijfebxpmdznuvt", ktype))
+  if(NULL != strchr("chijfebxpmdznuvt", ktype))
     return NUMERIC;
-  if(NULL != strchr("csg", ktype))
+  if(NULL != strchr("Csg", ktype))
     return STRING;
   return INVALID;
 }
