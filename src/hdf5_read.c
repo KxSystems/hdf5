@@ -112,8 +112,8 @@ K readDataSimple(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc){
   npoints = H5Sget_simple_extent_npoints(space);
   nclass = H5Tget_class(ntype);
   result = (nclass == H5T_STRING) ?
-    readDataSimpleNumeric(dset, npoints, ntype, space, readfunc):
-    readDataSimpleString(dset, npoints, ntype, space, readfunc);
+    readDataSimpleString(dset, npoints, ntype, space, readfunc):
+    readDataSimpleNumeric(dset, npoints, ntype, space, readfunc);
   H5Tclose(ntype);
   H5Tclose(nclass);
   return result;
@@ -121,8 +121,8 @@ K readDataSimple(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc){
 
 K readDataSimpleNumeric(hid_t dset, hsize_t npoints, hid_t ntype, hid_t UNUSED(space), readfunc_t readfunc){
   K result;
-  result = ktn(h2kType(ntype), npoints); // pass in npoints, don't pass in result
-  readfunc(dset, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, result);
+  result = ktn(h2kType(ntype), npoints);
+  readfunc(dset, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, kG(result));
   return result;
 }
 
