@@ -17,7 +17,6 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   char *filename, *dataname;
   hssize_t i;
   hsize_t *dims;
-
   filename = kdbGetString(fname);
   file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
   free(filename);
@@ -50,12 +49,14 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   H5Sget_simple_extent_dims(space, dims, NULL);
   for(i = 0; i < kdims->n; i++){
     if(kJ(kdims)[i] != (J)dims[i]){
+      free(dims);
       H5Dclose(data);
       H5Tclose(ntype);
       H5Sclose(space);
       return krr((S)"dimensions do not match");
     }
   }
+  free(dims);
   gtype = getKTypeGroup(ktype->g);
   if(gtype == NUMERIC)
     status = H5Dwrite(data, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, kG(dset));
@@ -123,12 +124,14 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   H5Sget_simple_extent_dims(space, dims, NULL);
   for(i = 0; i < kdims->n; i++){
     if(kJ(kdims)[i] != (J)dims[i]){
+      free(dims);
       H5Aclose(attr);
       H5Tclose(ntype);
       H5Sclose(space);
       return krr((S)"dimensions do not match");
     }
   }
+  free(dims);
   gtype = getKTypeGroup(ktype->g);
   if(gtype == NUMERIC)
     status = kdbH5Awrite(attr, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, kG(dset));
