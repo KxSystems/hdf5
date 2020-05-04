@@ -61,12 +61,12 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   if(gtype == NUMERIC)
     status = H5Dwrite(data, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, kG(dset));
   else if(gtype == STRING)
-    writeString(dset, data, H5Dwrite);
+    status = writeString(dset, data, H5Dwrite);
   else{
     H5Dclose(data);
     H5Tclose(ntype);
     H5Sclose(space);
-    krr((S)"unsupported datatype");
+    return krr((S)"unsupported datatype");
   }
   if(status < 0)
     krr((S)"error writing data");
