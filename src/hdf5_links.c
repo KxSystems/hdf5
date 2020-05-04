@@ -4,75 +4,67 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
-// Create a symbolic/soft link between a paths within a local hdf5 file
-// and an external link in another hdf5 file.
-/* tname = target file path */
-/* tobj = object path in target file */
-EXP K hdf5createExternal(K fname, K lname, K tname, K tobj){
-  if(!kdbCheckType("CCCC", fname, lname, tname, tobj))
+// create soft link to an external file
+EXP K hdf5createExternal(K linkfile, K linkpath, K targetfile, K targetpath){
+  if(!kdbCheckType("CCCC", linkfile, linkpath, targetfile, targetpath))
     return KNL;
   hid_t file, status;
-  char *filename, *linkname, *targetnm, *tobjname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename,  H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  char *linkfilename, *linkpathname, *targetfilename, *targetpathname;
+  linkfilename = kdbGetString(linkfile);
+  file = H5Fopen(linkfilename, H5F_ACC_RDWR, H5P_DEFAULT);
+  free(linkfilename);
   if(file < 0)
     return krr((S)"error opening file");
-  linkname = kdbGetString(lname);
-  targetnm = kdbGetString(tname);
-  tobjname = kdbGetString(tobj);
-  status = H5Lcreate_external(targetnm, tobjname, file, linkname, H5P_DEFAULT, H5P_DEFAULT);
-  free(linkname);
-  free(targetnm);
-  free(tobjname);
+  linkpathname = kdbGetString(linkpath);
+  targetfilename = kdbGetString(targetfile);
+  targetpathname = kdbGetString(targetpath);
+  status = H5Lcreate_external(targetfilename, targetpathname, file, linkfilename, H5P_DEFAULT, H5P_DEFAULT);
+  free(linkpathname);
+  free(targetfilename);
+  free(targetpathname);
   H5Fclose(file);
   if(status < 0)
     krr((S)"error creating external link");
   return KNL;
 }
 
-// Create a hard link from a defined location within a file (this object must exist)
-// and another location
-/* oname = name of the object being linked to */
-/* lname = linking path name */
-EXP K hdf5createHard(K fname, K oname, K lname){
-  if(!kdbCheckType("CCC", fname, oname, lname))
+// create hard link within file (target must exist)
+EXP K hdf5createHard(K linkfile, K linkpath, K targetpath){
+  if(!kdbCheckType("CCC", linkfile, linkpath, targetpath))
     return KNL;
   hid_t file, status;
-  char *filename, *objname, *linkname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  char *linkfilename, *linkpathname, *targetpathname;
+  linkfilename = kdbGetString(linkfile);
+  file = H5Fopen(linkfilename, H5F_ACC_RDWR, H5P_DEFAULT);
+  free(linkfilename);
   if(file < 0)
     return krr((S)"error opening file");
-  objname  = kdbGetString(oname);
-  linkname = kdbGetString(lname);
-  status = H5Lcreate_hard(file, objname, H5L_SAME_LOC, linkname, H5P_DEFAULT, H5P_DEFAULT);
-  free(objname);
-  free(linkname);
+  linkpathname = kdbGetString(linkpath);
+  targetpathname = kdbGetString(targetpath);
+  status = H5Lcreate_hard(file, targetpathname, H5L_SAME_LOC, linkpathname, H5P_DEFAULT, H5P_DEFAULT);
+  free(linkpathname);
+  free(targetpathname);
   H5Fclose(file);
   if(status < 0)
     krr((S)"error creating hard link");
   return KNL;
 }
 
-// Create a soft link between a two locations
-/* tpath = target path (may be dangling) */
-/* lpath = soft link path */
-EXP K hdf5createSoft(K fname, K tpath, K lname){
-  if(!kdbCheckType("CCC", fname, tpath, lname))
+// create soft link within file (target may be dangling)
+EXP K hdf5createSoft(K linkfile, K linkpath, K targetpath){
+  if(!kdbCheckType("CCC", linkfile, linkpath, targetpath))
     return KNL;
   hid_t file, status;
-  char *filename, *tarname, *linkname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+  char *linkfilename, *linkpathname, *targetpathname;
+  linkfilename = kdbGetString(linkfile);
+  file = H5Fopen(linkfilename, H5F_ACC_RDWR, H5P_DEFAULT);
   if(file < 0)
     return krr((S)"error opening file");
-  tarname  = kdbGetString(tpath);
-  linkname = kdbGetString(lname);
-  status = H5Lcreate_soft(tarname, file, linkname, H5P_DEFAULT, H5P_DEFAULT);
-  free(tarname);
-  free(linkname);
+  linkpathname = kdbGetString(linkpath);
+  targetpathname = kdbGetString(targetpath);
+  status = H5Lcreate_soft(targetpathname, file, linkpathname, H5P_DEFAULT, H5P_DEFAULT);
+  free(linkpathname);
+  free(targetpathname);
   H5Fclose(file);
   if(status < 0)
     krr((S)"error creating soft link");
@@ -80,19 +72,19 @@ EXP K hdf5createSoft(K fname, K tpath, K lname){
 }
 
 // delete link
-EXP K hdf5delLink(K fname, K lname){
-  if(!kdbCheckType("CC", fname, lname))
+EXP K hdf5delLink(K linkfile, K linkpath){
+  if(!kdbCheckType("CC", linkfile, linkpath))
     return KNL;
   hid_t file, status;
-  char *filename, *linkname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  char *linkfilename, *linkpathname;
+  linkfilename = kdbGetString(linkfile);
+  file = H5Fopen(linkfilename, H5F_ACC_RDWR, H5P_DEFAULT);
+  free(linkfilename);
   if(file < 0)
     return krr((S)"error opening file");
-  linkname = kdbGetString(lname);
-  status = H5Ldelete(file, linkname, H5P_DEFAULT);
-  free(linkname);
+  linkpathname = kdbGetString(linkpath);
+  status = H5Ldelete(file, linkpathname, H5P_DEFAULT);
+  free(linkpathname);
   H5Fclose(file);
   if(status < 0)
     krr((S)"error deleting link");
