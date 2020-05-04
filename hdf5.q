@@ -69,7 +69,7 @@ funcs:(
      (`hdf5createSoft;3);
          // .hdf5.createSoft[fname:Cs; tpath:Cs; lname:Cs]:_
      (`hdf5delLink;2)
-         // .hdf5.delLink[fname:Cs; lname:Cs]:C
+         // .hdf5.delLink[fname:Cs; lname:Cs]:_
  );
 // binding functions from c to q
 // hdf5<Name> -> .hdf5.<Name>
