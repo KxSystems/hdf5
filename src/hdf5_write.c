@@ -154,17 +154,14 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
 // define write utils
 
 hid_t writeString(K dset, hid_t loc, writefunc_t write){
-  hid_t stype, status;
+  hid_t status;
   int i;
-  stype = H5Tcopy(H5T_C_S1);
-  H5Tset_size(stype, H5T_VARIABLE);
   char **wdata = calloc(dset->n, sizeof(char*));
   for(i = 0; i < dset->n; ++i)
     wdata[i] = kdbGetString(kK(dset)[i]);
-  status = write(loc, stype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
+  status = write(loc, varstringtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
   for(i = 0; i < dset->n; ++i)
     free(wdata[i]);
   free(wdata);
-  H5Tclose(stype);
   return status;
 }
