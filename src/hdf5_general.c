@@ -311,6 +311,8 @@ EXP K hdf5datasetType(K fname, K dname){
     ktype = ks((S)"b32");
   else if(H5Tequal(ntype, H5T_NATIVE_B64))
     ktype = ks((S)"b64");
+  else if(H5Tequal(ntype, H5T_STRING))
+    ktype = ks((S)"string");
   else
     ktype = ks((S)"");
   H5Tclose(ntype);
