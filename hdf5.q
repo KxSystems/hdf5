@@ -69,7 +69,8 @@ funcs:(
 // hdf5<Name> -> .hdf5.<Name>
 .hdf5,:(`$4_'string funcs[;0])!LIBPATH@/:funcs
 
-i.typeConv:{$["s"=x;string;("*"^("bmduvtpnz"!"xiiiiijjf")x)$]}
+i.typeConv:{$[x in"sg";string;("*"^("bmduvtpnz"!"xiiiiijjf")x)$]}
+i.typeRead:{$[x="s";`;x="g";"G";x]$}
 i.typeChar:{$[0>x;.Q.t abs x;upper .Q.t x]}
 i.checkDimsType:{$[0=t:type x;count[x],'distinct raze .z.s each x;10=t;t;enlist(count x;neg t)]}
 i.checkData:{
@@ -85,7 +86,7 @@ writeData:{[fname;dname;dset]
   chk:i.checkData dset;
   createDataset[fname;dname] . chk`kdims`ktype;
   writeDataset[fname;dname] . chk`kdata`kdims`ktype;
-  if[chk[`ktype]in"bmduvtpnz";
+  if[chk[`ktype]in"bmduvtpnzsg";
     writeAttr[fname;dname;"datatype_kdb"]enlist chk`ktype];
   }
 writeAttr:{[fname;dname;aname;dset]
@@ -111,7 +112,7 @@ writeDictTab:{[fname;dname;dset]
 readData:{[fname;dname]
   typ:$[isAttr[fname;dname;"datatype_kdb"];readAttr[fname;dname;"datatype_kdb"];"*"];
   if[(typ~"table")|typ~"dict";:readDictTab[fname;dname;typ]];
-  first[typ]$getDataShape[fname;dname]#readDataset[fname;dname]
+  i.typeRead[first typ]getDataShape[fname;dname]#readDataset[fname;dname]
   }
 readAttr:{[fname;dname;aname]
   getAttrShape[fname;dname;aname]#readAttrDataset[fname;dname;aname]
