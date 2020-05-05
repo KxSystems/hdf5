@@ -139,6 +139,7 @@ hid_t k2hType(char ktype){
     case 'f':
     case 'z':
       return H5T_NATIVE_DOUBLE;
+    case 'g':
     case 's':
     case 'C':
       return varstringtype;
