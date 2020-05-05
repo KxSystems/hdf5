@@ -117,13 +117,14 @@ K createNumeric(hid_t loc, char *name, K kdims, K ktype, createfunc_t create, cl
 
 K createString(hid_t loc, char *name, K kdims, createfunc_t create, closefunc_t close){
   hid_t space, obj;
-  hsize_t dims[1];
-  int rank;
+  hsize_t dims[32];
+  int rank, i;
   rank = kdims->n;
-  if(rank != 1)
-    return krr((S)"string datasets must have dimensionality 1");
-  dims[0] = kJ(kdims)[0];
-  space = H5Screate_simple(1, dims, NULL);
+  if(rank > 32)
+    return krr((S)"string datasets must have dimensionality <=32");
+  for(i = 0; i < rank; ++i)
+    dims[i] = kJ(kdims)[i];
+  space = H5Screate_simple(rank, dims, NULL);
   if(space < 0)
     return krr((S)"error creating dataspace");
   obj = create(loc, name, varstringtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
