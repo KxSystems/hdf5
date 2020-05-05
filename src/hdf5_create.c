@@ -124,7 +124,7 @@ K createNumeric(hid_t loc, char *name, K kdims, K ktype, createfunc_t create, cl
 }
 
 K createString(hid_t loc, char *name, K kdims, createfunc_t create, closefunc_t close){
-  hid_t space, obj, dtype;
+  hid_t space, obj;
   hsize_t dims[1];
   int rank;
   rank = kdims->n;
@@ -134,10 +134,7 @@ K createString(hid_t loc, char *name, K kdims, createfunc_t create, closefunc_t 
   space = H5Screate_simple(1, dims, NULL);
   if(space < 0)
     return krr((S)"error creating dataspace");
-  dtype = H5Tcopy(H5T_C_S1);
-  H5Tset_size(dtype, H5T_VARIABLE);
-  obj = create(loc, name, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-  H5Tclose(dtype);
+  obj = create(loc, name, varstringtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   H5Sclose(space);
   if(obj < 0)
     return krr((S)"error creating dataset");
