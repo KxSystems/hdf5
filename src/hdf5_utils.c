@@ -70,7 +70,6 @@ hid_t kdbH5Oopen(hid_t loc, K name){
   return res;
 }
 
-
 // htype (hid_t) to ktype (H)
 H h2kType(hid_t htype){
   hid_t ntype;
