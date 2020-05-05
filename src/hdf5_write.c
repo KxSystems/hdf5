@@ -14,17 +14,12 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   hid_t file, data, space, status = -1;
   hid_t htype, dtype, ntype;
   ktypegroup_t gtype;
-  char *filename, *dataname;
   hssize_t i;
   hsize_t *dims;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  data = H5Dopen(file, dataname, H5P_DEFAULT);
-  free(dataname);
+  data = kdbH5Dopen(file, dname);
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset");
@@ -61,12 +56,12 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   if(gtype == NUMERIC)
     status = H5Dwrite(data, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, kG(dset));
   else if(gtype == STRING)
-    writeString(dset, data, H5Dwrite);
+    status = writeString(dset, data, H5Dwrite);
   else{
     H5Dclose(data);
     H5Tclose(ntype);
     H5Sclose(space);
-    krr((S)"unsupported datatype");
+    return krr((S)"unsupported datatype");
   }
   if(status < 0)
     krr((S)"error writing data");
@@ -82,24 +77,17 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   hid_t file, data, attr, space, status = -1;
   hid_t htype, dtype, ntype;
   ktypegroup_t gtype;
-  char *filename, *dataname, *attrname;
   hssize_t i;
   hsize_t *dims;
 
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  data = H5Oopen(file, dataname, H5P_DEFAULT);
-  free(dataname);
+  data = kdbH5Oopen(file, dname);
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset/group");
-  attrname = kdbGetString(aname);
-  attr = H5Aopen(data, attrname, H5P_DEFAULT);
-  free(attrname);
+  attr = kdbH5Aopen(data, aname);
   H5Oclose(data);
   if(attr < 0)
     return krr((S)"error opening attribute");
@@ -154,17 +142,14 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
 // define write utils
 
 hid_t writeString(K dset, hid_t loc, writefunc_t write){
-  hid_t stype, status;
+  hid_t status;
   int i;
-  stype = H5Tcopy(H5T_C_S1);
-  H5Tset_size(stype, H5T_VARIABLE);
   char **wdata = calloc(dset->n, sizeof(char*));
   for(i = 0; i < dset->n; ++i)
     wdata[i] = kdbGetString(kK(dset)[i]);
-  status = write(loc, stype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
+  status = write(loc, varstringtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
   for(i = 0; i < dset->n; ++i)
     free(wdata[i]);
   free(wdata);
-  H5Tclose(stype);
   return status;
 }

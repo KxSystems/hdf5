@@ -5,6 +5,26 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
+// string types
+hid_t varstringtype;
+void initvarstringtype(){
+  varstringtype = H5Tcopy(H5T_C_S1);
+  H5Tset_size(varstringtype, H5T_VARIABLE);
+}
+
+// error handler info
+herr_t (*err_func)(void*);
+void *err_data;
+void initerror(){
+  H5Eget_auto1(&err_func, &err_data);
+}
+void errorOn(){
+  H5Eset_auto1(err_func, err_data);
+}
+void errorOff(){
+  H5Eset_auto1(NULL, NULL);
+}
+
 // manipulate attribute functions to have the same signature as equivalent dataset functions
 hid_t kdbH5Acreate(hid_t attr, const char *name, hid_t type, hid_t space, hid_t UNUSED(lcpl), hid_t cpl, hid_t apl){
   return H5Acreate(attr, name, type, space, cpl, apl);
@@ -15,6 +35,41 @@ herr_t kdbH5Aread(hid_t attr, hid_t memtype, hid_t UNUSED(mspace), hid_t UNUSED(
 herr_t kdbH5Awrite(hid_t attr, hid_t memtype, hid_t UNUSED(mspace), hid_t UNUSED(fspace), hid_t UNUSED(pl), const void *buf){
   return H5Awrite(attr, memtype, buf);
 }
+
+// open functions
+hid_t kdbH5Fopen(K name, unsigned flags){
+  hid_t res;
+  char *namestr;
+  namestr = kdbGetString(name);
+  res = H5Fopen(namestr, flags, H5P_DEFAULT);
+  free(namestr);
+  return res;
+}
+hid_t kdbH5Dopen(hid_t loc, K name){
+  hid_t res;
+  char *namestr;
+  namestr = kdbGetString(name);
+  res = H5Dopen(loc, namestr, H5P_DEFAULT);
+  free(namestr);
+  return res;
+}
+hid_t kdbH5Aopen(hid_t loc, K name){
+  hid_t res;
+  char *namestr;
+  namestr = kdbGetString(name);
+  res = H5Aopen(loc, namestr, H5P_DEFAULT);
+  free(namestr);
+  return res;
+}
+hid_t kdbH5Oopen(hid_t loc, K name){
+  hid_t res;
+  char *namestr;
+  namestr = kdbGetString(name);
+  res = H5Oopen(loc, namestr, H5P_DEFAULT);
+  free(namestr);
+  return res;
+}
+
 
 // htype (hid_t) to ktype (H)
 H h2kType(hid_t htype){
@@ -62,6 +117,8 @@ H h2kType(hid_t htype){
 // ktype (char) to htype (hid_t)
 hid_t k2hType(char ktype){
   switch(ktype){
+    case 'c':
+      return H5T_NATIVE_CHAR;
     case 'b':
     case 'x':
       return H5T_NATIVE_UCHAR;
@@ -82,6 +139,9 @@ hid_t k2hType(char ktype){
     case 'f':
     case 'z':
       return H5T_NATIVE_DOUBLE;
+    case 's':
+    case 'C':
+      return varstringtype;
     default:
       return 0;
   }
@@ -89,9 +149,9 @@ hid_t k2hType(char ktype){
 
 // ktype (char) to ktypegroup (ktypegroup_t)
 ktypegroup_t getKTypeGroup(char ktype){
-  if(NULL != strchr("hijfebxpmdznuvt", ktype))
+  if(NULL != strchr("chijfebxpmdznuvt", ktype))
     return NUMERIC;
-  if(NULL != strchr("csg", ktype))
+  if(NULL != strchr("Csg", ktype))
     return STRING;
   return INVALID;
 }

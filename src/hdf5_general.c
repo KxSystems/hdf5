@@ -4,24 +4,21 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
-// error handler info
-herr_t (*err_func)(void*);
-void *err_data;
-
-EXP K hdf5errorOn(K UNUSED(dummy)){
-  H5Eset_auto1(err_func, err_data);
-  return KNL;
-}
-
-EXP K hdf5errorOff(K UNUSED(dummy)){
-  H5Eset_auto1(NULL, NULL);
-  return KNL;
-}
-
 // initialize hdf5-kdb library
 EXP K hdf5init(K UNUSED(dummy)){
-  H5Eget_auto1(&err_func, &err_data);
-  hdf5errorOff(KNL);
+  initvarstringtype();
+  initerror();
+  errorOff();
+  return KNL;
+}
+
+// error handling
+EXP K hdf5errorOn(K UNUSED(dummy)){
+  errorOn();
+  return KNL;
+}
+EXP K hdf5errorOff(K UNUSED(dummy)){
+  errorOff();
   return KNL;
 }
 
@@ -54,10 +51,7 @@ EXP K hdf5fileSize(K fname){
     return KNL;
   hsize_t fsize;
   hid_t file;
-  char *filename;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
   H5Fget_filesize(file, &fsize);
@@ -70,15 +64,10 @@ EXP K hdf5dataSize(K fname, K dname){
     return KNL;
   hsize_t dsize;
   hid_t file, data;
-  char *filename, *dataname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  data = H5Dopen(file, dataname, H5P_DEFAULT);
-  free(dataname);
+  data = kdbH5Dopen(file, dname);
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset");
@@ -92,15 +81,10 @@ EXP K hdf5getDataShape(K fname, K dname){
     return KNL;
   K kdims;
   hid_t file, data, space;
-  char *filename, *dataname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  data = H5Dopen(file, dataname, H5P_DEFAULT);
-  free(dataname);
+  data = kdbH5Dopen(file, dname);
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset");
@@ -118,19 +102,14 @@ EXP K hdf5getDataPoints(K fname, K dname){
     return KNL;
   J npoints;
   hid_t file, data, space;
-  char *filename, *dataname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  data = H5Dopen(file, dataname, H5P_DEFAULT);
-  free(dataname);
+  data = kdbH5Dopen(file, dname);
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset/group");
-  space  = H5Dget_space(data);
+  space = H5Dget_space(data);
   H5Dclose(data);
   if(space < 0)
     return krr((S)"error opening data space");
@@ -144,21 +123,14 @@ EXP K hdf5getAttrShape(K fname, K dname, K aname){
     return KNL;
   K kdims;
   hid_t file, data, attr, space;
-  char *filename, *dataname, *attrname;
-  filename = kdbGetString(fname);
-  file  = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  data  = H5Oopen(file, dataname, H5P_DEFAULT);
-  free(dataname);
+  data = kdbH5Oopen(file, dname);
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset/group");
-  attrname = kdbGetString(aname);
-  attr  = H5Aopen(data, attrname, H5P_DEFAULT);
-  free(attrname);
+  attr = kdbH5Aopen(data, aname);
   H5Oclose(data);
   if(attr < 0)
     return krr((S)"error opening attribute");
@@ -176,21 +148,14 @@ EXP K hdf5getAttrPoints(K fname, K dname, K aname){
     return KNL;
   hid_t file, data, attr, space;
   J npoints;
-  char *filename, *dataname, *attrname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  data = H5Oopen(file, dataname, H5P_DEFAULT);
-  free(dataname);
+  data = kdbH5Oopen(file, dname);
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset/group");
-  attrname = kdbGetString(aname);
-  attr   = H5Aopen(data, attrname, H5P_DEFAULT);
-  free(attrname);
+  attr = kdbH5Aopen(data, aname);
   H5Oclose(data);
   if(attr < 0)
     return krr((S)"error opening attribute");
@@ -220,10 +185,8 @@ EXP K hdf5isObject(K fname, K oname){
     return KNL;
   htri_t oexists;
   hid_t file;
-  char *filename, *objname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  char *objname;
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
   objname = kdbGetString(oname);
@@ -239,15 +202,11 @@ EXP K hdf5isAttr(K fname, K dname, K aname){
     return KNL;
   htri_t aexists;
   hid_t file, data;
-  char *filename, *dataname, *attrname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  char *attrname;
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  data = H5Oopen(file, dataname, H5P_DEFAULT);
-  free(dataname);
+  data = kdbH5Oopen(file, dname);
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset/group");
@@ -263,15 +222,10 @@ EXP K hdf5datasetType(K fname, K dname){
     return KNL;
   K ktype;
   hid_t file, data, dtype, ntype;
-  char *filename, *dataname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  data = H5Dopen(file, dataname, H5P_DEFAULT);
-  free(dataname);
+  data = kdbH5Dopen(file, dname);
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset");
@@ -336,15 +290,11 @@ EXP K hdf5copyObject(K srcfile, K src_obj, K dstfile, K dst_obj){
   if(!kdbCheckType("CCCC", srcfile, src_obj, dstfile, dst_obj))
     return KNL;
   hid_t src, dst, status;
-  char *srcfilename, *dstfilename, *src_objname, *dst_objname;
-  srcfilename = kdbGetString(srcfile);
-  src = H5Fopen(srcfilename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(srcfilename);
+  char *src_objname, *dst_objname;
+  src = kdbH5Fopen(srcfile, H5F_ACC_RDWR);
   if(src < 0)
     return krr((S)"error opening source file");
-  dstfilename = kdbGetString(dstfile);
-  dst = H5Fopen(dstfilename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(dstfilename);
+  dst = kdbH5Fopen(dstfile, H5F_ACC_RDWR);
   if(dst < 0){
     H5Fclose(src);
     return krr((S)"error opening destination file");
