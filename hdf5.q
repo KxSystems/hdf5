@@ -92,6 +92,7 @@ writeData:{[fname;dname;dset]
 writeAttr:{[fname;dname;aname;dset]
   if[type[dset]in 98 99h;:writeDictTab[fname;dname;dset]];
   chk:i.checkData dset;
+  if[not chk[`ktype]in "xihjfecCs";'"kdb+ type can not be mapped to an appropriate attribute"];
   createAttr[fname;dname;aname] . chk`kdims`ktype;
   writeAttrDataset[fname;dname;aname] . chk`kdata`kdims`ktype;
   }
