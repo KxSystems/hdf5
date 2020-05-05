@@ -69,7 +69,7 @@ funcs:(
 // hdf5<Name> -> .hdf5.<Name>
 .hdf5,:(`$4_'string funcs[;0])!LIBPATH@/:funcs
 
-i.typeConv:{$["s"=x;string;("*"^("bmduvtpnz"!"iiiiiijjf")x)$]}
+i.typeConv:{$["s"=x;string;("*"^("bmduvtpnz"!"xiiiiijjf")x)$]}
 i.typeChar:{$[0>x;.Q.t abs x;upper .Q.t x]}
 i.checkDimsType:{$[0=t:type x;count[x],'distinct raze .z.s each x;10=t;t;enlist(count x;neg t)]}
 i.checkData:{

@@ -70,7 +70,6 @@ hid_t kdbH5Oopen(hid_t loc, K name){
   return res;
 }
 
-
 // htype (hid_t) to ktype (H)
 H h2kType(hid_t htype){
   hid_t ntype;
@@ -125,6 +124,7 @@ hid_t k2hType(char ktype){
     case 'h':
       return H5T_NATIVE_SHORT;
     case 'i':
+    case 'm':
     case 'd':
     case 'u':
     case 'v':
