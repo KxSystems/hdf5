@@ -11,8 +11,9 @@
 // Move into the hdf5 namespace
 \d .hdf5
 
-// Initialize the name of the file
+// Initialize the file
 fname:"test.h5";
+createFile[fname];
 
 // Inititalize the name and values of the datasets
 dname:"dset";

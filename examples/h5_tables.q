@@ -20,6 +20,7 @@ show test_data:readData[data_name;"table"];
 
 // Naming of the file and kdb table to be written to HDF5
 fname:"test.h5";
+createFile[fname];
 write_name:"kdb_table";
 
 -1"\nWrite the above table to HDF5 using the kdb+ interface method ",

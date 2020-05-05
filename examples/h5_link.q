@@ -15,6 +15,8 @@
 
 // Initializing file naming and datasets
 fname:"test.h5"
+createFile[fname];
+
 init_dname:"initial_dset"
 init_dset:10 100 1000#1000000?10h
 -1"The dataset '",init_dname,"' will be written to the file ",fname,"\n";
@@ -29,7 +31,7 @@ init_sz:fileSize[fname];
 // Name of the soft link
 slink:"soft_link_dset";
 -1"Creating a symbolic link '",slink,"' from which to access '",init_dname,"\n";
-createSoft[fname;init_dname;slink];
+createSoft[fname;slink;init_dname];
 
 slink_sz:fileSize[fname];
 
