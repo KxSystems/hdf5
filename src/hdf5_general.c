@@ -222,6 +222,7 @@ EXP K hdf5datasetType(K fname, K dname){
     return KNL;
   K ktype;
   hid_t file, data, dtype, ntype;
+  H5T_class_t dclass;
   file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
@@ -265,10 +266,13 @@ EXP K hdf5datasetType(K fname, K dname){
     ktype = ks((S)"b32");
   else if(H5Tequal(ntype, H5T_NATIVE_B64))
     ktype = ks((S)"b64");
-  else if(H5Tequal(ntype, H5T_STRING))
-    ktype = ks((S)"string");
-  else
-    ktype = ks((S)"");
+  else{
+    dclass = H5Tget_class(ntype);
+    if(dclass == H5T_STRING)
+      ktype = ks((S)"string");
+    else
+      ktype = ks((S)"");
+  }
   H5Tclose(ntype);
   return ktype;
 }
