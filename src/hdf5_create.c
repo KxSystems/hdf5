@@ -96,11 +96,11 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
 
 K createNumeric(hid_t loc, char *name, K kdims, K ktype, createfunc_t create, closefunc_t close){
   hid_t space, obj, dtype;
-  hsize_t dims[3];
+  hsize_t dims[32];
   int rank, i;
   rank = kdims->n;
-  if(rank > 3)
-    return krr((S)"numerical datasets must have dimensionality <= 3");
+  if(rank > 32)
+    return krr((S)"numerical datasets must have dimensionality <= 32");
   for(i = 0; i < rank; ++i)
     dims[i] = kJ(kdims)[i];
   space = H5Screate_simple(rank, dims, NULL);
