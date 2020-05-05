@@ -5,8 +5,7 @@
 #include "hdf5_utils.h"
 
 // declare create utils
-K createNumeric(hid_t loc, char *name, K kdims, K ktype, createfunc_t create, closefunc_t close);
-K createString(hid_t loc, char *name, K kdims, createfunc_t create, closefunc_t close);
+K createData(hid_t loc, K name, K kdims, K ktype, createfunc_t create, closefunc_t close);
 
 EXP K hdf5createFile(K fname){
   if(!kdbCheckType("C", fname))
@@ -48,20 +47,10 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
   if(!kdbCheckType("CCJc", fname, dname, kdims, ktype))
     return KNL;
   hid_t file;
-  ktypegroup_t dtype;
-  char *dataname;
   file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  dtype = getKTypeGroup(ktype->g);
-  if(dtype == NUMERIC)
-    createNumeric(file, dataname, kdims, ktype, H5Dcreate, H5Dclose);
-  else if(dtype == STRING)
-    createString(file, dataname, kdims, H5Dcreate, H5Dclose);
-  else
-    krr((S)"unsupported datatype");
-  free(dataname);
+  createData(file, dname, kdims, ktype, H5Dcreate, H5Dclose);
   H5Fclose(file);
   return KNL;
 }
@@ -70,8 +59,6 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   if(!kdbCheckType("CCCJc", fname, dname, aname, kdims, ktype))
     return KNL;
   hid_t file, data;
-  ktypegroup_t dtype;
-  char *attrname;
   file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
@@ -79,55 +66,38 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset/group");
-  attrname = kdbGetString(aname);
-  dtype = getKTypeGroup(ktype->g);
-  if(dtype == NUMERIC)
-    createNumeric(data, attrname, kdims, ktype, kdbH5Acreate, H5Aclose);
-  else if(dtype == STRING)
-    createString(data, attrname, kdims, kdbH5Acreate, H5Aclose);
-  else
-    krr((S)"unsupported datatype");
-  free(attrname);
+  createData(data, aname, kdims, ktype, kdbH5Acreate, H5Aclose);
   H5Oclose(data);
   return KNL;
 }
 
 // define create utils
-
-K createNumeric(hid_t loc, char *name, K kdims, K ktype, createfunc_t create, closefunc_t close){
+K createData(hid_t loc, K name, K kdims, K ktype, createfunc_t create, closefunc_t close){
   hid_t space, obj, dtype;
+  char *namestr;
+  ktypegroup_t dgroup;
   hsize_t dims[32];
   int rank, i;
   rank = kdims->n;
   if(rank > 32)
-    return krr((S)"numerical datasets must have dimensionality <= 32");
+    return krr((S)"datasets must have dimensionality <= 32");
   for(i = 0; i < rank; ++i)
     dims[i] = kJ(kdims)[i];
   space = H5Screate_simple(rank, dims, NULL);
   if(space < 0)
     return krr((S)"error creating dataspace");
-  dtype = k2hType(ktype->g);
-  obj = create(loc, name, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-  H5Sclose(space);
-  if(obj < 0)
-    return krr((S)"error creating dataset");
-  close(obj);
-  return KNL;
-}
-
-K createString(hid_t loc, char *name, K kdims, createfunc_t create, closefunc_t close){
-  hid_t space, obj;
-  hsize_t dims[32];
-  int rank, i;
-  rank = kdims->n;
-  if(rank > 32)
-    return krr((S)"string datasets must have dimensionality <=32");
-  for(i = 0; i < rank; ++i)
-    dims[i] = kJ(kdims)[i];
-  space = H5Screate_simple(rank, dims, NULL);
-  if(space < 0)
-    return krr((S)"error creating dataspace");
-  obj = create(loc, name, varstringtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  dgroup = getKTypeGroup(ktype->g);
+  if(dgroup == NUMERIC)
+    dtype = k2hType(ktype->g);
+  else if(dgroup == STRING)
+    dtype = varstringtype;
+  else{
+    H5Sclose(space);
+    return krr((S)"unsupported datatype");
+  }
+  namestr = kdbGetString(name);
+  obj = create(loc, namestr, dtype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  free(namestr);
   H5Sclose(space);
   if(obj < 0)
     return krr((S)"error creating dataset");
