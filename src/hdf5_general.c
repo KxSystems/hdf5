@@ -108,7 +108,7 @@ EXP K hdf5getDataPoints(K fname, K dname){
   data = kdbH5Dopen(file, dname);
   H5Fclose(file);
   if(data < 0)
-    return krr((S)"error opening dataset/group");
+    return krr((S)"error opening dataset");
   space = H5Dget_space(data);
   H5Dclose(data);
   if(space < 0)
