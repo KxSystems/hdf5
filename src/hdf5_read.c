@@ -99,7 +99,6 @@ K readData(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc){
   result = (dclass == H5T_COMPOUND) ?
     readDataCompound(dset, space, dtype, readfunc):
     readDataSimple  (dset, space, dtype, readfunc);
-  H5Tclose(dclass);
   return result;
 }
 
@@ -115,7 +114,6 @@ K readDataSimple(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc){
     readDataSimpleString(dset, npoints, ntype, space, readfunc):
     readDataSimpleNumeric(dset, npoints, ntype, space, readfunc);
   H5Tclose(ntype);
-  H5Tclose(nclass);
   return result;
 }
 
