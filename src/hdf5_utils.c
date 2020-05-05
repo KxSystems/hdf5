@@ -124,6 +124,7 @@ hid_t k2hType(char ktype){
     case 'h':
       return H5T_NATIVE_SHORT;
     case 'i':
+    case 'm':
     case 'd':
     case 'u':
     case 'v':
