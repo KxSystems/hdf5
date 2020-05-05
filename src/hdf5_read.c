@@ -138,8 +138,8 @@ K readDataSimpleString(hid_t dset, hsize_t npoints, hid_t ntype, hid_t space, re
     readfunc(dset, stype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vdata);
     for(i = 0; i < npoints; ++i)
       jk(&result, kp(vdata[i]));
-    free(vdata);
     H5Dvlen_reclaim(stype, space, H5P_DEFAULT, vdata);
+    free(vdata);
   }
   // fixed length string
   else{
@@ -213,8 +213,8 @@ K readDataCompoundString(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, 
     readfunc(dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vdata);
     for(i = 0; i < npoints; ++i)
       jk(&result, kp(vdata[i]));
-    free(vdata);
     H5Dvlen_reclaim(memtype, space, H5P_DEFAULT, vdata);
+    free(vdata);
   }
   // fixed length string
   else{
