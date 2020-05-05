@@ -36,6 +36,41 @@ herr_t kdbH5Awrite(hid_t attr, hid_t memtype, hid_t UNUSED(mspace), hid_t UNUSED
   return H5Awrite(attr, memtype, buf);
 }
 
+// open functions
+hid_t kdbH5Fopen(K name, unsigned flags){
+  hid_t res;
+  char *namestr;
+  namestr = kdbGetString(name);
+  res = H5Fopen(namestr, flags, H5P_DEFAULT);
+  free(namestr);
+  return res;
+}
+hid_t kdbH5Dopen(hid_t loc, K name){
+  hid_t res;
+  char *namestr;
+  namestr = kdbGetString(name);
+  res = H5Dopen(loc, namestr, H5P_DEFAULT);
+  free(namestr);
+  return res;
+}
+hid_t kdbH5Aopen(hid_t loc, K name){
+  hid_t res;
+  char *namestr;
+  namestr = kdbGetString(name);
+  res = H5Aopen(loc, namestr, H5P_DEFAULT);
+  free(namestr);
+  return res;
+}
+hid_t kdbH5Oopen(hid_t loc, K name){
+  hid_t res;
+  char *namestr;
+  namestr = kdbGetString(name);
+  res = H5Oopen(loc, namestr, H5P_DEFAULT);
+  free(namestr);
+  return res;
+}
+
+
 // htype (hid_t) to ktype (H)
 H h2kType(hid_t htype){
   hid_t ntype;

@@ -27,10 +27,8 @@ EXP K hdf5createGroup(K fname, K gname){
     return KNL;
   hid_t file, group;
   hid_t gcpl; // group creation property list
-  char *filename, *groupnames;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  char *groupnames;
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
   groupnames = kdbGetString(gname);
@@ -51,10 +49,8 @@ EXP K hdf5createDataset(K fname, K dname, K kdims, K ktype){
     return KNL;
   hid_t file;
   ktypegroup_t dtype;
-  char *filename, *dataname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  char *dataname;
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
   dataname = kdbGetString(dname);
@@ -75,15 +71,11 @@ EXP K hdf5createAttr(K fname, K dname, K aname, K kdims, K ktype){
     return KNL;
   hid_t file, data;
   ktypegroup_t dtype;
-  char *filename, *dataname, *attrname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  char *attrname;
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  data = H5Oopen(file, dataname, H5P_DEFAULT);
-  free(dataname);
+  data = kdbH5Oopen(file, dname);
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset/group");

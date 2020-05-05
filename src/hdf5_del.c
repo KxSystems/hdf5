@@ -8,15 +8,11 @@ EXP K hdf5delAttr(K fname, K dname, K aname){
   if(!kdbCheckType("CCC", fname, dname, aname))
     return KNL;
   hid_t file, data, status;
-  char *filename, *dataname, *attrname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(filename);
+  char *attrname;
+  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  data = H5Oopen(file, dataname, H5P_DEFAULT);
-  free(dataname);
+  data = kdbH5Oopen(file, dname);
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset/group");

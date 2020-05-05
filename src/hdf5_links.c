@@ -9,16 +9,14 @@ EXP K hdf5createExternal(K linkfile, K linkpath, K targetfile, K targetpath){
   if(!kdbCheckType("CCCC", linkfile, linkpath, targetfile, targetpath))
     return KNL;
   hid_t file, status;
-  char *linkfilename, *linkpathname, *targetfilename, *targetpathname;
-  linkfilename = kdbGetString(linkfile);
-  file = H5Fopen(linkfilename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(linkfilename);
+  char *linkpathname, *targetfilename, *targetpathname;
+  file = kdbH5Fopen(linkfile, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
   linkpathname = kdbGetString(linkpath);
   targetfilename = kdbGetString(targetfile);
   targetpathname = kdbGetString(targetpath);
-  status = H5Lcreate_external(targetfilename, targetpathname, file, linkfilename, H5P_DEFAULT, H5P_DEFAULT);
+  status = H5Lcreate_external(targetfilename, targetpathname, file, linkpathname, H5P_DEFAULT, H5P_DEFAULT);
   free(linkpathname);
   free(targetfilename);
   free(targetpathname);
@@ -33,10 +31,8 @@ EXP K hdf5createHard(K linkfile, K linkpath, K targetpath){
   if(!kdbCheckType("CCC", linkfile, linkpath, targetpath))
     return KNL;
   hid_t file, status;
-  char *linkfilename, *linkpathname, *targetpathname;
-  linkfilename = kdbGetString(linkfile);
-  file = H5Fopen(linkfilename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(linkfilename);
+  char *linkpathname, *targetpathname;
+  file = kdbH5Fopen(linkfile, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
   linkpathname = kdbGetString(linkpath);
@@ -55,10 +51,8 @@ EXP K hdf5createSoft(K linkfile, K linkpath, K targetpath){
   if(!kdbCheckType("CCC", linkfile, linkpath, targetpath))
     return KNL;
   hid_t file, status;
-  char *linkfilename, *linkpathname, *targetpathname;
-  linkfilename = kdbGetString(linkfile);
-  file = H5Fopen(linkfilename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(linkfilename);
+  char *linkpathname, *targetpathname;
+  file = kdbH5Fopen(linkfile, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
   linkpathname = kdbGetString(linkpath);
@@ -77,10 +71,8 @@ EXP K hdf5delLink(K linkfile, K linkpath){
   if(!kdbCheckType("CC", linkfile, linkpath))
     return KNL;
   hid_t file, status;
-  char *linkfilename, *linkpathname;
-  linkfilename = kdbGetString(linkfile);
-  file = H5Fopen(linkfilename, H5F_ACC_RDWR, H5P_DEFAULT);
-  free(linkfilename);
+  char *linkpathname;
+  file = kdbH5Fopen(linkfile, H5F_ACC_RDWR);
   if(file < 0)
     return krr((S)"error opening file");
   linkpathname = kdbGetString(linkpath);

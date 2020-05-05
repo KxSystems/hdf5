@@ -19,15 +19,10 @@ EXP K hdf5readDataset(K fname, K dname){
     return KNL;
   K result;
   hid_t file, data, space, dtype;
-  char *filename, *dataname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-  free(filename);
+  file = kdbH5Fopen(fname, H5F_ACC_RDONLY);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  data = H5Dopen(file, dataname, H5P_DEFAULT);
-  free(dataname);
+  data = kdbH5Dopen(file, dname);
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset");
@@ -54,21 +49,14 @@ EXP K hdf5readAttrDataset(K fname, K dname, K aname){
     return KNL;
   K result;
   hid_t file, data, attr, space, dtype;
-  char *filename, *dataname, *attrname;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-  free(filename);
+  file = kdbH5Fopen(fname, H5F_ACC_RDONLY);
   if(file < 0)
     return krr((S)"error opening file");
-  dataname = kdbGetString(dname);
-  data = H5Oopen(file, dataname, H5P_DEFAULT);
-  free(dataname);
+  data = kdbH5Oopen(file, dname);
   H5Fclose(file);
   if(data < 0)
     return krr((S)"error opening dataset/group");
-  attrname = kdbGetString(aname);
-  attr = H5Aopen(data, attrname, H5P_DEFAULT);
-  free(attrname);
+  attr = kdbH5Aopen(data, aname);
   H5Oclose(data);
   if(attr < 0)
     return krr((S)"error opening attribute");

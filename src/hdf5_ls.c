@@ -20,10 +20,7 @@ EXP K hdf5ls(K fname){
   hid_t file;
   H5O_info_t infobuf;
   struct opdata od;
-  char *filename;
-  filename = kdbGetString(fname);
-  file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-  free(filename);
+  file = kdbH5Fopen(fname, H5F_ACC_RDONLY);
   if(file < 0)
     return krr((S)"file does not exist");
   H5Oget_info1(file,&infobuf);
