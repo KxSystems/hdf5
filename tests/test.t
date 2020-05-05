@@ -82,4 +82,4 @@ not .hdf5.ishdf5["test_txt.txt"]
 -1"Testing of utility functions complete\n";
 
 // Clean up
-$[.z.o like "w*";system "del test_file.h5";system"rm test_file.h5"];
+$[.z.o like "w*";system "del test_*";system"rm test_*"];

@@ -12,7 +12,7 @@
 fname:"test.h5"
 
 // check if a file exists, if it's already a hdf5 file highlight to the user
-$[.hdf5.ishdf5[fname];
+$[ishdf5[fname];
   [-1"file already exists, it will not be created\n";];
   [createFile[fname];-1"The hdf5 file ",fname," was created\n";]]
 
