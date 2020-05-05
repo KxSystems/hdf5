@@ -5,6 +5,26 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
+// string types
+hid_t varstringtype;
+void initvarstringtype(){
+  varstringtype = H5Tcopy(H5T_C_S1);
+  H5Tset_size(varstringtype, H5T_VARIABLE);
+}
+
+// error handler info
+herr_t (*err_func)(void*);
+void *err_data;
+void initerror(){
+  H5Eget_auto1(&err_func, &err_data);
+}
+void errorOn(){
+  H5Eset_auto1(err_func, err_data);
+}
+void errorOff(){
+  H5Eset_auto1(NULL, NULL);
+}
+
 // manipulate attribute functions to have the same signature as equivalent dataset functions
 hid_t kdbH5Acreate(hid_t attr, const char *name, hid_t type, hid_t space, hid_t UNUSED(lcpl), hid_t cpl, hid_t apl){
   return H5Acreate(attr, name, type, space, cpl, apl);
@@ -84,6 +104,9 @@ hid_t k2hType(char ktype){
     case 'f':
     case 'z':
       return H5T_NATIVE_DOUBLE;
+    case 's':
+    case 'C':
+      return varstringtype;
     default:
       return 0;
   }

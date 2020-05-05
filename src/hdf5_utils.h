@@ -5,6 +5,17 @@
 #include "hdf5.h"
 #include "kdb_utils.h"
 
+// string types
+extern hid_t varstringtype;
+void initvarstringtype();
+
+// error handler info
+extern herr_t (*err_func)(void*);
+extern void *err_data;
+void initerror();
+void errorOn();
+void errorOff();
+
 // manipulate attribute functions to have the same signature as equivalent dataset functions
 typedef hid_t (*createfunc_t)(hid_t, const char *, hid_t, hid_t, hid_t, hid_t, hid_t);
 typedef herr_t (*readfunc_t)(hid_t, hid_t, hid_t, hid_t, hid_t, void *);
