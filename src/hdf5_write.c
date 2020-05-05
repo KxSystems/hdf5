@@ -11,7 +11,7 @@ hid_t writeString(K dset, hid_t loc, writefunc_t write);
 EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
   if(!kdbCheckType("CCJc", fname, dname, kdims, ktype))
     return KNL;
-  hid_t file, data, space, status = -1;
+  hid_t file, data, space, status;
   hid_t htype, dtype, ntype;
   ktypegroup_t gtype;
   hssize_t i;
@@ -25,6 +25,10 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
     return krr((S)"error opening dataset");
   // check datatypes
   htype = k2hType(ktype->g);
+  if(htype == 0){
+    H5Dclose(data);
+    return krr((S)"invalid ktype");
+  }
   dtype = H5Dget_type(data);
   ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
   H5Tclose(dtype);
@@ -74,7 +78,7 @@ EXP K hdf5writeDataset(K fname, K dname, K dset, K kdims, K ktype){
 EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
   if(!kdbCheckType("CCCJc", fname, dname, aname, kdims, ktype))
     return KNL;
-  hid_t file, data, attr, space, status = -1;
+  hid_t file, data, attr, space, status;
   hid_t htype, dtype, ntype;
   ktypegroup_t gtype;
   hssize_t i;
@@ -93,6 +97,10 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
     return krr((S)"error opening attribute");
   // check datatypes
   htype = k2hType(ktype->g);
+  if(htype == 0){
+    H5Dclose(data);
+    return krr((S)"invalid ktype");
+  }
   dtype = H5Aget_type(attr);
   ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
   H5Tclose(dtype);
@@ -140,11 +148,11 @@ EXP K hdf5writeAttrDataset(K fname, K dname, K aname, K dset, K kdims, K ktype){
 }
 
 // define write utils
-
 hid_t writeString(K dset, hid_t loc, writefunc_t write){
   hid_t status;
+  char **wdata;
   int i;
-  char **wdata = calloc(dset->n, sizeof(char*));
+  wdata = calloc(dset->n, sizeof(char*));
   for(i = 0; i < dset->n; ++i)
     wdata[i] = kdbGetString(kK(dset)[i]);
   status = write(loc, varstringtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
