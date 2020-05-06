@@ -1,7 +1,4 @@
 #include <stdlib.h>
-#include "k.h"
-#include "hdf5.h"
-#include "kdb_utils.h"
 #include "hdf5_utils.h"
 
 // initialize hdf5-kdb library

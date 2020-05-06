@@ -1,6 +1,10 @@
 #ifndef HDF5_UTILS_H
 #define HDF5_UTILS_H
 
+#define H5Oget_info_vers         1
+#define H5Oget_info_by_name_vers 1
+#define H5O_info_t_vers          1
+
 #include "k.h"
 #include "hdf5.h"
 #include "kdb_utils.h"
