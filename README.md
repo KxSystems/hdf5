@@ -1,4 +1,4 @@
-# `hdf5-kdb` – Interface for conversion between the hdf5 data format and kdb+ data 
+# Interface for conversion between hdf5 and kdb+ data 
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/kxsystems/hdf5-kdb)](https://github.com/kxsystems/hdf5-kdb/releases) [![Travis (.org) branch](https://img.shields.io/travis/kxsystems/hdf5-kdb/master?label=travis%20build)](https://travis-ci.org/kxsystems/hdf5-kdb/branches)
 
