@@ -1,46 +1,37 @@
-/* --- ls like function ---
- * Function to display the structure of a file 
-*/
-
 #include <stdlib.h>
+#include <stdio.h>
 #include "k.h"
 #include "hdf5.h"
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
 struct opdata {
-    unsigned recurs;     // Recursion level.  0=root
-    struct opdata *prev; // Pointer to previous opdata
-    haddr_t addr;        // Group address
+  unsigned recurs;     // Recursion level (0=root)
+  struct opdata *prev; // Pointer to previous opdata
+  haddr_t addr;        // Group address
 };
 
 int group_check(struct opdata *od, haddr_t target_addr);
 herr_t opfunc(hid_t loc_id, const char *name, const H5L_info_t *info, void *operator_data);
 
 EXP K hdf5ls(K fname){
-  disable_err();
-  if(!checkType("[Cs]",fname))
+  if(!kdbCheckType("C", fname))
     return KNL;
-  char *filename = getkstring(fname);
   hid_t file;
   H5O_info_t infobuf;
   struct opdata od;
-  file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-  if(file<0){
-    free(filename);
-    H5Fclose(file);
+  file = kdbH5Fopen(fname, H5F_ACC_RDONLY);
+  if(file < 0)
     return krr((S)"file does not exist");
-  }
   H5Oget_info1(file,&infobuf);
   od.recurs = 0;
   od.prev = NULL;
   od.addr = infobuf.addr;
   printf("/ {\n");
   H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, NULL, opfunc, (void *)&od);
-  printf("}\n");
-  free(filename);
   H5Fclose(file);
-  return 0;
+  printf("}\n");
+  return KNL;
 }
 
 // Utility functions

@@ -1,54 +1,47 @@
 #ifndef HDF5_UTILS_H
 #define HDF5_UTILS_H
 
-#include "hdf5.h"
 #include "k.h"
+#include "hdf5.h"
+#include "kdb_utils.h"
 
-// HDF5 Types
-#define HDF5FLOAT H5T_NATIVE_DOUBLE 
-#define HDF5INT   H5T_NATIVE_INT
-#define HDF5LONG  H5T_NATIVE_LONG
-#define HDF5REAL  H5T_NATIVE_FLOAT
-#define HDF5SHORT H5T_NATIVE_SHORT
-#define HDF5CHAR  H5T_C_S1
-#define HDF5BYTE  H5T_NATIVE_UCHAR
+// string types
+extern hid_t varstringtype;
+void initvarstringtype();
 
-// Retrieve hdf5 numeric types
-hid_t hdf5typ_from_k(K ktype);
+// error handler info
+extern herr_t (*err_func)(void*);
+extern void *err_data;
+void initerror();
+void errorOn();
+void errorOff();
 
-// Disable errors from hdf5 side
-void disable_err(void);
+// manipulate attribute functions to have the same signature as equivalent dataset functions
+typedef hid_t (*createfunc_t)(hid_t, const char *, hid_t, hid_t, hid_t, hid_t, hid_t);
+typedef herr_t (*readfunc_t)(hid_t, hid_t, hid_t, hid_t, hid_t, void *);
+typedef herr_t (*writefunc_t)(hid_t, hid_t, hid_t, hid_t, hid_t, const void *);
+typedef herr_t (*closefunc_t)(hid_t);
 
-// check if a file/attribute exists
-htri_t ish5(char *filename);
-htri_t isattr(hid_t data,char *attrname);
+hid_t kdbH5Acreate(hid_t attr, const char *name, hid_t type, hid_t space, hid_t UNUSED(lcpl), hid_t cpl, hid_t apl);
+herr_t kdbH5Aread(hid_t attr, hid_t memtype, hid_t mspace, hid_t fspace, hid_t pl, void *buf);
+herr_t kdbH5Awrite(hid_t attr, hid_t memtype, hid_t mspace, hid_t fspace, hid_t pl, const void *buf);
 
-// Create a file based on name
-void createfile(char *filename);
+// open functions
+hid_t kdbH5Fopen(K name, unsigned flags);
+hid_t kdbH5Dopen(hid_t loc, K name);
+hid_t kdbH5Aopen(hid_t loc, K name);
+hid_t kdbH5Oopen(hid_t loc, K name);
 
-// Create a string attribute
-int createstrattr(hid_t data, char *attrname, K kdims);
+// k datatypes
+typedef enum {NUMERIC, STRING, INVALID} ktypegroup_t;
 
-// Used for the creation of simple attributes for types ijhef
-int createsimpleattr(hid_t data, char *attrname, K kdims, K ktype);
+// htype (hid_t) to ktype (H)
+H h2kType(hid_t htype);
 
-int createstrdataset(hid_t file, char *dataname, K kdims);
+// ktype (char) to htype (hid_t)
+hid_t k2hType(char ktype);
 
-// Used for the creation of simple datasets of type ijhef
-int createsimpledataset(hid_t file, char *dataname, K kdims, K ktype);
-
-// Check that the dataset exists
-int checkdataset(hid_t file, char *dataname);
-
-int checkgroup(hid_t file, char *groupname);
-
-// Returns group/data object depending on format of the file denoted in dataname
-hid_t isGroupData(hid_t file, char *dataname);
-
-// Close the group or datatype depending on object type
-void closeGroupData(hid_t file, char *dataname,hid_t data);
-
-// used to check what datatype is being passed in to make decisions on write path
-int checkvalid(char *ktype);
+// ktype (char) to ktypegroup (ktypegroup_t)
+ktypegroup_t getKTypeGroup(char ktype);
 
 #endif // HDF5_UTILS_H

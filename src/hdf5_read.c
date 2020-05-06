@@ -1,9 +1,3 @@
-/* --- Read functionality
- * The following functions are used in conversion to q data from hdf5.
- * These functions assume that numeric data is being passed as a contiguous list "(raze/)data",
- * this may need to be reevaluated in order to improve efficiency.
-*/
-
 #include <stdlib.h>
 #include <string.h>
 #include "k.h"
@@ -11,183 +5,218 @@
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
-#include "hdf5_read_utils.c"
+// declare read utils
+K readData(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc);
+K readDataSimple(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc);
+K readDataSimpleNumeric(hid_t dset, hsize_t npoints, hid_t ntype, hid_t space, readfunc_t readfunc);
+K readDataSimpleString(hid_t dset, hsize_t npoints, hid_t ntype, hid_t space, readfunc_t readfunc);
+K readDataCompound(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc);
+K readDataCompoundNumeric(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, hid_t space, readfunc_t readfunc);
+K readDataCompoundString(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, hid_t space, readfunc_t readfunc);
 
-// Function prototypes for utility functions relating to reading of hdf5 data 
-// these are defined later in this script
-K readData(hid_t data, char *rdtyp);
-K readCompound(hid_t dset, char *rdtyp);
-
-// Read data from an attribute associated with a group or dataset
-EXP K hdf5readAttrDataset(K fname, K dname, K aname){
-  disable_err();
-  // Type check inputs
-  if(!checkType("[Cs][Cs][Cs]", fname, dname,aname))
-    return KNL;
-  // Define required elements
-  K result;
-  hid_t file, data, attr;
-  char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
-  char *attrname = getkstring(aname);
-  // Open file and dataset
-  file = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-  // error if file doesn't exist
-  if(file < 0){
-    free(filename);
-    free(dataname);
-    free(attrname);
-    return krr((S)"file does not exist");
-  }
-  data = isGroupData(file, dataname);
-  if(data < 0){
-    free(filename);
-    free(dataname);
-    free(attrname);
-    H5Fclose(file);
-    return krr((S)"dataset/group from which attribute is to be read to does not exist");
-  }
-  attr = H5Aopen(data, attrname, H5P_DEFAULT);
-  if(attr < 0){
-    closeGroupData(file,dataname,data);
-    H5Fclose(file);
-    free(filename);
-    free(dataname);
-    free(attrname);
-    return krr((S)"This attribute does not exist");
-  }
-  result = readData(attr, "a");
-  closeGroupData(file, dataname, data);
-  free(filename);
-  free(dataname);
-  H5Fclose(file);
-  H5Aclose(attr);
-  return result;
-}
-
-// Read data from a signularly typed HDF5 dataset
 EXP K hdf5readDataset(K fname, K dname){
-  disable_err();
-  // Type check inputs
-  if(!checkType("[Cs][Cs]", fname, dname))
+  if(!kdbCheckType("CC", fname, dname))
     return KNL;
-  // Define required elements
   K result;
-  hid_t file, data;
-  char *filename = getkstring(fname);
-  char *dataname = getkstring(dname);
-  // Open file and dataset
-  file   = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-  if(file < 0){
-    free(filename);
-    free(dataname);
-    return krr((S)"file does not exist");
-  }
-  data   = H5Dopen(file, dataname, H5P_DEFAULT);
-  if(data < 0){
-    free(filename);
-    free(dataname);
-    H5Fclose(file);
-    return krr((S)"dataset does not exist");
-  }
-  result = readData(data, "d");
-  free(filename);
-  free(dataname);
+  hid_t file, data, space, dtype;
+  file = kdbH5Fopen(fname, H5F_ACC_RDONLY);
+  if(file < 0)
+    return krr((S)"error opening file");
+  data = kdbH5Dopen(file, dname);
   H5Fclose(file);
+  if(data < 0)
+    return krr((S)"error opening dataset");
+  space = H5Dget_space(data);
+  if(space < 0){
+    H5Dclose(data);
+    return krr((S)"error opening dataspace");
+  }
+  dtype = H5Dget_type(data);
+  if(dtype < 0){
+    H5Dclose(data);
+    H5Sclose(space);
+    return krr((S)"error retrieving dataset type");
+  }
+  result = readData(data, space, dtype, H5Dread);
   H5Dclose(data);
-  return result;
-}
-
-
-// Read numerical data to kdb from a hdf5 object
-K readData(hid_t data,char *rdtyp){
-  hid_t dtype, ntype;
-  K result;
-  // Get type based on form of object being read
-  if(strcmp("d",rdtyp)==0)
-    dtype = H5Dget_type(data);
-  else
-    dtype = H5Aget_type(data);
-  ntype = H5Tget_native_type(dtype,H5T_DIR_ASCEND);
-  // Read as a compound datatype if suitable
-  if(H5T_COMPOUND == H5Tget_class(dtype))
-    result = readCompound(data,rdtyp);
-  // Read vanilla datatypes
-  else{
-    if(H5Tequal(ntype, HDF5INT))
-      result = readInt(data,rdtyp);
-    else if(H5Tequal(ntype, HDF5LONG))
-      result = readLong(data,rdtyp);
-    else if(H5Tequal(ntype, HDF5FLOAT))
-      result = readFloat(data,rdtyp);
-    else if(H5Tequal(ntype, HDF5REAL))
-      result = readReal(data,rdtyp);
-    else if(H5Tequal(ntype, HDF5SHORT))
-      result = readShort(data,rdtyp);
-    else if(H5Tequal(ntype, H5T_NATIVE_USHORT))
-      result = readUShort(data,rdtyp);
-    else if(H5Tequal(ntype, H5T_NATIVE_UINT))
-      result = readUInt(data,rdtyp);
-    else if(H5Tequal(ntype, H5T_NATIVE_ULONG))
-      result = readULong(data,rdtyp);
-    else if(H5Tequal(ntype, H5T_NATIVE_B8))
-      result = readBitfield(data,rdtyp);
-    else if(H5Tequal(ntype, H5T_NATIVE_UCHAR))
-      result = readByte(data,rdtyp);
-    else 
-      result = readChar(data, rdtyp);
-  }
-  H5Tclose(dtype);
-  H5Tclose(ntype);
-  return result;
-}
-
-// Recursively read data from a HDF5 compound dataset
-K readCompound(hid_t dset, char *rdtyp){
-  int i, nmembs, rank;
-  hid_t dtype, space;
-  hid_t ntype, item_type;
-  H5T_class_t memb_cls;
-  dtype  = H5Dget_type(dset);
-  ntype  = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
-  K key_vals, data_vals, memb_val;
-  data_vals = knk(0);
-  if(strcmp(rdtyp,"a")==0)
-    space  = H5Aget_space(dset);
-  else
-    space  = H5Dget_space(dset);
-  rank   = H5Sget_simple_extent_ndims(space);
-  hsize_t dims[rank];
-  H5Sget_simple_extent_dims (space, dims, NULL);
-  nmembs      = H5Tget_nmembers(ntype);
-  key_vals    = ktn(KS, nmembs);
-  for(i = 0;i < nmembs; i++){
-    char* member_name = H5Tget_member_name(ntype,i);
-    kS(key_vals)[i] = member_name;
-    memb_cls  = H5Tget_member_class(ntype,i);
-    item_type = H5Tget_member_type(dtype, i);
-    if(H5Tequal(item_type,HDF5INT) || H5Tequal(item_type,HDF5LONG) || H5Tequal(item_type,HDF5SHORT))
-      memb_val = compoundInteger(dset, member_name, dims[0], item_type,rdtyp);
-    else if(H5Tequal(item_type,HDF5FLOAT) || H5Tequal(item_type,HDF5REAL))
-      memb_val = compoundFloat(dset, member_name, dims[0], item_type, rdtyp);
-    else if(H5Tequal(item_type,H5T_NATIVE_UCHAR) || H5Tequal(item_type,H5T_NATIVE_B8))
-      memb_val = compoundByte(dset, member_name, dims[0], item_type, rdtyp);
-    else if(H5Tequal(item_type,H5T_NATIVE_USHORT))
-      memb_val = compoundUShort(dset, member_name, dims[0], item_type, rdtyp);
-    else if(H5Tequal(item_type,H5T_NATIVE_UINT))
-      memb_val = compoundUInt(dset, member_name, dims[0], item_type, rdtyp);
-    else if(H5Tequal(item_type,H5T_NATIVE_ULONG))
-      memb_val = compoundULong(dset, member_name, dims[0], item_type, rdtyp);
-    else if(H5Tequal(item_type,H5T_NATIVE_HBOOL))
-      memb_val = compoundBool(dset, member_name, dims[0], item_type, rdtyp);
-    else if(memb_cls == H5T_STRING)
-      memb_val = compoundString(dset, member_name, dims[0], item_type, rdtyp);
-    jk(&data_vals,memb_val);
-  }
-  H5Tclose(dtype);
-  H5Tclose(ntype);
-  H5Tclose(item_type);
   H5Sclose(space);
-  return(xT(xD(key_vals,data_vals)));
+  H5Tclose(dtype);
+  return result;
 }
 
+EXP K hdf5readAttrDataset(K fname, K dname, K aname){
+  if(!kdbCheckType("CCC", fname, dname, aname))
+    return KNL;
+  K result;
+  hid_t file, data, attr, space, dtype;
+  file = kdbH5Fopen(fname, H5F_ACC_RDONLY);
+  if(file < 0)
+    return krr((S)"error opening file");
+  data = kdbH5Oopen(file, dname);
+  H5Fclose(file);
+  if(data < 0)
+    return krr((S)"error opening dataset/group");
+  attr = kdbH5Aopen(data, aname);
+  H5Oclose(data);
+  if(attr < 0)
+    return krr((S)"error opening attribute");
+  space = H5Aget_space(attr);
+  if(space < 0){
+    H5Aclose(attr);
+    return krr((S)"error opening dataspace");
+  }
+  dtype = H5Aget_type(attr);
+  if(dtype < 0){
+    H5Aclose(attr);
+    H5Sclose(space);
+    return krr((S)"error retrieving attribute type");
+  }
+  result = readData(attr, space, dtype, kdbH5Aread);
+  H5Aclose(attr);
+  H5Sclose(space);
+  H5Tclose(dtype);
+  return result;
+}
+
+// define read utils
+
+K readData(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc){
+  K result;
+  H5T_class_t dclass;
+  dclass = H5Tget_class(dtype);
+  result = (dclass == H5T_COMPOUND) ?
+    readDataCompound(dset, space, dtype, readfunc):
+    readDataSimple  (dset, space, dtype, readfunc);
+  return result;
+}
+
+K readDataSimple(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc){
+  K result;
+  hid_t ntype;
+  hsize_t npoints;
+  H5T_class_t nclass;
+  ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
+  npoints = H5Sget_simple_extent_npoints(space);
+  nclass = H5Tget_class(ntype);
+  result = (nclass == H5T_STRING) ?
+    readDataSimpleString(dset, npoints, ntype, space, readfunc):
+    readDataSimpleNumeric(dset, npoints, ntype, space, readfunc);
+  H5Tclose(ntype);
+  return result;
+}
+
+K readDataSimpleNumeric(hid_t dset, hsize_t npoints, hid_t ntype, hid_t UNUSED(space), readfunc_t readfunc){
+  K result;
+  result = ktn(h2kType(ntype), npoints);
+  readfunc(dset, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, kG(result));
+  return result;
+}
+
+K readDataSimpleString(hid_t dset, hsize_t npoints, hid_t ntype, hid_t space, readfunc_t readfunc){
+  K result;
+  hid_t stype;
+  char **vdata, *fdata;
+  unsigned i;
+  stype = H5Tcopy(H5T_C_S1);
+  result = knk(0);
+  // variable length string
+  if(H5Tis_variable_str(ntype)){
+    H5Tset_size(stype, H5T_VARIABLE);
+    vdata = (char **)calloc(npoints, sizeof(char *));
+    readfunc(dset, stype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vdata);
+    for(i = 0; i < npoints; ++i)
+      jk(&result, kp(vdata[i]));
+    H5Dvlen_reclaim(stype, space, H5P_DEFAULT, vdata);
+    free(vdata);
+  }
+  // fixed length string
+  else{
+    size_t sz = H5Tget_size(ntype) + 1;
+    H5Tset_size(stype, sz);
+    fdata = (char *)calloc(npoints * sz, sizeof(char));
+    readfunc(dset, stype, H5S_ALL, H5S_ALL, H5P_DEFAULT, fdata);
+    for(i = 1; i < npoints; ++i)
+      jk(&result, kp(fdata + i * sz));
+    free(fdata);
+  }
+  H5Tclose(stype);
+  return result;
+}
+
+K readDataCompound(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc){
+  hsize_t *dims;
+  hid_t ntype, mtype;
+  H5T_class_t mclass;
+  char* mname;
+  int i, nmembers, rank;
+  K keys, vals, mval;
+  ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
+  nmembers = H5Tget_nmembers(ntype);
+  rank  = H5Sget_simple_extent_ndims(space);
+  dims  = calloc(rank, sizeof(hsize_t));
+  H5Sget_simple_extent_dims(space, dims, NULL);
+  keys = ktn(KS,0);
+  vals = knk(0);
+  for(i = 0; i < nmembers; ++i){
+    mname = H5Tget_member_name(ntype, i);
+    js(&keys, ss(mname));
+    mclass = H5Tget_member_class(ntype, i);
+    mtype  = H5Tget_member_type(ntype, i);
+    mval = (mclass == H5T_STRING) ?
+      readDataCompoundString(dset, mname, dims[0], mtype, space, readfunc):
+      readDataCompoundNumeric (dset, mname, dims[0], mtype, space, readfunc);
+    jk(&vals, mval);
+    H5free_memory(mname);
+  }
+  free(dims);
+  H5Tclose(ntype);
+  H5Tclose(mtype);
+  return(xT(xD(keys,vals)));
+}
+
+K readDataCompoundNumeric(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, hid_t UNUSED(space), readfunc_t readfunc){
+  K result;
+  hid_t memtype;
+  memtype = H5Tcreate(H5T_COMPOUND, H5Tget_size(mtype));
+  H5Tinsert(memtype, mname, 0, mtype);
+  result = ktn(h2kType(mtype), npoints);
+  readfunc(dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, kG(result));
+  H5Tclose(memtype);
+  return result;
+}
+
+K readDataCompoundString(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, hid_t space, readfunc_t readfunc){
+  hid_t memtype, stype;
+  K result;
+  char **vdata, *fdata;
+  unsigned i;
+  stype = H5Tcopy(H5T_C_S1);
+  result = knk(0);
+  // variable length string
+  if(H5Tis_variable_str(mtype)){
+    H5Tset_size(stype, H5T_VARIABLE);
+    memtype = H5Tcreate(H5T_COMPOUND, sizeof(char *));
+    H5Tinsert(memtype, mname, 0, stype);
+    vdata = (char **)calloc(npoints, sizeof(char *));
+    readfunc(dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vdata);
+    for(i = 0; i < npoints; ++i)
+      jk(&result, kp(vdata[i]));
+    H5Dvlen_reclaim(memtype, space, H5P_DEFAULT, vdata);
+    free(vdata);
+  }
+  // fixed length string
+  else{
+    size_t sz = H5Tget_size(mtype) + 1;
+    H5Tset_size(stype, sz);
+    memtype = H5Tcreate(H5T_COMPOUND, sz);
+    H5Tinsert(memtype, mname, 0, stype);
+    fdata = (char *)calloc(npoints * sz, sizeof(char));
+    readfunc(dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, fdata);
+    for(i = 1; i < npoints; ++i)
+      jk(&result, kp(fdata + i * sz));
+    free(fdata);
+  }
+  H5Tclose(stype);
+  H5Tclose(memtype);
+  return result;
+}

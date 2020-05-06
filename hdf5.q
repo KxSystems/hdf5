@@ -1,100 +1,93 @@
 \d .hdf5
-LIBPATH:`:hdf5 2:
+LIBPATH:`:libhdf5 2:
 funcs:(
-  /* write functions */
-  (`hdf5writeDataset;5);
-  (`hdf5writeAttrDataset;6);
+     (`hdf5init;1);
+         // .hdf5.init[]_
+     (`hdf5createFile;1);
+         // .hdf5.createFile[fname:C]:_
+     (`hdf5createGroup;2);
+         // .hdf5.createGroup[fname:C; gname:C]:_
+     (`hdf5createDataset;4);
+         // .hdf5.createDataset[fname:C; dname:C; kdims:J; ktype:c]:_
+     (`hdf5createAttr;5);
+         // .hdf5.createAttr[fname:C; dname:C; aname:C; kdims:J; ktype:c]:_
+     (`hdf5delAttr;3);
+         // .hdf5.delAttr[fname:Cs; dname:Cs; aname:Cs]:_
+     (`hdf5readDataset;2);
+         // .hdf5.readDataset[fname:C; dname:C]:*
+     (`hdf5readAttrDataset;3);
+         // .hdf5.readAttrDataset[fname:C; dname:C; aname:C]:*
+     (`hdf5writeDataset;5);
+         // .hdf5.writeDataset[fname:C; dname:C; dset:*; kdims:J; ktype:c]:_
+     (`hdf5writeAttrDataset;6);
+         // .hdf5.writeAttrDataset[fname:C; dname:C; aname:C; dset:*; kdims:J; ktype:c]:_
+     (`hdf5version;1);
+         // .hdf5.version[]:S!J
+     (`hdf5errorOn;1);
+         // .hdf5.errorOn[]:_
+     (`hdf5errorOff;1);
+         // .hdf5.errorOff[]:_
+     (`hdf5ishdf5;1);
+         // .hdf5.ishdf5[fname:C]:b
+     (`hdf5isObject;2);
+         // .hdf5.isObject[fname:C; oname:C]:b
+     (`hdf5isAttr;3);
+         // .hdf5.isAttr[fname:C; dname:C; aname:C]:b
+     (`hdf5fileSize;1);
+         // .hdf5.fileSize[fname:C]:f
+     (`hdf5dataSize;2);
+         // .hdf5.dataSize[fname:C; dname:C]:f
+     (`hdf5getDataShape;2);
+         // .hdf5.getDataShape[fname:C; dname:C]:J
+     (`hdf5getAttrShape;3);
+         // .hdf5.getAttrShape[fname:C; dname:C; aname:C]:J
+     (`hdf5copyObject;4);
+         // .hdf5.copyObject[srcfile:C; src_obj:C; dstfile:C; dst_obj:C]:_
+     (`hdf5ls;1);
+         // .hdf5.ls[fname:C]:_
+     (`hdf5gc;1);
+         // .hdf5.gc[]:i
+     (`hdf5createExternal;4);
+         // .hdf5.createExternal[linkfile:C; linkpath:C; targetfile:C; targetpath:C]:_
+     (`hdf5createHard;3);
+         // .hdf5.createHard[linkfile:C; linkpath:C; targetpath:C]:_
+     (`hdf5createSoft;3);
+         // .hdf5.createSoft[linkfile:C; linkpath:C; targetpath:C]:_
+     (`hdf5delLink;2)
+         // .hdf5.delLink[linkfile:C; linkpath:C]:_
+ );
 
-  /* create functions */
-  (`hdf5createFile;1);
-  (`hdf5createDataset;4);
-  (`hdf5createAttr;5);
-  
-  /* General use functions */
-  (`hdf5isAttr;3);
-  (`hdf5ishdf5;1);
-  (`hdf5isObject;2);
-  (`hdf5fileSize;1);
-  (`hdf5dataSize;2);
-  (`hdf5getAttrShape;3);
-  (`hdf5getAttrPoints;3);
-  (`hdf5getDataShape;2);
-  (`hdf5getDataPoints;2);
-  (`hdf5datasetInfo;2);
-  (`hdf5version;1);
-  (`hdf5copyObject;4);
-  (`hdf5gc;1);
-  (`hdf5ls;1);
-
-  /* Deletion functions */
-  (`hdf5delAttr;3);
-  
-  /* Read functionality */
-  (`hdf5readDataset;2);
-  (`hdf5readAttrDataset;3);
-  
-  /* Group function */
-  (`hdf5createGroup;2);
-  
-  /* Linking functionality */
-  (`hdf5createExternal;4);
-  (`hdf5createHard;3);
-  (`hdf5createSoft;3);
-  (`hdf5delLink;2)
-  )
-
-// Add all functions read from C to the hdf5 namespace
+// binding functions from c to q
+// hdf5<Name> -> .hdf5.<Name>
 .hdf5,:(`$4_'string funcs[;0])!LIBPATH@/:funcs
 
-// Find the appropriate type for a dataset being written to hdf5
-i.self_type:{$[any 0h in type each x;.z.s each x;raze type each x]}
-i.nlist_types:{$[1=count distinct l:i.self_type x;(abs distinct raze l)0;'"mixed list detected"]}
-i.fntyp:{first(.Q.t til 20)@i.nlist_types[x]}
-
-datamap:`b`p`m`d`z`n`u`v`t!`boolean`timestamp`month`date`datetime`timespan`minute`second`time;
+i.typeConv:{$[x in"sg";string;("*"^("bmduvtpnz"!"xiiiiijjf")x)$]}
+i.typeRead:{$[x="s";`;x="g";"G";x]$}
+i.typeChar:{$[0>x;.Q.t abs x;upper .Q.t x]}
+i.checkDimsType:{$[0=t:type x;count[x],'distinct raze .z.s each x;10=t;t;enlist(count x;neg t)]}
+i.checkData:{
+  if[1<count dt:i.checkDimsType x;`$"invalid ",$[1<count distinct last each dt;"type";"shape"]];
+  if[10h~dt:first dt;dt:count[x],-10h];
+  kdims:-1_dt;
+  ktype:i.typeChar last dt;
+  kdata:i.typeConv[ktype](count[kdims]-1)raze/x;
+  `kdims`ktype`kdata!(kdims;ktype;kdata)}
 
 writeData:{[fname;dname;dset]
   if[type[dset]in 98 99h;:writeDictTab[fname;dname;dset]];
-  if[11h = abs type dset;dset:string dset];
-  if[10h = abs type dset;dset:enlist dset];
-  typ:i.fntyp dset;
-  dims:"i"$i.shape dset;
-  dset:$[typ in "csg";
-         $[typ in "gs";string dset;dset];
-         $[typ in "bmduvt";"i"$dset;
-           typ in "pn";"j"$dset;
-           typ = "z";"f"$dset;
-           dset]];
-  writeDataset[fname;dname;dset;dims;typ];
-  if[typ in"bpmdznuvt";writeAttr[fname;dname;"datatype_kdb";datamap`$typ]]
+  chk:i.checkData dset;
+  createDataset[fname;dname] . chk`kdims`ktype;
+  writeDataset[fname;dname] . chk`kdata`kdims`ktype;
+  if[chk[`ktype]in"bmduvtpnzsg";
+    writeAttr[fname;dname;"datatype_kdb"]enlist chk`ktype];
   }
-
 writeAttr:{[fname;dname;aname;dset]
-  if[11h = abs type dset;dset:string dset];
-  if[10h = abs type dset;dset:enlist dset];
-  typ:i.fntyp dset;
-  dims:"i"$i.shape dset;
-  dset:$[typ in "csg";
-         $[typ in "gs";string dset;dset];
-         $[typ in "bmduvt";"i"$dset;
-           typ in "pn";"j"$dset;
-           typ = "z";"f"$dset;
-           dset]];
-  if[typ in" ";'"This data format cannot be written to an attribute"];
-  writeAttrDataset[fname;dname;aname;dset;dims;typ]
+  if[type[dset]in 98 99h;:writeDictTab[fname;dname;dset]];
+  chk:i.checkData dset;
+  if[not chk[`ktype]in "xihjfecCs";'"kdb+ type can not be mapped to an appropriate attribute"];
+  createAttr[fname;dname;aname] . chk`kdims`ktype;
+  writeAttrDataset[fname;dname;aname] . chk`kdata`kdims`ktype;
   }
-
-readAttr:{[fname;dname;aname]getAttrShape[fname;dname;aname]#readAttrDataset[fname;dname;aname]}
-readData:{[fname;dname]
-  if[isAttr[fname;dname;"datatype_kdb"];
-    typ:readAttr[fname;dname;"datatype_kdb"]0;
-    if[(typ~"table")|typ~"dict";:readDictTab[fname;dname;typ]]];
-  data:getDataShape[fname;dname]#readDataset[fname;dname];
-  $[isAttr[fname;dname;"datatype_kdb"];(first `$readAttr[fname;dname;"datatype_kdb"])$;]data}
-
-i.shape:{-1_count each first scan x}
-
-// Functionality to recursively write a kdb+ table/dictionary to a hdf5 group
 writeDictTab:{[fname;dname;dset]
   createGroup[fname;dname];
   $[98h=type dset;
@@ -109,7 +102,14 @@ writeDictTab:{[fname;dname;dset]
   writeData[fname]'[dict_keys;data];
   }
 
-// Read a kdb+ table/dictionary written from q to a group
+readData:{[fname;dname]
+  typ:$[isAttr[fname;dname;"datatype_kdb"];readAttr[fname;dname;"datatype_kdb"];"*"];
+  if[(typ~"table")|typ~"dict";:readDictTab[fname;dname;typ]];
+  i.typeRead[first typ]getDataShape[fname;dname]#readDataset[fname;dname]
+  }
+readAttr:{[fname;dname;aname]
+  getAttrShape[fname;dname;aname]#readAttrDataset[fname;dname;aname]
+  }
 readDictTab:{[fname;dname;typ]
   $["table"~typ;
     [tab_cols:readAttr[fname;dname;"kdb_columns"];
@@ -118,8 +118,7 @@ readDictTab:{[fname;dname;typ]
     [dict_cols:readAttr[fname;dname;"kdb_keys"];
      kdb_data:readData[fname]each dname,/:"/",/:dict_cols;
      r:(`$dict_cols)!kdb_data]
-   ];
-  r
-  }
+  ];r}
 
-
+// initialize
+init[];

@@ -19,6 +19,7 @@ dname:"dset";
 show dset:3 100000#300000?1f;
 
 -1"\nWriting the dataset to file\n";
+createFile[fname];
 writeData[fname;dname;dset];
 -1"Reading the dataset back to kdb+\n";
 show rdset:readData[fname;dname];

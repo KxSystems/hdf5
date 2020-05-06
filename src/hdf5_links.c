@@ -1,131 +1,85 @@
-/* --- Linking functionality
- * The functions contained in this file are used for the creation of link paths
- * internally within a file or externally between files, these are analogous to unix
- * soft/hard and symbolic links
-*/
-
 #include <stdlib.h>
 #include "k.h"
 #include "hdf5.h"
 #include "kdb_utils.h"
 #include "hdf5_utils.h"
 
-// Create a symbolic/soft link between a paths within a local hdf5 file
-// and an external link in another hdf5 file.
-/* tname = target file path */
-/* tobj = object path in target file */
-EXP K hdf5createExternal(K fname, K lname, K tname, K tobj){
-  disable_err();
-  if(!checkType("[Cs][Cs][Cs][Cs]", fname, lname, tname, tobj))
+// create soft link to an external file
+EXP K hdf5createExternal(K linkfile, K linkpath, K targetfile, K targetpath){
+  if(!kdbCheckType("CCCC", linkfile, linkpath, targetfile, targetpath))
     return KNL;
-  K res;
-  hid_t file;
-  char *filename = getkstring(fname);
-  file = H5Fopen(filename,  H5F_ACC_RDWR, H5P_DEFAULT);
-  if(file < 0){
-    free(filename);
-    H5Fclose(file);
-    return krr((S)"file does not exist");
-  }
-  char *linkname = getkstring(lname);
-  char *targetnm = getkstring(tname);
-  char *tobjname = getkstring(tobj);
-  // Create link to external location
-  if(H5Lcreate_external(targetnm, tobjname, file, linkname, H5P_DEFAULT, H5P_DEFAULT)<0)
-    res = krr((S)"Creation of external link unsuccessful");
-  else
-    res = 0;
-  // Clean up
-  free(filename);
-  free(linkname);
-  free(targetnm);
-  free(tobjname);
+  hid_t file, status;
+  char *linkpathname, *targetfilename, *targetpathname;
+  file = kdbH5Fopen(linkfile, H5F_ACC_RDWR);
+  if(file < 0)
+    return krr((S)"error opening file");
+  linkpathname = kdbGetString(linkpath);
+  targetfilename = kdbGetString(targetfile);
+  targetpathname = kdbGetString(targetpath);
+  status = H5Lcreate_external(targetfilename, targetpathname, file, linkpathname, H5P_DEFAULT, H5P_DEFAULT);
+  free(linkpathname);
+  free(targetfilename);
+  free(targetpathname);
   H5Fclose(file);
-  return res;
+  if(status < 0)
+    krr((S)"error creating external link");
+  return KNL;
 }
 
-// Create a hard link from a defined location within a file (this object must exist)
-// and another location
-/* oname = name of the object being linked to */
-/* lname = linking path name */
-EXP K hdf5createHard(K fname, K oname, K lname){
-  disable_err();
-  if(!checkType("[Cs][Cs][Cs]", fname, oname, lname))
+// create hard link within file (target must exist)
+EXP K hdf5createHard(K linkfile, K linkpath, K targetpath){
+  if(!kdbCheckType("CCC", linkfile, linkpath, targetpath))
     return KNL;
-  K res;
-  hid_t file;
-  char *filename = getkstring(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  if(file < 0){
-    free(filename);
-    H5Fclose(file);
-    return krr((S)"file does not exist");
-  }
-  char *objname  = getkstring(oname);
-  char *linkname = getkstring(lname);
-  // Create hard link between two physical locations within a file
-  if(H5Lcreate_hard(file, objname, H5L_SAME_LOC, linkname, H5P_DEFAULT, H5P_DEFAULT)<0)
-    res = krr((S)"Creation of hard link unsuccessful");
-  else
-    res = 0;
-  free(filename);
-  free(objname);
-  free(linkname);
+  hid_t file, status;
+  char *linkpathname, *targetpathname;
+  file = kdbH5Fopen(linkfile, H5F_ACC_RDWR);
+  if(file < 0)
+    return krr((S)"error opening file");
+  linkpathname = kdbGetString(linkpath);
+  targetpathname = kdbGetString(targetpath);
+  status = H5Lcreate_hard(file, targetpathname, H5L_SAME_LOC, linkpathname, H5P_DEFAULT, H5P_DEFAULT);
+  free(linkpathname);
+  free(targetpathname);
   H5Fclose(file);
-  return res;
+  if(status < 0)
+    krr((S)"error creating hard link");
+  return KNL;
 }
 
-// Create a soft link between a two locations
-/* tpath = target path (may be dangling) */
-/* lpath = soft link path */
-EXP K hdf5createSoft(K fname,K tpath,K lname){
-  disable_err();
-  if(!checkType("[Cs][Cs][Cs]", fname, tpath, lname))
+// create soft link within file (target may be dangling)
+EXP K hdf5createSoft(K linkfile, K linkpath, K targetpath){
+  if(!kdbCheckType("CCC", linkfile, linkpath, targetpath))
     return KNL;
-  K res;
-  hid_t file;
-  char *filename = getkstring(fname);
-  char *tarname  = getkstring(tpath);
-  char *linkname = getkstring(lname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  if(file < 0){
-    free(filename);
-    H5Fclose(file);
-    return krr((S)"file does not exist");
-  }
-  // Create a soft/symbolic link between two locations within a file
-  if(H5Lcreate_soft(tarname, file, linkname, H5P_DEFAULT, H5P_DEFAULT)<0)
-    res = krr((S)"Creation of soft link unsuccessful");
-  else
-    res = 0;
-  free(filename);
-  free(tarname);
-  free(linkname);
+  hid_t file, status;
+  char *linkpathname, *targetpathname;
+  file = kdbH5Fopen(linkfile, H5F_ACC_RDWR);
+  if(file < 0)
+    return krr((S)"error opening file");
+  linkpathname = kdbGetString(linkpath);
+  targetpathname = kdbGetString(targetpath);
+  status = H5Lcreate_soft(targetpathname, file, linkpathname, H5P_DEFAULT, H5P_DEFAULT);
+  free(linkpathname);
+  free(targetpathname);
   H5Fclose(file);
-  return res;
+  if(status < 0)
+    krr((S)"error creating soft link");
+  return KNL;
 }
 
-// Delete a hard/soft or external link
-EXP K hdf5delLink(K fname, K lname){
-  disable_err();
-  if(!checkType("[Cs][Cs]", fname, lname))
+// delete link
+EXP K hdf5delLink(K linkfile, K linkpath){
+  if(!kdbCheckType("CC", linkfile, linkpath))
     return KNL;
-  K res;
-  hid_t file;
-  char *filename = getkstring(fname);
-  file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-  if(file < 0){
-    free(filename);
-    H5Fclose(file);
-    return krr((S)"file does not exist");
-  }
-  char *linkname = getkstring(lname);
-  if(H5Ldelete(file, linkname, H5P_DEFAULT)<0)
-    res = krr("could not delete specified link");
-  else
-    res = kp("successfully deleted the link");
-  free(filename);
-  free(linkname);
+  hid_t file, status;
+  char *linkpathname;
+  file = kdbH5Fopen(linkfile, H5F_ACC_RDWR);
+  if(file < 0)
+    return krr((S)"error opening file");
+  linkpathname = kdbGetString(linkpath);
+  status = H5Ldelete(file, linkpathname, H5P_DEFAULT);
+  free(linkpathname);
   H5Fclose(file);
-  return res;
+  if(status < 0)
+    krr((S)"error deleting link");
+  return KNL;
 }

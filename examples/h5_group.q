@@ -17,9 +17,10 @@ fname:"test.h5";
 gname1:"Group1";
 
 -1"Creating a file '",fname,"' containing an initial group '",gname1,"'\n";
+createFile[fname];
 createGroup[fname;gname1];
 
--1"The following is the initial structure of the file:\n"
+-1"The following is the initial structure of the file:\n";
 show ls[fname];
 
 // Initialize subgroups
