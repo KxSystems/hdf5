@@ -17,11 +17,8 @@ show gc[];
 fname:"test.h5";
 createFile[fname];
 
--1"\nCreate a dataset named 'dset' in the file 'test.h5' and return information about the dataset";
+-1"\nCreate a dataset named 'dset' in the file 'test.h5' and return its size";
 writeData[fname;"dset";202 10#2020?1e];
-show datasetInfo["test.h5";"dset"];
--1"\nHow many data points make up the dataset?";
-show getDataPoints[fname;"dset"];
 -1"\nWhat memory in MB is required to store this dataset?";
 show dataSize[fname;"dset"];
 
