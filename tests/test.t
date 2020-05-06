@@ -23,7 +23,7 @@ one_d  :flip(gen_names["1_";dset_3D];dset_1D);
 three_d:flip(gen_names["3_";dset_3D];dset_3D);
 five_d :flip(gen_names["5_";dset_5D];dset_5D);
 (all/){test_dset .'x}each(one_d;three_d;five_d)
--1"Testing of numeric types complete\n";
+-1"Testing numeric types complete\n";
 
 -1"Testing table and dictionary write/read";
 one_tb  :("dset_1_tab";flip(`$gen_names["1_tab";dset_1D])!dset_1D);
@@ -40,7 +40,7 @@ gname2:"Group1/Group2/";
 gname1_d:flip(gname1,/:gen_names["1_";dset_1D];dset_1D);
 gname2_d:flip(gname2,/:gen_names["3_";dset_3D];dset_3D);
 (all/){test_dset .'x}each(gname1_d;gname2_d)
--1"Testing of writing data to Groups complete\n";
+-1"Testing writing data to Groups complete\n";
 
 -1"Testing attribute functions";
 attr1:"int attr";
@@ -55,19 +55,18 @@ not .hdf5.isAttr[fname;attr_dset;attr2]
 .hdf5.writeAttr[fname;attr_dset;"num attr";num_tst];
 str_tst ~ .hdf5.readAttr[fname;attr_dset;"str attr"]
 num_tst ~ .hdf5.readAttr[fname;attr_dset;"num attr"]
--1"Testing of attribute functions complete\n";
+-1"Testing attribute functions complete\n";
 
--1"Testing of linking functionality";
+-1"Testing linking functionality";
 n_loc:"new_path"
 .hdf5.createSoft[fname;n_loc;"dset_1_0"]
 .hdf5.readData[fname;"dset_1_0"] ~ .hdf5.readData[fname;n_loc]
 .hdf5.delLink[fname;n_loc];
 .hdf5.createHard[fname;n_loc;"dset_5_10"]
 .hdf5.readData[fname;"dset_5_10"] ~ .hdf5.readData[fname;n_loc]
--1"Testing of linking functionality completed";
+-1"Testing linking functionality complete\n";
 
--1"Testing of utility functions";
-
+-1"Testing utility functions";
 // Create a file to check function of ishdf5
 `:test_txt.txt 0: enlist "text to save";
 
@@ -75,11 +74,7 @@ not .hdf5.ishdf5["test_txt.txt"]
 .hdf5.ishdf5[fname]
 
 .hdf5.getDataShape [fname;"dset_5_6" ] ~ 5 4 3 2 1 
-.hdf5.getDataPoints[fname;"dset_3_10"] ~ 100
-
-.hdf5.datasetInfo[fname;"dset_5_6"]~`type`ndims`dims!(`short;5;5 4 3 2 1)
-.hdf5.datasetInfo[fname;"dset_3_10"]~`type`ndims`dims!(`double;3;10 5 2)
--1"Testing of utility functions complete\n";
+-1"Testing utility functions complete\n";
 
 // Clean up
 $[.z.o like "w*";system "del test_*";system"rm test_*"];

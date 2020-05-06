@@ -97,27 +97,6 @@ EXP K hdf5getDataShape(K fname, K dname){
   return kdims;
 }
 
-EXP K hdf5getDataPoints(K fname, K dname){
-  if(!kdbCheckType("CC", fname, dname))
-    return KNL;
-  J npoints;
-  hid_t file, data, space;
-  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
-  if(file < 0)
-    return krr((S)"error opening file");
-  data = kdbH5Dopen(file, dname);
-  H5Fclose(file);
-  if(data < 0)
-    return krr((S)"error opening dataset");
-  space = H5Dget_space(data);
-  H5Dclose(data);
-  if(space < 0)
-    return krr((S)"error opening data space");
-  npoints = H5Sget_simple_extent_npoints(space);
-  H5Sclose(space);
-  return kj(npoints);
-}
-
 EXP K hdf5getAttrShape(K fname, K dname, K aname){
   if(!kdbCheckType("CCC", fname, dname, aname))
     return KNL;
@@ -141,31 +120,6 @@ EXP K hdf5getAttrShape(K fname, K dname, K aname){
   kdims = getShape(space);
   H5Sclose(space);
   return kdims;
-}
-
-EXP K hdf5getAttrPoints(K fname, K dname, K aname){
-  if(!kdbCheckType("CCC", fname, dname, aname))
-    return KNL;
-  hid_t file, data, attr, space;
-  J npoints;
-  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
-  if(file < 0)
-    return krr((S)"error opening file");
-  data = kdbH5Oopen(file, dname);
-  H5Fclose(file);
-  if(data < 0)
-    return krr((S)"error opening dataset/group");
-  attr = kdbH5Aopen(data, aname);
-  H5Oclose(data);
-  if(attr < 0)
-    return krr((S)"error opening attribute");
-  space  = H5Aget_space(attr);
-  H5Aclose(attr);
-  if(space < 0)
-    return krr((S)"error opening attribute space");
-  npoints = H5Sget_simple_extent_npoints(space);
-  H5Sclose(space);
-  return kj(npoints);
 }
 
 // is file a hdf5 file
@@ -215,79 +169,6 @@ EXP K hdf5isAttr(K fname, K dname, K aname){
   free(attrname);
   H5Oclose(data);
   return kb(aexists > 0 ? 1 : 0);
-}
-
-EXP K hdf5datasetType(K fname, K dname){
-  if(!kdbCheckType("CC", fname, dname))
-    return KNL;
-  K ktype;
-  hid_t file, data, dtype, ntype;
-  H5T_class_t dclass;
-  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
-  if(file < 0)
-    return krr((S)"error opening file");
-  data = kdbH5Dopen(file, dname);
-  H5Fclose(file);
-  if(data < 0)
-    return krr((S)"error opening dataset");
-  dtype = H5Dget_type(data);
-  H5Dclose(data);
-  ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
-  H5Tclose(dtype);
-       if(H5Tequal(ntype, H5T_NATIVE_CHAR))
-    ktype = ks((S)"char");
-  else if(H5Tequal(ntype, H5T_NATIVE_SHORT))
-    ktype = ks((S)"short");
-  else if(H5Tequal(ntype, H5T_NATIVE_INT))
-    ktype = ks((S)"int");
-  else if(H5Tequal(ntype, H5T_NATIVE_LONG))
-    ktype = ks((S)"long");
-  else if(H5Tequal(ntype, H5T_NATIVE_LLONG))
-    ktype = ks((S)"llong");
-  else if(H5Tequal(ntype, H5T_NATIVE_UCHAR))
-    ktype = ks((S)"uchar");
-  else if(H5Tequal(ntype, H5T_NATIVE_USHORT))
-    ktype = ks((S)"ushort");
-  else if(H5Tequal(ntype, H5T_NATIVE_UINT))
-    ktype = ks((S)"uint");
-  else if(H5Tequal(ntype, H5T_NATIVE_ULONG))
-    ktype = ks((S)"ulong");
-  else if(H5Tequal(ntype, H5T_NATIVE_ULLONG))
-    ktype = ks((S)"ullong");
-  else if(H5Tequal(ntype, H5T_NATIVE_FLOAT))
-    ktype = ks((S)"float");
-  else if(H5Tequal(ntype, H5T_NATIVE_DOUBLE))
-    ktype = ks((S)"double");
-  else if(H5Tequal(ntype, H5T_NATIVE_B8))
-    ktype = ks((S)"b8");
-  else if(H5Tequal(ntype, H5T_NATIVE_B16))
-    ktype = ks((S)"b16");
-  else if(H5Tequal(ntype, H5T_NATIVE_B32))
-    ktype = ks((S)"b32");
-  else if(H5Tequal(ntype, H5T_NATIVE_B64))
-    ktype = ks((S)"b64");
-  else{
-    dclass = H5Tget_class(ntype);
-    if(dclass == H5T_STRING)
-      ktype = ks((S)"string");
-    else
-      ktype = ks((S)"");
-  }
-  H5Tclose(ntype);
-  return ktype;
-}
-
-// return type, ndims, dims
-EXP K hdf5datasetInfo(K fname, K dname){
-  if(!kdbCheckType("CC", fname, dname))
-    return KNL;
-  K ktype, kdims, kndims;
-  ktype  = hdf5datasetType(fname, dname);
-  kdims  = hdf5getDataShape(fname, dname);
-  if(!kdims)
-    return KNL;
-  kndims = kj(kdims->n);
-  return kdbCreateDict("type", ktype, "ndims", kndims, "dims", kdims);
 }
 
 EXP K hdf5copyObject(K srcfile, K src_obj, K dstfile, K dst_obj){

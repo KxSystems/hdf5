@@ -39,16 +39,8 @@ funcs:(
          // .hdf5.dataSize[fname:C; dname:C]:f
      (`hdf5getDataShape;2);
          // .hdf5.getDataShape[fname:C; dname:C]:J
-     (`hdf5getDataPoints;2);
-         // .hdf5.getDataPoints[fname:C; dname:C]:j
      (`hdf5getAttrShape;3);
          // .hdf5.getAttrShape[fname:C; dname:C; aname:C]:J
-     (`hdf5getAttrPoints;3);
-         // .hdf5.getAttrPoints[fname:C; dname:C; aname:C]:j
-     (`hdf5datasetType;2);
-         // .hdf5.datasetType[fname:C; dname:C]:s
-     (`hdf5datasetInfo;2);
-         // .hdf5.datasetInfo[fname:C; dname:C]:S!*
      (`hdf5copyObject;4);
          // .hdf5.copyObject[srcfile:C; src_obj:C; dstfile:C; dst_obj:C]:_
      (`hdf5ls;1);
