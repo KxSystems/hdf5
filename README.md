@@ -21,7 +21,7 @@ The following sections outline the instructions for building the interface for v
 ### Installing HDF5
 
 **Linux**
-- Download a release of hdf5 and install, instructions are provided [here](https://support.hdfgroup.org/HDF5/HDF5-FAQ.html#10) but left as an exercise for a user.
+- Download a release of hdf5 and install, instructions are provided [here](https://support.hdfgroup.org/HDF5/HDF5-FAQ.html#10).
 
 **MacOS**
 - To install hdf5 run `brew install hdf5`
