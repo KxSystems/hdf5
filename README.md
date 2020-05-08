@@ -1,6 +1,6 @@
 # Interface for conversion between hdf5 and kdb+ data 
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/kxsystems/hdf5-kdb)](https://github.com/kxsystems/hdf5-kdb/releases) [![Travis (.org) branch](https://img.shields.io/travis/kxsystems/hdf5-kdb/master?label=travis%20build)](https://travis-ci.org/kxsystems/hdf5-kdb/branches)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/kxsystems/hdf5)](https://github.com/kxsystems/hdf5/releases) [![Travis (.org) branch](https://img.shields.io/travis/kxsystems/hdf5/master?label=travis%20build)](https://travis-ci.org/kxsystems/hdf5/branches)
 
 This is a thin wrapper for kdb+ around the [HDF Groups](https://support.hdfgroup.org/) C api for HDF5.
 
