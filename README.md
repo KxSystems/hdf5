@@ -31,7 +31,7 @@ If you have any HDF5 related questions, you can raise them on the [HDF Forum](ht
 
 ### Support
 
-This interface is currently supported under the following conditions
+This interface is currently supported on a best effort basis under the following conditions
 
 * Linux/Mac 64-bit
 * kdb+ ≥ 3.5
