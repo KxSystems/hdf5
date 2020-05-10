@@ -18,13 +18,13 @@ Hierarchical Data Format 5 (HDF5) is a file format designed specifically for the
 
 In many ways, HDF5 acts like a hierarchical file system similar to that used by linux or windows. This structure contains two major objects:
 
-1. Datasets - These may contain multidimensional arrays of homogeneously-typed data, or compound data containing a mixture of types. This is similar to files within a traditional POSIX file system.
-2. Groups - These act as container structures, which can hold datasets or other groups. They act similarly to directories in a traditional POSIX file system.
+1. Datasets - Multidimensional arrays of homogeneously-typed data, or compound data containing a mixture of types. Datasets are similar to files within a traditional POSIX file system.
+2. Groups - Container structures holding datasets or other groups. They function similarly to directories within a traditional POSIX file system.
 
 There are a number of secondary objects and structures, which add complexity to the format. In doing so, they allow the format to be used for a wider range of use cases
 
-* Attributes: These allow metadata information to be associated with a dataset or group e.g. Associate the date of data collection with a group, or the room temperature when a set of results was collected.
-* Linking functionality: Like a traditional POSIX file system it is possible to create links between objects (hard/soft/external). These allow datasets or groups relevant to multiple experiments or use-cases to be accessed via routes that a user may find more intuitive.
+* Attributes: These allow metadata information to be associated with a dataset or group e.g. associate the date of data collection with a group, or the temperature when a set of results was collected.
+* Linking functionality: Like a traditional POSIX file system it is possible to create links between objects (hard/soft/external). These allow datasets or groups relevant to multiple experiments to be accessed via more intuitive routes.
 
 If you have any HDF5 related questions, you can raise them on the [HDF Forum](https://forum.hdfgroup.org/).
 
@@ -44,15 +44,15 @@ The following outlines instructions for installing the HDF5 group's C api for su
 - Download a supported release of hdf5 and install, instructions are provided [here](https://support.hdfgroup.org/HDF5/HDF5-FAQ.html#10).
 
 **MacOS**
-- To install hdf5 run `brew install hdf5`
+- Run `brew install hdf5`
 
 
 ### Interface build and install
 
-In order to successfully build and install this interface the following environment variables must be set:
+In order to successfully build and install this interface, the following environment variables must be set:
 
-1. `HDF5_HOME` = Location of the HDF5 C apis' `/include` and `/lib` directories.
-2. `QHOME` = Location of the q executable 
+1. `HDF5_HOME` = Location of the HDF5 C api installation (directory containing `/include` and `/lib` subdirectories).
+2. `QHOME` = Q installation directory (directory containing `q.k`).
 
 * Create a directory from which the execute the CMAKE command and move into this directory
 
