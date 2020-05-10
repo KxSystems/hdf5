@@ -6,6 +6,8 @@
 
 This interface provides a mechanism for kdb+ users to interact with and create HDF5 datasets. The interface is a thin wrapper for kdb+ around the HDF Groups' C api for HDF5, outlined in full [here](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5Front.html)
 
+This is part of the [_Fusion for kdb+_](http://code.kx.com/q/interfaces/fusion/) interface collection.
+
 ## New to kdb+ ?
 
 Kdb+ is the world's fastest time-series database, optimized for ingesting, analyzing and storing massive amounts of structured data. To get started with kdb+, please visit https://code.kx.com/q/learn/ for downloads and developer information. For general information, visit https://kx.com/
@@ -32,7 +34,7 @@ If you have any HDF5 related questions, you can raise them on the [HDF Forum](ht
 **Requirements**
 
 * kdb+ ≥ 3.5 64-bit
-* HDF5 C api ≥ 1.10
+* [HDF5 C api](https://support.hdfgroup.org/HDF5/doc/H5.intro.html) ≥ 1.10
 
 ## Third-Party Library Installation
 
