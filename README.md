@@ -29,14 +29,10 @@ If you have any HDF5 related questions, you can raise them on the [HDF Forum](ht
 
 ## Installation
 
-### Support
+**Requirements**
 
-This interface is currently supported on a best effort basis under the following conditions
-
-* Linux/Mac 64-bit
-* kdb+ ≥ 3.5
-* HDF5 C api 1.10 & 1.12
-
+* kdb+ ≥ 3.5 64-bit
+* HDF5 C api ≥ 1.10
 
 ## Third-Party Library Installation
 
@@ -100,4 +96,4 @@ The HDF5 interface is still in development and is provided here as a beta releas
 
 If you find issues with the interface or have feature requests please consider raising an issue [here](https://github.com/KxSystems/hdf5/issues).
 
-If you wish to contribute to this project please follow the contributing guide [here](https://github.com/KxSystems/solace/blob/master/CONTRIBUTING.md).
+If you wish to contribute to this project please follow the contributing guide [here](https://github.com/KxSystems/hdf5/blob/master/CONTRIBUTING.md).
