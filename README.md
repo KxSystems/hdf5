@@ -95,7 +95,7 @@ Documentation outlining the functionality available for this interface can be fo
 
 ## Status
 
-The HDF5 interface is still in development and is provided here as a beta release under an Apache 2.0 license.
+The HDF5 interface is provided here under an Apache 2.0 license.
 
 If you find issues with the interface or have feature requests please consider raising an issue [here](https://github.com/KxSystems/hdf5/issues).
 
