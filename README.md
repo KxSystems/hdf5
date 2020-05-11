@@ -51,7 +51,7 @@ The following outlines instructions for installing the HDF5 group's C api for su
 It is recommended that a user install this interface through a release. Installation of the interface from a release is completed in a number of steps
 
 1. Ensure you have downloaded/installed the HDF5 C api following the instructions [here](###Third-Party Library Installation)
-2. Download a release from [here](https://github.com/KxSystems/mqtt/releases) for your system architecture.
+2. Download a release from [here](https://github.com/KxSystems/hdf5/releases) for your system architecture.
 3. Add the location of the 'lib' directory for the HDF5 C api to `LD_LIBRARY_PATH`/`DYLD_LIBRARY_PATH` for Linux or MacOS respectively.
 
 	```
