@@ -52,7 +52,7 @@ install:
 
 script:
 - echo "Preparing version $TRAVIS_BRANCH-$TRAVIS_COMMIT"
-- tar -zcvf hdf5_$TRAVIS_OS_NAME-$TRAVIS_BRANCH.tgz hdf5-kdb/Release/README.md hdf5-kdb/Release/hdf5.q hdf5-kdb/Release/lib/ hdf5-kdb/Release/examples/ 
+- tar -zcvf hdf5_$TRAVIS_OS_NAME-$TRAVIS_BRANCH.tgz hdf5-kdb/Release/*
 - echo "Packaged as hdf5_$TRAVIS_OS_NAME-$TRAVIS_BRANCH.zip"
 -  if [[ "x$QLIC_KC" != "x" ]]; then
     curl -fsSL -o test.q https://github.com/KxSystems/embedpy/raw/master/test.q;
