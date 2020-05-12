@@ -45,14 +45,16 @@ install:
   - if [[ "x$QLIC_KC" != "x" ]]; then
       echo -n $QLIC_KC |base64 --decode > q/kc.lic;
     fi
-  - mkdir hdf5
-  - cd hdf5
+  - mkdir build
+  - cd build
   - cmake .. -DCMAKE_BUILD_TYPE=Release && make && make install
   - cd ..
 
 script:
 - echo "Preparing version $TRAVIS_BRANCH-$TRAVIS_COMMIT"
+- cd build
 - tar -zcvf hdf5_$TRAVIS_OS_NAME-$TRAVIS_BRANCH.tgz hdf5
+- cd ..
 - echo "Packaged as hdf5_$TRAVIS_OS_NAME-$TRAVIS_BRANCH.zip"
 -  if [[ "x$QLIC_KC" != "x" ]]; then
     curl -fsSL -o test.q https://github.com/KxSystems/embedpy/raw/master/test.q;
@@ -66,7 +68,7 @@ deploy:
   provider: releases
   api_key: "$GH_APIKEY"
   file_glob: true
-  file: hdf5_$TRAVIS_OS_NAME-$TRAVIS_BRANCH.tgz
+  file: build/hdf5_$TRAVIS_OS_NAME-$TRAVIS_BRANCH.tgz
   skip_cleanup: true
   on:
     tags: true
