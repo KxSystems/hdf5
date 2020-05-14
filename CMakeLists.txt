@@ -11,21 +11,38 @@ ENDIF()
 cmake_minimum_required(VERSION 2.8)
 project(hdf5 C)
 
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-strict-aliasing -DKXVER=3")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -DKXVER=3")
 
 set(MY_LIBRARY_NAME hdf5)
 file(GLOB C_FILES src/*.c)
 set_source_files_properties(${C_FILES} PROPERTIES LANGUAGE C)
 
+message(STATUS "Generator : ${CMAKE_GENERATOR}")
+message(STATUS "Build Tool : ${CMAKE_BUILD_TOOL}")
+message(STATUS "HDF5 API : $ENV{HDF5_HOME}")
+
 include_directories($ENV{HDF5_HOME}/include)
 
 find_library(HDF5_LIBRARY
     NAMES hdf5 libhdf5
-    HINTS "$ENV{HDF5_HOME}/lib/"
+    HINTS "$ENV{HDF5_HOME}/lib/" 
 )
 
+# cmake -DCMAKE_INSTALL_PREFIX="C:/Git/hdf5-1.12.0/cmake/install" -DBUILD_SHARED_LIBS=ON ..
+# cmake --build . --config Release
+# cmake --install . --config Release
+
+if (MSVC)
+    file(DOWNLOAD "https://github.com/KxSystems/kdb/raw/master/w64/q.lib" "${CMAKE_BINARY_DIR}/q.lib" )
+    set(LINK_LIBS "${CMAKE_BINARY_DIR}/q.lib")
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W3 /D H5_BUILT_AS_DYNAMIC_LIB /D WIN32_LEAN_AND_MEAN /D _CRT_SECURE_NO_WARNINGS")
+else()
+    set(LINK_LIBS "")
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-strict-aliasing")
+endif()
+
 add_library (${MY_LIBRARY_NAME} SHARED ${C_FILES})
-target_link_libraries(${MY_LIBRARY_NAME} ${HDF5_LIBRARY})
+target_link_libraries(${MY_LIBRARY_NAME} ${HDF5_LIBRARY} ${LINK_LIBS})
 
 # "-undefined dynamic_lookup" needed for building shared libraries on Mac
 # MacOS also produces binaries as .dylib, for kdb these should be ".so"
@@ -57,6 +74,6 @@ install(FILES hdf5.q DESTINATION "$ENV{QHOME}" CONFIGURATIONS MinSizeRel Release
 install(FILES LICENSE DESTINATION ${PROJECT_BINARY_DIR}/hdf5 CONFIGURATIONS Release)
 install(FILES README.md DESTINATION ${PROJECT_BINARY_DIR}/hdf5 CONFIGURATIONS Release)
 install(DIRECTORY examples DESTINATION ${PROJECT_BINARY_DIR}/hdf5 CONFIGURATIONS Release)
-install(FILES install.sh DESTINATION ${PROJECT_BINARY_DIR}/hdf5 CONFIGURATIONS Release)
+install(FILES ${INSTALL_SCRIPT} DESTINATION ${PROJECT_BINARY_DIR}/hdf5 CONFIGURATIONS Release)
 install(FILES hdf5.q DESTINATION ${PROJECT_BINARY_DIR}/hdf5 CONFIGURATIONS Release)
 install(TARGETS ${MY_LIBRARY_NAME} DESTINATION ${PROJECT_BINARY_DIR}/hdf5/lib CONFIGURATIONS Release)
