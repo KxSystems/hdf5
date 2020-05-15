@@ -8,7 +8,7 @@
 -1"Running h5_link.q\n";
 
 // import the hdf5 library
-\l ../hdf5.q
+\l ../q/hdf5.q
 
 // Move into the hdf5 namespace
 \d .hdf5
