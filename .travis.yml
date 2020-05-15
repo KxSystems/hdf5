@@ -45,8 +45,6 @@ before_install:
   
   # Set up q for testing and execute tests on multiple 
   - if [[ $TESTS == "True" && "x$OD" != "x" && "x$QLIC_KC" != "x" ]]; then
-      export LD_LIBRARY_PATH=$BUILD_HOME/lib:$LD_LIBRARY_PATH;
-      export DYLD_LIBRARY_PATH=$BUILD_HOME/lib:$LD_LIBRARY_PATH;
       export PATH=$BUILD_HOME/lib:$PATH;
       export PATH=$BUILD_HOME/bin:$PATH;
       curl -o qhome/q.zip -L $OD;
