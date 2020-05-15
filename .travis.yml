@@ -49,7 +49,6 @@ before_install:
       export DYLD_LIBRARY_PATH=$BUILD_HOME/lib:$DYLD_LIBRARY_PATH
       export PATH=$BUILD_HOME/lib:$PATH;
       export PATH=$BUILD_HOME/bin:$PATH;
-      export PATH=$BUILD_HOME/bin/Release:$PATH;
       curl -o qhome/q.zip -L $OD;
       unzip -d qhome qhome/q.zip;
       rm qhome/q.zip;
