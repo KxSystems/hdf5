@@ -8,8 +8,9 @@ else # install from source
   wget "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.4/src/hdf5-1.10.4.tar.gz"
   tar -xzf "hdf5-1.10.4.tar.gz"
   cd "hdf5-1.10.4"
+  mkdir $TRAVIS_BUILD_DIR/cbuild
   if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-    ./configure --prefix=/usr/local
+    ./configure --prefix=$TRAVIS_BUILD_DIR/cbuild
     sudo make install 2>&1 | tail -n200
   else
     # Windows build
