@@ -39,7 +39,6 @@ endif()
 
 add_library (${MY_LIBRARY_NAME} SHARED ${C_FILES})
 target_link_libraries(${MY_LIBRARY_NAME} ${HDF5_LIBRARY} ${LINK_LIBS})
-set_target_properties(${MY_LIBRARY_NAME} PROPERTIES PREFIX "")
 
 # "-undefined dynamic_lookup" needed for building shared libraries on Mac
 # MacOS also produces binaries as .dylib, for kdb these should be ".so"
