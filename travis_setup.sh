@@ -15,9 +15,10 @@ else # install from source
   else
     # Windows build
     mkdir cmake && cd cmake
-    cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/cbuild ..
-    cmake --build . --config Release
-    cmake --build . --config Release --target install
+    cmake -G "Visual Studio 15 2017 Win64" ..
+    export MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin/";
+    export PATH=$MSBUILD_PATH:$PATH;
+    MSBuild.exe INSTALL.vcxproj //m //nologo //verbosity:normal //p:Configuration=Release //p:Platform=x64;
     cd ..
   fi
   cd ..
