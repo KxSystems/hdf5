@@ -7,7 +7,7 @@ matrix:
   - dist: bionic
     os: linux
   - os: osx
-#  - os: windows
+  - os: windows
 language: c
 compiler: gcc
 
