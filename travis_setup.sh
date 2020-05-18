@@ -15,9 +15,7 @@ else # install from source
   else
     # Windows build
     mkdir cmake && cd cmake
-    export BUILD_HOME=$TRAVIS_BUILD_DIR/cbuild
-    mkdir $BUILD_HOME
-    cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_INSTALL_PREFIX=$BUILD_HOME ..
+    cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/cbuild ..
     cmake --build . --config Release
     cmake --build . --config Release --target install
     cd ..
