@@ -23,6 +23,7 @@ before_install:
       ./travis_setup.sh;
       export BUILD_HOME=$TRAVIS_BUILD_DIR/cbuild
       export LIB="cmake/$FILE_ROOT/lib";
+      mkdir cmake
     else
       export LIB="";
     fi
