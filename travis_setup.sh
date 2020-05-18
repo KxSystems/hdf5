@@ -1,7 +1,5 @@
 #!/bin/bash
 
-mkdir cbuild
-
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then # use homebrew version
   brew update
   brew install hdf5
@@ -11,12 +9,14 @@ else # install from source
   tar -xzf "hdf5-1.10.4.tar.gz"
   cd "hdf5-1.10.4"
   if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-    ./configure --prefix=$TRAVIS_BUILD_DIR/cbuild
+    ./configure --prefix=/usr/local
     sudo make install 2>&1 | tail -n200
   else
     # Windows build
-    cd cbuild
-    cmake -G "Visual Studio 15 2017 Win64" ..
+    mkdir cmake && cd cmake
+    export HDF5_HOME=$TRAVIS_BUILD_DIR/cbuild
+    mkdir $HDF5_HOME
+    cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_INSTALL_PREFIX=$cbuild ..
     cmake --build . --config Release
     cmake --build . --config Release --target install
     cd ..
