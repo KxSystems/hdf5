@@ -5,7 +5,7 @@
 -1"Running h5_tables.q\n";
  
 // import the hdf5 library
-\l ../hdf5.q
+\l ../q/hdf5.q
 
 // Move into the hdf5 namespace
 \d .hdf5
