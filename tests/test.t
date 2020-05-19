@@ -1,4 +1,4 @@
-\l hdf5.q
+\l q/hdf5.q
 
 fname:"test_file.h5"
 attr_dset:"attr_dset";
