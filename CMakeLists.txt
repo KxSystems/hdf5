@@ -13,27 +13,12 @@ project(hdf5 C)
 
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -DKXVER=3")
 
-set(MY_LIBRARY_NAME hdf5)
+set(MY_LIBRARY_NAME kdbhdf5)
 file(GLOB C_FILES src/*.c)
 set_source_files_properties(${C_FILES} PROPERTIES LANGUAGE C)
 
 message(STATUS "Generator : ${CMAKE_GENERATOR}")
 message(STATUS "Build Tool : ${CMAKE_BUILD_TOOL}")
-<<<<<<< HEAD
-message(STATUS "HDF5 API : $ENV{HDF5_HOME}")
-
-include_directories($ENV{HDF5_HOME}/include)
-
-find_library(HDF5_LIBRARY
-    NAMES hdf5 libhdf5
-    HINTS "$ENV{HDF5_HOME}/lib/" 
-)
-
-# cmake -DCMAKE_INSTALL_PREFIX="C:/Git/hdf5-1.12.0/cmake/install" -DBUILD_SHARED_LIBS=ON ..
-# cmake --build . --config Release
-# cmake --install . --config Release
-
-=======
 message(STATUS "HDF5 API : $ENV{BUILD_HOME}")
 
 include_directories($ENV{BUILD_HOME}/include)
@@ -43,7 +28,6 @@ find_library(HDF5_LIBRARY
     HINTS "$ENV{BUILD_HOME}/lib/" 
 )
 
->>>>>>> 25c813b989c39a247055b186a238ba20da1277e7
 if (MSVC)
     file(DOWNLOAD "https://github.com/KxSystems/kdb/raw/master/w64/q.lib" "${CMAKE_BINARY_DIR}/q.lib" )
     set(LINK_LIBS "${CMAKE_BINARY_DIR}/q.lib")
@@ -81,15 +65,11 @@ endif()
 message(STATUS "Installing package to : ${PROJECT_BINARY_DIR}/hdf5")
 
 # Minimum build/install move binary and q-script to $QHOME & $QHOME/<QARCH>
-install(TARGETS ${MY_LIBRARY_NAME} DESTINATION "$ENV{QHOME}/${OSFLAG}${BITNESS}/" CONFIGURATIONS MinSizeRel Release)
-install(DIRECTORY "q/" DESTINATION "$ENV{QHOME}" CONFIGURATIONS MinSizeRel Release FILES_MATCHING PATTERN "*.q")
+file(TO_CMAKE_PATH "$ENV{QHOME}" QHOME_PATH)
+install(TARGETS ${MY_LIBRARY_NAME} DESTINATION "${QHOME_PATH}/${OSFLAG}${BITNESS}/" CONFIGURATIONS MinSizeRel Release)
+install(DIRECTORY "q/" DESTINATION "${QHOME_PATH}" CONFIGURATIONS MinSizeRel Release FILES_MATCHING PATTERN "*.q")
 
 install(FILES README.md LICENSE ${INSTALL_SCRIPT} DESTINATION ${PROJECT_BINARY_DIR}/hdf5 CONFIGURATIONS Release)
 install(DIRECTORY examples DESTINATION ${PROJECT_BINARY_DIR}/hdf5 CONFIGURATIONS Release)
-<<<<<<< HEAD
-install(FILES ${INSTALL_SCRIPT} DESTINATION ${PROJECT_BINARY_DIR}/hdf5 CONFIGURATIONS Release)
-install(FILES hdf5.q DESTINATION ${PROJECT_BINARY_DIR}/hdf5 CONFIGURATIONS Release)
-=======
 install(DIRECTORY q DESTINATION ${PROJECT_BINARY_DIR}/hdf5 CONFIGURATIONS Release)
->>>>>>> 25c813b989c39a247055b186a238ba20da1277e7
 install(TARGETS ${MY_LIBRARY_NAME} DESTINATION ${PROJECT_BINARY_DIR}/hdf5/lib CONFIGURATIONS Release)

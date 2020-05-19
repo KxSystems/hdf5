@@ -68,9 +68,8 @@ before_install:
   # Make binaries for the library as appropriate
   - if [[ $BUILD == "True" && $TRAVIS_OS_NAME == "windows" ]]; then
       cd cmake && cmake -G "Visual Studio 15 2017 Win64" .. ;
-      export MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin/";
-      export PATH=$MSBUILD_PATH:$PATH;
-      MSBuild.exe INSTALL.vcxproj //m //nologo //verbosity:normal //p:Configuration=Release //p:Platform=x64;
+      cmake --build . --config Release;
+      cmake --build . --config Release --target install;
       cd ..;
     elif [[ $BUILD == "True" && ( $TRAVIS_OS_NAME == "linux" || $TRAVIS_OS_NAME == "osx" ) ]]; then
       cd cmake && cmake .. -DCMAKE_BUILD_TYPE=Release && make install && cd .. ;
