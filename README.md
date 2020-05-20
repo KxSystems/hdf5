@@ -152,7 +152,6 @@ cd mqtt && install.bat
 
 This interface is in active developement and as such there are a number of use-cases that are currently not supported.
 
-- Use of this interface on Windows 64-bit systems
 - Creation of compressed datasets
 - Access to unlimited datasets
 - Interaction with HDF5 images
