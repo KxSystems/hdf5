@@ -13,7 +13,7 @@ project(hdf5 C)
 
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -DKXVER=3")
 
-set(MY_LIBRARY_NAME hdf5)
+set(MY_LIBRARY_NAME kdbhdf5)
 file(GLOB C_FILES src/*.c)
 set_source_files_properties(${C_FILES} PROPERTIES LANGUAGE C)
 
@@ -49,6 +49,7 @@ if(APPLE)
    set(INSTALL_SCRIPT install.sh)
    set(OSFLAG m)
 elseif(WIN32)
+   set_target_properties(${MY_LIBRARY_NAME} PROPERTIES PREFIX lib)
    set(INSTALL_SCRIPT install.bat)
    set(OSFLAG w)
 else()
@@ -65,8 +66,9 @@ endif()
 message(STATUS "Installing package to : ${PROJECT_BINARY_DIR}/hdf5")
 
 # Minimum build/install move binary and q-script to $QHOME & $QHOME/<QARCH>
-install(TARGETS ${MY_LIBRARY_NAME} DESTINATION "$ENV{QHOME}/${OSFLAG}${BITNESS}/" CONFIGURATIONS MinSizeRel Release)
-install(DIRECTORY "q/" DESTINATION "$ENV{QHOME}" CONFIGURATIONS MinSizeRel Release FILES_MATCHING PATTERN "*.q")
+file(TO_CMAKE_PATH "$ENV{QHOME}" QHOME_PATH)
+install(TARGETS ${MY_LIBRARY_NAME} DESTINATION "${QHOME_PATH}/${OSFLAG}${BITNESS}/" CONFIGURATIONS MinSizeRel Release)
+install(DIRECTORY "q/" DESTINATION "${QHOME_PATH}" CONFIGURATIONS MinSizeRel Release FILES_MATCHING PATTERN "*.q")
 
 install(FILES README.md LICENSE ${INSTALL_SCRIPT} DESTINATION ${PROJECT_BINARY_DIR}/hdf5 CONFIGURATIONS Release)
 install(DIRECTORY examples DESTINATION ${PROJECT_BINARY_DIR}/hdf5 CONFIGURATIONS Release)
