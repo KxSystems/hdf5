@@ -38,7 +38,7 @@ before_install:
       echo "unknown OS ('$TRAVIS_OS_NAME')" >&2; exit 1;
     fi
 
-  - export LD_LIBRARY_PATH=$BUILD_HOME/lib:$LD_LIBRARY_PATH
+  - export LD_LIBRARY_PATH=$BUILD_HOME/lib:$LD_LIBRARY_PATH 
   - export DYLD_LIBRARY_PATH=$BUILD_HOME/lib:$DYLD_LIBRARY_PATH
   - export PATH=$BUILD_HOME/lib:$PATH
   - export PATH=$BUILD_HOME/bin:$PATH
