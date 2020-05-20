@@ -54,21 +54,21 @@ If you have any HDF5 related questions, you can raise them on the [HDF Forum](ht
 
 For Linux and MacOS, add the location of the 'lib' directory to `LD_LIBRARY_PATH`/`DYLD_LIBRARY_PATH` as appropriate
 
-	```
-	## Linux
-	export LD_LIBRARY_PATH=$BUILD_HOME/lib/:$LD_LIBRARY_PATH
-	
-	## MacOS
-	export DYLD_LIBRARY_PATH=$BUILD_HOME/lib/:$DYLD_LIBRARY_PATH
-	```
+```
+## Linux
+export LD_LIBRARY_PATH=$BUILD_HOME/lib/:$LD_LIBRARY_PATH
+
+## MacOS
+export DYLD_LIBRARY_PATH=$BUILD_HOME/lib/:$DYLD_LIBRARY_PATH
+```
 
 For Windows, create links to the paho dll's in the %QHOME%\w64 directory. e.g.
 
-	```
-	cd %QHOME%\w64
-	MKLINK libhdf5.dll %BUILD_HOME%\lib\libhdf5.dll
-	MKLINK hdf5.dll %BUILD_HOME%\lib\hdf5.dll
-	```
+```
+cd %QHOME%\w64
+MKLINK libhdf5.dll %BUILD_HOME%\lib\libhdf5.dll
+MKLINK hdf5.dll %BUILD_HOME%\lib\hdf5.dll
+```
 
 ### Installing a release
 
@@ -78,13 +78,13 @@ It is recommended that a user install this interface through a release. This is 
 2. Download a release from [here](https://github.com/KxSystems/hdf5/releases)
 4. Install required q executable script `q/hdf5.q` and binary file `lib/libkdbhdf5.(so|dll)` to `$QHOME` and `$QHOME/[mlw](64)`, by executing the following from the Release directory
 
-	```
-	## Linux/MacOS
-	chmod +x install.sh && ./install.sh
+```
+## Linux/MacOS
+chmod +x install.sh && ./install.sh
 
-	## Windows
-	install.bat
-	```
+## Windows
+install.bat
+```
 
 
 ### Building interface from source and install
