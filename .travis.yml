@@ -1,79 +1,105 @@
+matrix:
+  include:
+  - dist: xenial
+    os: linux
+  - dist: trusty 
+    os: linux
+  - dist: bionic
+    os: linux
+  - os: osx
+  - os: windows
 language: c
-os:
-- linux
-- osx
-git:
-  depth: 1
+compiler: gcc
 
-env:
-  global:
-    - HDF5_RELEASE_URL = "https://support.hdfgroup.org/ftp/HDF5/releases"
-    - HDF5_HOME="/usr"
+before_install:
+  - export FILE_ROOT="hdf5"
+  - export TESTS="True"
+  - export BUILD="True"
 
-before_install: 
-  - chmod +x travis_setup.sh
-  - ./travis_setup.sh
-
-install:
-  # We do this conditionally because it saves us some downloading if the
-  # version is the same.
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      wget https://repo.continuum.io/miniconda/Miniconda3-4.5.4-Linux-x86_64.sh -O miniconda.sh;
+  # Run instructions to install the C/C++ requirements (BUILD_HOME) set in place of PAHO_HOME/HDF5_HOME etc.
+  # Files in this case are unzipped into cbuild within travis_setup.sh
+  - if [[ $BUILD == "True" ]]; then
+      chmod +x travis_setup.sh; 
+      ./travis_setup.sh;
+      export BUILD_HOME=$TRAVIS_BUILD_DIR/cbuild
+      export LIB="cmake/$FILE_ROOT/lib";
+      mkdir cmake
     else
-      wget https://repo.continuum.io/miniconda/Miniconda3-4.5.4-MacOSX-x86_64.sh -O miniconda.sh;
+      export LIB="";
     fi
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - ls /usr/local/lib
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - echo $LD_LIBRARY_PATH
-  - export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-  - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  # Useful for debugging any issues with conda
-  - conda info -a
-  - if [ $TRAVIS_OS_NAME = linux ]; then 
-      QLIBDIR=l64; 
-    elif [ $TRAVIS_OS_NAME = osx ]; then 
-      QLIBDIR=m64; 
-    else 
-      echo "unknown OS ('$TRAVIS_OS_NAME')" >&2; exit 1; 
-    fi; export QLIBDIR
-  - conda install -c kx embedpy # grab kdb+ with conda
-  - cp -r $(conda info --base)/q q && export QHOME=$(pwd)/q && export PATH=$QHOME/$QLIBDIR:$PATH
-  # grab latest embedpy
-  - if [[ "x$QLIC_KC" != "x" ]]; then
-      echo -n $QLIC_KC |base64 --decode > q/kc.lic;
+
+  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then
+      QLIBDIR=l64; OD=$L64;
+    elif [[ $TRAVIS_OS_NAME == "osx" ]]; then
+      QLIBDIR=m64; OD=$M64;
+    elif [[ $TRAVIS_OS_NAME == "windows" ]]; then
+      QLIBDIR=w64; OD=$W64;
+    else
+      echo "unknown OS ('$TRAVIS_OS_NAME')" >&2; exit 1;
     fi
-  - mkdir build
-  - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Release && make && make install
-  - cd ..
+
+  - export LD_LIBRARY_PATH=$BUILD_HOME/lib:$LD_LIBRARY_PATH 
+  - export DYLD_LIBRARY_PATH=$BUILD_HOME/lib:$DYLD_LIBRARY_PATH
+  - export PATH=$BUILD_HOME/lib:$PATH
+  - export PATH=$BUILD_HOME/bin:$PATH
+  - export PATH=$BUILD_HOME/include:$PATH
+  - export QLIBDIR
+  - mkdir qhome
+  - export QHOME=$(pwd)/qhome
+  - export PATH=$QHOME/$QLIBDIR:$PATH
+  
+  # Set up q for testing and execute tests on multiple 
+  - if [[ $TESTS == "True" && "x$OD" != "x" && "x$QLIC_KC" != "x" ]]; then
+      curl -o qhome/q.zip -L $OD;
+      unzip -d qhome qhome/q.zip;
+      rm qhome/q.zip;
+      echo -n $QLIC_KC |base64 --decode > qhome/kc.lic;
+    else
+      echo No kdb+, no tests;
+    fi
+
+  - if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+      export FILE_TAIL="zip";
+    else
+      export FILE_TAIL="tgz";
+    fi
+  - export FILE_NAME=$FILE_ROOT-$TRAVIS_OS_NAME-$TRAVIS_BRANCH.$FILE_TAIL
+
+  # Make binaries for the library as appropriate
+  - if [[ $BUILD == "True" && $TRAVIS_OS_NAME == "windows" ]]; then
+      cd cmake && cmake -G "Visual Studio 15 2017 Win64" .. ;
+      cmake --build . --config Release;
+      cmake --build . --config Release --target install;
+      cd ..;
+    elif [[ $BUILD == "True" && ( $TRAVIS_OS_NAME == "linux" || $TRAVIS_OS_NAME == "osx" ) ]]; then
+      cd cmake && cmake .. -DCMAKE_BUILD_TYPE=Release && make install && cd .. ;
+    fi
 
 script:
-- echo "Preparing version $TRAVIS_BRANCH-$TRAVIS_COMMIT"
-- cd build
-- tar -zcvf hdf5_$TRAVIS_OS_NAME-$TRAVIS_BRANCH.tgz hdf5
-- cd ..
-- echo "Packaged as hdf5_$TRAVIS_OS_NAME-$TRAVIS_BRANCH.zip"
--  if [[ "x$QLIC_KC" != "x" ]]; then
-    curl -fsSL -o test.q https://github.com/KxSystems/embedpy/raw/master/test.q;
-    q test.q tests/ -q;
-
-  else
-    echo No kdb+, no tests;
-  fi
+  - if [[ $TESTS == "True" && "x$OD" != "x" && "x$QLIC_KC" != "x" ]]; then
+      q test.q tests/ -q;
+    fi
+  - if [[ $TRAVIS_OS_NAME == "windows" && $BUILD == "True" ]]; then
+      7z a -tzip -r $FILE_NAME ./cmake/$FILE_ROOT/*;
+    elif [[ $BUILD == "True" && ( $TRAVIS_OS_NAME == "linux" || $TRAVIS_OS_NAME == "osx" ) ]]; then  
+      tar  -zcvf $FILE_NAME -C cmake/$FILE_ROOT .;
+    elif [[ $TRAVIS_OS_NAME == "windows" ]]; then
+      7z a -tzip $FILE_NAME README.md install.bat LICENSE q examples;
+    elif [[ $TRAVIS_OS_NAME == "linux" || $TRAVIS_OS_NAME == "osx" ]]; then
+      tar  -zcvf $FILE_NAME README.md install.sh LICENSE q examples;
+    fi
 
 deploy:
   provider: releases
-  api_key: "$GH_APIKEY"
-  file_glob: true
-  file: build/hdf5_$TRAVIS_OS_NAME-$TRAVIS_BRANCH.tgz
-  skip_cleanup: true
+  api_key: "$GITHUB_APIKEY"
+  file: "$FILE_NAME"
   on:
     tags: true
+    condition: $TRAVIS_OS_NAME = windows || $TRAVIS_OS_NAME = osx || ($TRAVIS_DIST = trusty && $TRAVIS_OS_NAME = linux) 
+  skip_cleanup: 'true'
 
 notifications:
   slack:
-   secure: "fDsGcgmkYyndvlN2NQlfqPrk0rfKVbDlp2Wg5pr/PZYCRY7rjXEwdby9T/tOpulQ6HXpdnqFN1zJ+5ih3XCwtLa4mPYRGWK3GvLNFvINTQDsYrCpgfQKxC6snBiGrUA0DoSAhS1nlB2igGoZSUSGi+sROsLiDn5aIqi3+Wz3JcFytISncWovO2bhedRjrFZXt4zmrDRpJ2BCShQdg2kppPGIDUHS0/xDElGtaHizLijeJjX/49xtABn7cLrv3wbVvejHU6yu5OdxOqtc98NYLV1lVPxiUIrjmvs/tlV4C6peGc1H9GioExThoWxW/KrMEL7biRxtTZzgqr+2W6+NWkzL74pMhqROOGvULH9DkfQxkjNNN6aLhN98oYswOgzg/UxM/F+Qolf948EWgcbg4USlAotd779YOfYPymYEeJlZTrvuYSazUdjUh6FkJtDYeiu7ZHkc75c4Fm8RNpxC6Kc4fO1Aq9ga0A8VoEzwIEscsMDvNC0hJjeFvglN0wie+jT23nNXnucTdgqxH9aCdub+ARcDEIXMS99WiYApHjbNK2WcTJYVDIKy1g1dO49oQMNLaHofaoO14OHw3OcWBlnHKhU2OWPuB0v0vqTeW8YAhGUewEmc5uwg6hYeVmE4ThDr4tiNDDyeCA6uTTN87oCguvlwrLF56vIEg0Sh4ok="
-
+    secure: "Czkq4kk2Pl2TyWnW1y7KP7YLndCyb3Qai+ISPikf1VyBZp358apYRkiQZC7D8wwgCG4V+HjDj9+XJK9SBYyXGVsEnA+KEKS+9YG0K/UIuo6gv8IOj3962chaB4HfZn5LO34oLuhIjZJA0u8s5lPFoLJktfcHFvJibc6kXlET6ZMt/tZIHhztMGSyCqL46oidnTGZJFGO3Gb9FkBB8NOPduvROZAa9mF0CBNdd2gzig5lPG7eXjQSbKxVDbKWW81zEs8CSmM/guC+2Ar+rpPO4RAFq7UgrK6Gdg2GN863L0tMTttxDYdTLD+Bjk6mUZVnr5vPvtgvqKU801pjqtSEjNjeV3ZN+E19359mlH1eQ/9Uv5HaB05i3CIvWUTodp1eQDFGsvixQMnD9PrzD+SbY5v6oDg/R0+pEHhPhRJ6v23OAmFyU90kn3VQQIFDMKufKSJE4jItoUBXhmavSHHU/sysH1n8YXCU0kuOFtWIK+t5RIFrhYuDvVcz8O4xF95oCdKXjX/jWTO+qGc+YU9WKieCwS8PXwqBJJA4V5D4KkzmJAX5Y2SqODYF/KOD59AedX9u7nlnTD3EHK5iGnnIVhAKyJq0kwLp3ikP7uZupddMg/6J8s0zg3r61GvxXaoPDTAzTn7MDEX7HQonX+IiUvfRQFIuT3VmQvv+pEeoDOw="
+    
+    

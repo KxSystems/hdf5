@@ -58,22 +58,23 @@ if [ ! -w "$Q_SHARED_LIB_DIR" ]; then
     echo "ERROR: Directory '$Q_SHARED_LIB_DIR' does not exist"
     exit 1
 fi
-if [ ! -d lib ]; then
-    echo "ERROR: Directory 'lib' does not exist. Please run from release package"
+
+if [ -d q ]; then
+  echo "Copying q script to $Q_SCRIPT_DIR ..."
+  cp q/* $Q_SCRIPT_DIR
+  if [ $? -ne 0 ]; then
+    echo "ERROR: copy failed"
     exit 1
+  fi
 fi
 
-echo "Copying q script to $Q_SCRIPT_DIR ..."
-cp hdf5.q $Q_SCRIPT_DIR
-if [ $? -ne 0 ]; then
+if [ -d lib ]; then
+  echo "Copying shared lib to $Q_SHARED_LIB_DIR ..."
+  cp lib/* $Q_SHARED_LIB_DIR
+  if [ $? -ne 0 ]; then
     echo "ERROR: copy failed"
     exit 1
-fi
-echo "Copying shared lib to $Q_SHARED_LIB_DIR ..."
-cp lib/* $Q_SHARED_LIB_DIR
-if [ $? -ne 0 ]; then
-    echo "ERROR: copy failed"
-    exit 1
+  fi
 fi
 
 echo "Install complete"
