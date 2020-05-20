@@ -99,3 +99,9 @@ deploy:
     condition: $TRAVIS_OS_NAME = windows || $TRAVIS_OS_NAME = osx || ($TRAVIS_DIST = trusty && $TRAVIS_OS_NAME = linux) 
   skip_cleanup: 'true'
 
+notifications:
+  slack:"kxsys:$SLACK_KEY"
+    on_pull_requests:false
+
+    
+    
