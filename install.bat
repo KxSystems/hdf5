@@ -30,3 +30,4 @@ IF EXIST lib (
 )
 
 ECHO Installation complete
+
