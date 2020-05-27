@@ -63,10 +63,10 @@ funcs:(
 
 i.typeConv:{$[x in"sg";string;("*"^("bmduvtpnz"!"xiiiiijjf")x)$]}
 i.typeRead:{$[x="s";`;x="g";"G";x]$}
-i.typeChar:{$[0>x;.Q.t abs x;upper .Q.t x]}
+i.typeChar:{$[0>x;::;upper].Q.t abs x}
 i.checkDimsType:{$[0=t:type x;count[x],'distinct raze .z.s each x;10=t;t;enlist(count x;neg t)]}
 i.checkData:{
-  if[1<count dt:i.checkDimsType x;`$"invalid ",$[1<count distinct last each dt;"type";"shape"]];
+  if[1<count dt:i.checkDimsType x;'"invalid ",$[1<count distinct last each dt;"type";"shape"]];
   if[10h~dt:first dt;dt:count[x],-10h];
   kdims:-1_dt;
   ktype:i.typeChar last dt;
