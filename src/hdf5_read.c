@@ -132,7 +132,7 @@ K readDataSimpleString(hid_t dset, hsize_t npoints, hid_t ntype, hid_t space, re
     H5Tset_size(stype, sz);
     fdata = (char *)calloc(npoints * sz, sizeof(char));
     readfunc(dset, stype, H5S_ALL, H5S_ALL, H5P_DEFAULT, fdata);
-    for(i = 1; i < npoints; ++i)
+    for(i = 0; i < npoints; ++i)
       jk(&result, kp(fdata + i * sz));
     free(fdata);
   }
