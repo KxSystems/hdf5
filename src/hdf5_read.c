@@ -209,7 +209,7 @@ K readDataCompoundString(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, 
     H5Tinsert(memtype, mname, 0, stype);
     fdata = (char *)calloc(npoints * sz, sizeof(char));
     readfunc(dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, fdata);
-    for(i = 1; i < npoints; ++i)
+    for(i = 0; i < npoints; ++i)
       jk(&result, kp(fdata + i * sz));
     free(fdata);
   }
