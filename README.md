@@ -34,7 +34,7 @@ If you have any HDF5 related questions, you can raise them on the [HDF Forum](ht
 ### Requirements
 
 * kdb+ ≥ 3.5 64-bit
-* [HDF5 C api](https://support.hdfgroup.org/HDF5/doc/H5.intro.html) ≥ 1.10
+* [HDF5 C api](https://support.hdfgroup.org/HDF5/doc/H5.intro.html) ≥ 1.10.4
 
 ### Third-Party Library Installation
 
@@ -152,7 +152,6 @@ cd mqtt && install.bat
 
 This interface is in active developement and as such there are a number of use-cases that are currently not supported.
 
-- Use of this interface on Windows 64-bit systems
 - Creation of compressed datasets
 - Access to unlimited datasets
 - Interaction with HDF5 images
