@@ -1,3 +1,6 @@
+cmake_minimum_required(VERSION 3.0)
+project(hdf5 C)
+
 # Environment variable for HDF5_HOME is required
 if(NOT DEFINED ENV{BUILD_HOME})
 	message(FATAL_ERROR "BUILD_HOME must be set to the location of your installed hdf5-group repository")
@@ -7,9 +10,6 @@ endif()
 IF(NOT CMAKE_BUILD_TYPE)
    SET(CMAKE_BUILD_TYPE MinSizeRel)
 ENDIF()
-
-cmake_minimum_required(VERSION 3.0)
-project(hdf5 C)
 
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -DKXVER=3")
 
