@@ -1,4 +1,4 @@
-matrix:
+jobs:
   include:
   - dist: xenial
     os: linux
@@ -10,6 +10,8 @@ matrix:
   - os: windows
 language: c
 compiler: gcc
+os: linux
+dist: xenial
 
 before_install:
   - export FILE_ROOT="hdf5"
@@ -91,7 +93,7 @@ script:
 
 deploy:
   provider: releases
-  api_key: "$GITHUB_APIKEY"
+  token: "$GITHUB_APIKEY"
   file: "$FILE_NAME"
   on:
     tags: true
