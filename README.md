@@ -100,8 +100,8 @@ Install the windows C api for HDF5 following the instructions provided [here](ht
 ```bat
 
 > cd %QHOME%\w64
-> MKLINK libhdf5.dll %HDF5_INSTALL_DIR%\lib\libhdf5.dll
-> MKLINK hdf5.dll %HDF5_INSTALL_DIR%\lib\hdf5.dll
+> MKLINK libhdf5.lib %HDF5_INSTALL_DIR%\lib\libhdf5.lib
+> MKLINK hdf5.lib %HDF5_INSTALL_DIR%\lib\hdf5.lib
 
 ```
 

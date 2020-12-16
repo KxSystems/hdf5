@@ -52,10 +52,10 @@ before_install:
   
   # Set up q for testing and execute tests on multiple 
   - if [[ $TESTS == "True" && "x$OD" != "x" && "x$QLIC_KC" != "x" ]]; then
-      curl -u $NEXUS_USER:$NEXUS_PASS -o qhome/q.zip -L $OD;
-      unzip -d qhome qhome/q.zip;
-      rm qhome/q.zip;
-      echo -n $QLIC_KC |base64 --decode > qhome/kc.lic;
+      curl -u $NEXUS_USER:$NEXUS_PASS -o ${QHOME}/q.zip -L $OD;
+      unzip -d ${QHOME} ${QHOME}/q.zip;
+      rm ${QHOME}/q.zip;
+      echo -n $QLIC_KC |base64 --decode > ${QHOME}/kc.lic;
     else
       echo No kdb+, no tests;
     fi
