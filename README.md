@@ -95,11 +95,11 @@ $ export DYLD_LIBRARY_PATH=${HDF5_INSTALL_DIR}/lib:$DYLD_LIBRARY_PATH
 
 **Windows**
 
-Install the windows C api for HDF5 following the instructions provided [here](https://support.hdfgroup.org/HDF5/faq/windows.html). Then set `HDF5_INSTALL_DIR` to your install directory and create links to the lib's in the %QHOME%\w64 directory. e.g.
+Install the windows C api for HDF5 following the instructions provided [here](https://support.hdfgroup.org/HDF5/faq/windows.html). Then set `HDF5_INSTALL_DIR` to your install directory and create links to the dll's in the %QHOME%\w64 directory. e.g.
 
 ```bat
 
-:: Download zip for Windows and unzip it.
+:: Download zip for Windows and unzip it. ex.) hdf5-1.12.0.zip from https://confluence.hdfgroup.org/display/support/HDF5%201.12.0
 > cd hdf5[some version]
 > mkdir build
 > mkdir install
@@ -108,8 +108,8 @@ Install the windows C api for HDF5 following the instructions provided [here](ht
 build> cmake --config Release -DCMAKE_INSTALL_PREFIX=%HDF5_INSTALL_DIR% .. -DBUILD_TESTING:BOOL=OFF
 build> cmake --build . --config Release --target install
 build> cd %QHOME%\w64
-w64> MKLINK libhdf5.lib %HDF5_INSTALL_DIR%\lib\libhdf5.lib
-w64> MKLINK hdf5.lib %HDF5_INSTALL_DIR%\lib\hdf5.lib
+w64> MKLINK libhdf5.dll %HDF5_INSTALL_DIR%\bin\libhdf5.dll
+w64> MKLINK hdf5.dll %HDF5_INSTALL_DIR%\bin\hdf5.dll
 
 ```
 
