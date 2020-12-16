@@ -105,7 +105,7 @@ Install the windows C api for HDF5 following the instructions provided [here](ht
 > mkdir install
 > set HDF5_INSTALL_DIR=%cd%\install
 > cd build
-build> cmake --config Release .. -DBUILD_TESTING:BOOL=OFF
+build> cmake --config Release -DCMAKE_INSTALL_PREFIX=%HDF5_INSTALL_DIR% .. -DBUILD_TESTING:BOOL=OFF
 build> cmake --build . --config Release --target install
 build> cd %QHOME%\w64
 w64> MKLINK libhdf5.lib %HDF5_INSTALL_DIR%\lib\libhdf5.lib
