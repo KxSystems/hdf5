@@ -2,8 +2,6 @@ jobs:
   include:
   - dist: xenial
     os: linux
-  - dist: trusty 
-    os: linux
   - dist: bionic
     os: linux
   - os: osx
