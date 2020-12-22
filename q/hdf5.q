@@ -1,5 +1,5 @@
 \d .hdf5
-LIBPATH:`:libkdbhdf5 2:
+LIBPATH:`:hdf5kdb 2:
 funcs:(
      (`hdf5init;1);
          // .hdf5.init[]_
@@ -122,3 +122,5 @@ readDictTab:{[fname;dname;typ]
 
 // initialize
 init[];
+
+\d .
