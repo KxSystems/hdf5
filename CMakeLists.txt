@@ -38,6 +38,7 @@ file(DOWNLOAD "https://github.com/KxSystems/kdb/raw/master/c/c/k.h" "${PROJECT_S
 
 # Search HDF5 library
 find_library(HDF5_LIBRARY
+    REQUIRED
     NAMES hdf5 libhdf5
     HINTS "$ENV{HDF5_INSTALL_DIR}/lib/" 
 )
@@ -100,5 +101,5 @@ add_custom_command(TARGET ${MY_LIBRARY_NAME}
 )
 
 # Install binary and q-script to $QHOME & $QHOME/<QARCH> at Release
-install(TARGETS ${MY_LIBRARY_NAME} DESTINATION "$ENV{QHOME}/${OSFLAG}${BITNESS}/" CONFIGURATIONS Release)
-install(DIRECTORY "q/" DESTINATION "$ENV{QHOME}" CONFIGURATIONS Release)
+install(TARGETS ${MY_LIBRARY_NAME} DESTINATION $ENV{QHOME}/${OSFLAG}${BITNESS}/ CONFIGURATIONS Release)
+install(DIRECTORY q/ DESTINATION $ENV{QHOME} CONFIGURATIONS Release)
