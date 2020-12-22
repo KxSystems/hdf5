@@ -18,12 +18,12 @@ before_install:
   - export TESTS="True"
   - export BUILD="True"
 
-  # Run instructions to install the C/C++ requirements (BUILD_HOME) set in place of PAHO_HOME/HDF5_HOME etc.
+  # Run instructions to install the C/C++ requirements (HDF5_INSTALL_DIR) set in place of PAHO_HOME/HDF5_HOME etc.
   # Files in this case are unzipped into cbuild within travis_setup.sh
   - if [[ $BUILD == "True" ]]; then
       chmod +x travis_setup.sh; 
       ./travis_setup.sh;
-      export BUILD_HOME=$TRAVIS_BUILD_DIR/cbuild
+      export HDF5_INSTALL_DIR=$TRAVIS_BUILD_DIR/cbuild
       export LIB="cmake/$FILE_ROOT/lib";
       mkdir cmake
     else
@@ -40,11 +40,11 @@ before_install:
       echo "unknown OS ('$TRAVIS_OS_NAME')" >&2; exit 1;
     fi
 
-  - export LD_LIBRARY_PATH=$BUILD_HOME/lib:$LD_LIBRARY_PATH 
-  - export DYLD_LIBRARY_PATH=$BUILD_HOME/lib:$DYLD_LIBRARY_PATH
-  - export PATH=$BUILD_HOME/lib:$PATH
-  - export PATH=$BUILD_HOME/bin:$PATH
-  - export PATH=$BUILD_HOME/include:$PATH
+  - export LD_LIBRARY_PATH=$HDF5_INSTALL_DIR/lib:$LD_LIBRARY_PATH 
+  - export DYLD_LIBRARY_PATH=$HDF5_INSTALL_DIR/lib:$DYLD_LIBRARY_PATH
+  - export PATH=$HDF5_INSTALL_DIR/lib:$PATH
+  - export PATH=$HDF5_INSTALL_DIR/bin:$PATH
+  - export PATH=$HDF5_INSTALL_DIR/include:$PATH
   - export QLIBDIR
   - mkdir qhome
   - export QHOME=$(pwd)/qhome
