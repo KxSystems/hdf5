@@ -23,11 +23,10 @@ before_install:
   - if [[ $BUILD == "True" ]]; then
       chmod +x travis_setup.sh; 
       ./travis_setup.sh;
-      export HDF5_INSTALL_DIR=$TRAVIS_BUILD_DIR/cbuild
-      export LIB="cmake/$FILE_ROOT/lib";
+      export HDF5_INSTALL_DIR=$TRAVIS_BUILD_DIR/cbuild;
       mkdir cmake
     else
-      export LIB="";
+      echo "no build.";
     fi
 
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then
