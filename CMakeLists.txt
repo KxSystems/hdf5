@@ -64,7 +64,7 @@ endif()
 # target_link_libraries(${MY_LIBRARY_NAME} ${HDF5_LIBRARY} ${LINK_LIBS})
 
 # Shared library prefix and suffix
-# ex.) telegrafkdb.so for linux
+# ex.) hdf5kdb.so for linux
 # Suffix must be `.so` for Mac
 if(APPLE)
   set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
@@ -75,12 +75,15 @@ set_target_properties(${MY_LIBRARY_NAME} PROPERTIES PREFIX "")
 # "-undefined dynamic_lookup" needed for building shared libraries on Mac
 # Setting OSFLAG variable needed for installing binary to $QHOME/<QARCH>
 if(APPLE)
-   set_target_properties(${MY_LIBRARY_NAME} PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
-   set(OSFLAG m)
+    set_target_properties(${MY_LIBRARY_NAME} PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+    set(INSTALL_SCRIPT install.sh)
+    set(OSFLAG m)
 elseif(WIN32)
-   set(OSFLAG w)
+    set(INSTALL_SCRIPT install.bat)
+    set(OSFLAG w)
 else()
-   set(OSFLAG l)
+    set(INSTALL_SCRIPT install.sh)
+    set(OSFLAG l)
 endif()
 
 # Check if 32-bit/64-bit machine

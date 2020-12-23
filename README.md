@@ -95,7 +95,7 @@ $ export DYLD_LIBRARY_PATH=${HDF5_INSTALL_DIR}/lib:$DYLD_LIBRARY_PATH
 
 **Windows**
 
-Install the windows C api for HDF5 following the instructions provided [here](https://support.hdfgroup.org/HDF5/faq/windows.html). Then set `HDF5_INSTALL_DIR` to your install directory and create links to the dll's in the %QHOME%\w64 directory. e.g.
+Install the windows C api for HDF5 following the instructions provided [here](https://support.hdfgroup.org/HDF5/faq/windows.html). Then set `HDF5_INSTALL_DIR` to your install directory and create links to the dll's in the `%QHOME%\w64` directory. e.g.
 
 ```bat
 

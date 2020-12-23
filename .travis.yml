@@ -4,6 +4,8 @@ jobs:
     os: linux
   - dist: bionic
     os: linux
+  - dist: focal
+    os: linux
   - os: osx
   - os: windows
 language: c
@@ -79,6 +81,7 @@ before_install:
 
 script:
   - if [[ $TESTS == "True" && "x$OD" != "x" && "x$QLIC_KC" != "x" ]]; then
+      curl -fsSL -o test.q https://github.com/KxSystems/embedpy/raw/master/test.q;
       q test.q tests/ -q;
     fi
   - if [[ $TRAVIS_OS_NAME == "windows" && $BUILD == "True" ]]; then
