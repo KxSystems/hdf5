@@ -36,116 +36,105 @@ If you have any HDF5 related questions, you can raise them on the [HDF Forum](ht
 * kdb+ ≥ 3.5 64-bit
 * [HDF5 C api](https://support.hdfgroup.org/HDF5/doc/H5.intro.html) ≥ 1.10.4
 
-### Third-Party Library Installation
-
-1. Install the HDF group's C api for your architecture
-
-**Linux**
-- Download a supported release of hdf5 and install, instructions are provided [here](https://support.hdfgroup.org/HDF5/HDF5-FAQ.html#10).
-
-**MacOS**
-- Run `brew install hdf5`
-
-**Windows**
-- Install the windows C api for HDF5 following the instructions provided [here](https://support.hdfgroup.org/HDF5/faq/windows.html)
-
-2. Set an environment variable `$BUILD_HOME`/`%BUILD_HOME%` pointing to the location of the installed HDF group C api
-3. Make the HDF group C api for HDF5 available to kdb
-
-For Linux and MacOS, add the location of the 'lib' directory to `LD_LIBRARY_PATH`/`DYLD_LIBRARY_PATH` as appropriate
-
-```
-## Linux
-export LD_LIBRARY_PATH=$BUILD_HOME/lib/:$LD_LIBRARY_PATH
-
-## MacOS
-export DYLD_LIBRARY_PATH=$BUILD_HOME/lib/:$DYLD_LIBRARY_PATH
-```
-
-For Windows, create links to the paho dll's in the %QHOME%\w64 directory. e.g.
-
-```
-cd %QHOME%\w64
-MKLINK libhdf5.dll %BUILD_HOME%\lib\libhdf5.dll
-MKLINK hdf5.dll %BUILD_HOME%\lib\hdf5.dll
-```
-
 ### Installing a release
 
 It is recommended that a user install this interface through a release. This is completed in a number of steps
 
 1. Ensure you have downloaded/installed the HDF groups C api for HDF5 following the instructions [here](https://github.com/KxSystems/hdf5#third-party-library-installation)
 2. Download a release from [here](https://github.com/KxSystems/hdf5/releases)
-4. Install required q executable script `q/hdf5.q` and binary file `lib/libkdbhdf5.(so|dll)` to `$QHOME` and `$QHOME/[mlw](64)`, by executing the following from the Release directory
+3. Install required q executable script `q/hdf5.q` and binary file `lib/hdf5kdb.(so|dll)` to `$QHOME` and `$QHOME/[mlw](64)`, by executing the following from the Release directory
 
-```
+```bash
+
 ## Linux/MacOS
-chmod +x install.sh && ./install.sh
+$ chmod +x install.sh && ./install.sh
 
 ## Windows
-install.bat
-```
+>install.bat
 
+```
 
 ### Building interface from source and install
 
 In order to successfully build and install this interface, the following environment variables must be set:
 
-1. `BUILD_HOME` = Location of the HDF5 C api installation (directory containing `/include` and `/lib` subdirectories).
+1. `HDF5_INSTALL_DIR` = Location of the HDF5 C api installation (directory containing `/include` and `/lib` subdirectories).
 2. `QHOME` = Q installation directory (directory containing `q.k`).
+
+#### Third-Party Library Installation
+
+Install HDF5 C API according to your architecture.
+
+**Linux**
+
+Download a supported release of hdf5 and install, instructions are provided [here](https://support.hdfgroup.org/HDF5/HDF5-FAQ.html#10). Then set `HDF5_INSTALL_DIR` to your install directory and add the path to `LD_LIBRARY_PATH`.
+
+```bash
+
+$ export LD_LIBRARY_PATH=${HDF5_INSTALL_DIR}/lib:$LD_LIBRARY_PATH 
+
+```
+
+**MacOS**
+
+Run:
+
+```bash
+
+$ brew install hdf5
+
+```
+
+Then set `HDF5_INSTALL_DIR` to your install directory and add the path to `DYLD_LIBRARY_PATH`.
+
+```bash
+
+$ export DYLD_LIBRARY_PATH=${HDF5_INSTALL_DIR}/lib:$DYLD_LIBRARY_PATH
+
+```
+
+**Windows**
+
+Install the windows C api for HDF5 following the instructions provided [here](https://support.hdfgroup.org/HDF5/faq/windows.html). Then set `HDF5_INSTALL_DIR` to your install directory and create links to the dll's in the `%QHOME%\w64` directory. e.g.
+
+```bat
+
+:: Download zip for Windows and unzip it. ex.) hdf5-1.12.0.zip from https://confluence.hdfgroup.org/display/support/HDF5%201.12.0
+> cd hdf5[some version]
+> mkdir build
+> mkdir install
+> set HDF5_INSTALL_DIR=%cd%\install
+> cd build
+build> cmake --config Release -DCMAKE_INSTALL_PREFIX=%HDF5_INSTALL_DIR% .. -DBUILD_TESTING:BOOL=OFF
+build> cmake --build . --config Release --target install
+build> cd %QHOME%\w64
+w64> MKLINK libhdf5.dll %HDF5_INSTALL_DIR%\bin\libhdf5.dll
+w64> MKLINK hdf5.dll %HDF5_INSTALL_DIR%\bin\hdf5.dll
+
+```
+
+### Instaling hdf5 shared object
 
 #### Linux/MacOS
 
-* Create a directory from which the execute the CMAKE command and move into this directory
-
 ```bash
-mkdir cmake && cd cmake
-```
 
-* Execute the `cmake` instructions
+]$ mkdir build && cd build
+build]$ cmake ..
+build]$ cmake --build . --target install
 
-```bash
-cmake ..
-```
-
-* generate the `libkdbhdf5.so` binary
-
-```bash
-make
-```
-
-* Install the `libkdbhdf5.so` binary into `$QHOME/[ml]64` and `hdf5.q` into `$QHOME`
-
-```bash
-make install
 ```
 
 #### Windows
 
 From a Visual Studio command prompt:
 
-* Create an out-of-source directory for the CMake and object files.
+```bat
 
-```bash
-mkdir cmake && cd cmake
-```
+> mkdir build && cd build
+build> cmake --config Release ..
+build> cmake --build . --config Release --target install
 
-* Generate the VS solution
-
-```bash
-cmake ..
-```
-
-* Build the interface DLL and create the installation package into sub-directory hdf5
-
-```bash
-MSBuild.exe INSTALL.vcxproj /p:Configuration=Release /p:Platform=x64
-```
-
-* Install the package (copies the shared object to%QHOME%/w64 )
-
-```bash
-cd mqtt && install.bat
 ```
 
 ## Unsupported Functionality
