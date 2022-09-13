@@ -42,11 +42,11 @@ In order to have your pull request approved in a timely manner, please provide c
 
 ### Additional Resources
 
-[Outline of HDF5 data format](https://support.hdfgroup.org/HDF5/whatishdf5.html)
+[Outline of HDF5 data format](https://portal.hdfgroup.org/display/HDF5/Introduction+to+HDF5)
 
-[HDF5 C api home page](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5Front.html)
+[HDF5 C api home page](https://portal.hdfgroup.org/pages/viewpage.action?pageId=50073943)
 
-[HDF5 C api examples](https://support.hdfgroup.org/HDF5/examples/api-c.html)
+[HDF5 C api examples](https://portal.hdfgroup.org/display/HDF5/Examples+by+API)
 
 [KDB+ and q documentation](https://code.kx.com/q/)
 

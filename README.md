@@ -4,7 +4,7 @@
 
 ## Introduction
 
-This interface provides a mechanism for kdb+ users to interact with and create HDF5 datasets. The interface is a thin wrapper for kdb+ around the HDF Group's C api for HDF5, outlined in full [here](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5Front.html)
+This interface provides a mechanism for kdb+ users to interact with and create HDF5 datasets. The interface is a thin wrapper for kdb+ around the HDF Group's C api for HDF5, outlined in full [here](https://portal.hdfgroup.org/pages/viewpage.action?pageId=50073943)
 
 This is part of the [_Fusion for kdb+_](http://code.kx.com/q/interfaces/fusion/) interface collection.
 
@@ -34,7 +34,7 @@ If you have any HDF5 related questions, you can raise them on the [HDF Forum](ht
 ### Requirements
 
 * kdb+ ≥ 3.5 64-bit
-* [HDF5 C api](https://support.hdfgroup.org/HDF5/doc/H5.intro.html) ≥ 1.10.4
+* [HDF5 C api](https://portal.hdfgroup.org/display/support/Downloads) ≥ 1.10.4
 
 ### Installing a release
 
@@ -67,7 +67,7 @@ Install HDF5 C API according to your architecture.
 
 **Linux**
 
-Download a supported release of hdf5 and install, instructions are provided [here](https://support.hdfgroup.org/HDF5/HDF5-FAQ.html#10). Then set `HDF5_INSTALL_DIR` to your install directory and add the path to `LD_LIBRARY_PATH`.
+Download a supported release of hdf5 and install, instructions are provided in the README of the hdf5 packages. Then set `HDF5_INSTALL_DIR` to your install directory and add the path to `LD_LIBRARY_PATH`.
 
 ```bash
 
