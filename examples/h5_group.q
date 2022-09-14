@@ -32,8 +32,7 @@ createGroup[fname;gname2];
 createGroup[fname;gname3];
 
 -1"The following is the file structure following the addition of sub groups\n";
-ls[fname];
--1"";
+show ls[fname];
 
 // Clean up and exit
 $[.z.o like "w*";system "del test.h5";system"rm test.h5"];

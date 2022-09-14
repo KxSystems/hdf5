@@ -12,8 +12,8 @@
 
 data_name:"example_data/table.h5"
 
--1"What is the structure of '",data_name,"' which contain a standard HDF5 compound dataset?";
-ls[data_name];
+-1"What is the structure of '",data_name,"' which contain a standard HDF5 compound dataset?\n";
+show ls[data_name];
 
 -1"\nRead the compound dataset table from '",data_name,"'";
 show test_data:readData[data_name;"table"];
@@ -27,7 +27,7 @@ write_name:"kdb_table";
   "naming the table '",write_name,"' to the new file '",fname,"'\n";
 writeData[fname;write_name;test_data];
 -1"What does the this data look like saved to '",fname,"'?\n";
-ls[fname];
+show ls[fname];
 
 -1"\nDisplay the attribute 'datatype_kdb' associated with the ",
   "group 'kdb_table' and read table back 'kdb_table'\n";
