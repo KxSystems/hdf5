@@ -42,7 +42,7 @@ It is recommended that a user install this interface through a release. This is 
 
 1. Ensure you have downloaded/installed the HDF groups C api for HDF5 following the instructions [here](https://github.com/KxSystems/hdf5#third-party-library-installation)
 2. Download a release from [here](https://github.com/KxSystems/hdf5/releases)
-3. Install required q executable script `q/hdf5.q` and binary file `lib/hdf5kdb.(so|dll)` to `$QHOME` and `$QHOME/[mlw](64)`, by executing the following from the Release directory
+3. Install by executing the following from the Release directory. NOTE: by default, the q executable script `q/hdf5.q` and binary file `lib/hdf5kdb.(so|dll)` will be copied to `$QHOME` and `$QHOME/[mlw](64)` but you can override by setting the environment variables Q_SCRIPT_DIR and/or Q_SHARED_LIB_DIR
 
 ```bash
 
