@@ -163,11 +163,11 @@ K readDataCompound(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc){
       readDataCompoundString(dset, mname, dims[0], mtype, space, readfunc):
       readDataCompoundNumeric (dset, mname, dims[0], mtype, space, readfunc);
     jk(&vals, mval);
+    H5Tclose(mtype);
     H5free_memory(mname);
   }
   free(dims);
   H5Tclose(ntype);
-  H5Tclose(mtype);
   return(xT(xD(keys,vals)));
 }
 
