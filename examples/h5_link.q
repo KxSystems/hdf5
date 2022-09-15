@@ -52,7 +52,7 @@ copyObject[fname;init_dname;fname;cpdset];
 show readData[fname;init_dname] ~ readData[fname;cpdset];
 
 -1"The following is the structure of the file following creation of the copied and symbolic links\n";
-ls[fname];
+show ls[fname];
 -1"";
 
 // Clean up and exit
