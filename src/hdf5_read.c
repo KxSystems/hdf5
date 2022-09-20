@@ -115,14 +115,14 @@ K readDataSimpleString(hid_t dset, hsize_t npoints, hid_t ntype, hid_t space, re
   char **vdata, *fdata;
   unsigned i;
   stype = H5Tcopy(H5T_C_S1);
-  result = knk(0);
+  result = ktn(0,npoints);
   // variable length string
   if(H5Tis_variable_str(ntype)){
     H5Tset_size(stype, H5T_VARIABLE);
     vdata = (char **)calloc(npoints, sizeof(char *));
     readfunc(dset, stype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vdata);
     for(i = 0; i < npoints; ++i)
-      jk(&result, kp(vdata[i]));
+      kK(result)[i] = kp(vdata[i]);
     H5Dvlen_reclaim(stype, space, H5P_DEFAULT, vdata);
     free(vdata);
   }
@@ -133,7 +133,7 @@ K readDataSimpleString(hid_t dset, hsize_t npoints, hid_t ntype, hid_t space, re
     fdata = (char *)calloc(npoints * sz, sizeof(char));
     readfunc(dset, stype, H5S_ALL, H5S_ALL, H5P_DEFAULT, fdata);
     for(i = 0; i < npoints; ++i)
-      jk(&result, kp(fdata + i * sz));
+      kK(result)[i] = kp(fdata + i * sz);
     free(fdata);
   }
   H5Tclose(stype);
@@ -152,22 +152,22 @@ K readDataCompound(hid_t dset, hid_t space, hid_t dtype, readfunc_t readfunc){
   rank  = H5Sget_simple_extent_ndims(space);
   dims  = calloc(rank, sizeof(hsize_t));
   H5Sget_simple_extent_dims(space, dims, NULL);
-  keys = ktn(KS,0);
-  vals = knk(0);
+  keys = ktn(KS,nmembers);
+  vals = ktn(0,nmembers);
   for(i = 0; i < nmembers; ++i){
     mname = H5Tget_member_name(ntype, i);
-    js(&keys, ss(mname));
+    kS(keys)[i] = ss(mname);
     mclass = H5Tget_member_class(ntype, i);
     mtype  = H5Tget_member_type(ntype, i);
     mval = (mclass == H5T_STRING) ?
       readDataCompoundString(dset, mname, dims[0], mtype, space, readfunc):
       readDataCompoundNumeric (dset, mname, dims[0], mtype, space, readfunc);
-    jk(&vals, mval);
+    kK(vals)[i] = mval;
+    H5Tclose(mtype);
     H5free_memory(mname);
   }
   free(dims);
   H5Tclose(ntype);
-  H5Tclose(mtype);
   return(xT(xD(keys,vals)));
 }
 
@@ -188,7 +188,7 @@ K readDataCompoundString(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, 
   char **vdata, *fdata;
   unsigned i;
   stype = H5Tcopy(H5T_C_S1);
-  result = knk(0);
+  result = ktn(0,npoints);
   // variable length string
   if(H5Tis_variable_str(mtype)){
     H5Tset_size(stype, H5T_VARIABLE);
@@ -197,7 +197,7 @@ K readDataCompoundString(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, 
     vdata = (char **)calloc(npoints, sizeof(char *));
     readfunc(dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vdata);
     for(i = 0; i < npoints; ++i)
-      jk(&result, kp(vdata[i]));
+      kK(result)[i] = kp(vdata[i]);
     H5Dvlen_reclaim(memtype, space, H5P_DEFAULT, vdata);
     free(vdata);
   }
@@ -210,7 +210,7 @@ K readDataCompoundString(hid_t dset, char* mname, hsize_t npoints, hid_t mtype, 
     fdata = (char *)calloc(npoints * sz, sizeof(char));
     readfunc(dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, fdata);
     for(i = 0; i < npoints; ++i)
-      jk(&result, kp(fdata + i * sz));
+      kK(result)[i] = kp(fdata + i * sz);
     free(fdata);
   }
   H5Tclose(stype);

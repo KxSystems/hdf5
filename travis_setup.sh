@@ -5,9 +5,9 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then # use homebrew version
   brew install hdf5
   echo "brew install finished"
 else # install from source
-  wget --no-check-certificate "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.4/src/hdf5-1.10.4.tar.gz"
-  tar -xzf "hdf5-1.10.4.tar.gz"
-  cd "hdf5-1.10.4"
+  wget --no-check-certificate "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.9/src/hdf5-1.10.9.tar.gz"
+  tar -xzf "hdf5-1.10.9.tar.gz"
+  cd "hdf5-1.10.9"
   export HDF5_INSTALL_DIR=$TRAVIS_BUILD_DIR/cbuild
   mkdir $HDF5_INSTALL_DIR
   if [ "$TRAVIS_OS_NAME" == "linux" ]; then

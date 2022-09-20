@@ -34,7 +34,7 @@ If you have any HDF5 related questions, you can raise them on the [HDF Forum](ht
 ### Requirements
 
 * kdb+ ≥ 3.5 64-bit
-* [HDF5 C api](https://portal.hdfgroup.org/display/support/Downloads) ≥ 1.10.4
+* [HDF5 C api](https://portal.hdfgroup.org/display/support/Downloads) ≥ 1.10.9
 
 ### Installing a release
 
