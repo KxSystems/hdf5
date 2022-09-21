@@ -147,6 +147,12 @@ This interface is in active developement and as such there are a number of use-c
 
 If your use case requires the above functionality to be available, please open an issue [here](https://github.com/KxSystems/hdf5/issues). If you are capable, please consider contributing to the project.
 
+## Threaded/Concurrent Access
+
+Please view this [HDF5 FAQ article](https://portal.hdfgroup.org/display/knowledge/Questions+about+thread-safety+and+concurrent+access#Questionsaboutthread-safetyandconcurrentaccess-thread-safety) that explains when you can use threads (e.g. peach) or concurrently process files from multiple instances.
+
+By default, our releases are not built with multi-thread support. Please download the source from our release page in order to build against your HDF5 library with threading enabled if you wish to avail of that functionality. It is recommended to use the standard non-thread safe version of hdf5 when not wishing to use multiple threads.
+
 ## Documentation
 
 Documentation outlining the functionality available for this interface can be found [here](https://code.kx.com/q/interfaces/hdf5).
