@@ -19,6 +19,12 @@ EXP K hdf5errorOff(K UNUSED(dummy)){
   return KNL;
 }
 
+EXP K hdf5isThreadsafe(K UNUSED(dummy)){
+    hbool_t is;
+    H5is_library_threadsafe(&is);
+    return kb(is);
+}
+
 EXP K hdf5version(K UNUSED(dummy)){
   unsigned int maj, min, rel;
   if(H5get_libversion(&maj, &min, &rel) < 0)

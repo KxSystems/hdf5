@@ -23,6 +23,8 @@ funcs:(
          // .hdf5.writeAttrDataset[fname:C; dname:C; aname:C; dset:*; kdims:J; ktype:c]:_
      (`hdf5version;1);
          // .hdf5.version[]:S!J
+     (`hdf5isThreadsafe;1);
+         // .hdf5.isThreadsafe[]:b
      (`hdf5errorOn;1);
          // .hdf5.errorOn[]:_
      (`hdf5errorOff;1);
