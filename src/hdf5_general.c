@@ -48,7 +48,7 @@ EXP K hdf5fileSize(K fname){
     return KNL;
   hsize_t fsize;
   hid_t file;
-  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
+  file = kdbH5Fopen(fname, H5F_ACC_RDONLY);
   if(file < 0)
     return krr((S)"error opening file");
   H5Fget_filesize(file, &fsize);
@@ -61,7 +61,7 @@ EXP K hdf5dataSize(K fname, K dname){
     return KNL;
   hsize_t dsize;
   hid_t file, data;
-  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
+  file = kdbH5Fopen(fname, H5F_ACC_RDONLY);
   if(file < 0)
     return krr((S)"error opening file");
   data = kdbH5Dopen(file, dname);
@@ -78,7 +78,7 @@ EXP K hdf5getDataShape(K fname, K dname){
     return KNL;
   K kdims;
   hid_t file, data, space;
-  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
+  file = kdbH5Fopen(fname, H5F_ACC_RDONLY);
   if(file < 0)
     return krr((S)"error opening file");
   data = kdbH5Dopen(file, dname);
@@ -99,7 +99,7 @@ EXP K hdf5getAttrShape(K fname, K dname, K aname){
     return KNL;
   K kdims;
   hid_t file, data, attr, space;
-  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
+  file = kdbH5Fopen(fname, H5F_ACC_RDONLY);
   if(file < 0)
     return krr((S)"error opening file");
   data = kdbH5Oopen(file, dname);
@@ -137,7 +137,7 @@ EXP K hdf5isObject(K fname, K oname){
   htri_t oexists;
   hid_t file;
   char *objname;
-  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
+  file = kdbH5Fopen(fname, H5F_ACC_RDONLY);
   if(file < 0)
     return krr((S)"error opening file");
   objname = kdbGetString(oname);
@@ -154,7 +154,7 @@ EXP K hdf5isAttr(K fname, K dname, K aname){
   htri_t aexists;
   hid_t file, data;
   char *attrname;
-  file = kdbH5Fopen(fname, H5F_ACC_RDWR);
+  file = kdbH5Fopen(fname, H5F_ACC_RDONLY);
   if(file < 0)
     return krr((S)"error opening file");
   data = kdbH5Oopen(file, dname);
@@ -173,13 +173,14 @@ EXP K hdf5copyObject(K srcfile, K src_obj, K dstfile, K dst_obj){
     return KNL;
   hid_t src, dst, status;
   char *src_objname, *dst_objname;
-  src = kdbH5Fopen(srcfile, H5F_ACC_RDWR);
-  if(src < 0)
-    return krr((S)"error opening source file");
   dst = kdbH5Fopen(dstfile, H5F_ACC_RDWR);
   if(dst < 0){
-    H5Fclose(src);
     return krr((S)"error opening destination file");
+  }
+  src = kdbH5Fopen(srcfile, H5F_ACC_RDONLY);
+  if(src < 0){
+    H5Fclose(dst);
+    return krr((S)"error opening source file");
   }
   src_objname = kdbGetString(src_obj);
   dst_objname = kdbGetString(dst_obj);
