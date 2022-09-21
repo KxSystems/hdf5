@@ -173,13 +173,14 @@ EXP K hdf5copyObject(K srcfile, K src_obj, K dstfile, K dst_obj){
     return KNL;
   hid_t src, dst, status;
   char *src_objname, *dst_objname;
-  src = kdbH5Fopen(srcfile, H5F_ACC_RDWR);
-  if(src < 0)
-    return krr((S)"error opening source file");
   dst = kdbH5Fopen(dstfile, H5F_ACC_RDWR);
   if(dst < 0){
-    H5Fclose(src);
     return krr((S)"error opening destination file");
+  }
+  src = kdbH5Fopen(srcfile, H5F_ACC_RDONLY);
+  if(src < 0){
+    H5Fclose(dst);
+    return krr((S)"error opening source file");
   }
   src_objname = kdbGetString(src_obj);
   dst_objname = kdbGetString(dst_obj);
