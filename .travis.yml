@@ -40,7 +40,7 @@ before_install:
     fi
 
   - if [[ $BUILD == "True" && $TRAVIS_OS_NAME == "osx" ]]; then
-      export HDF5_INSTALL_DIR="/usr/local/opt/hdf5@1.10/"
+      export HDF5_INSTALL_DIR="/usr/local/opt/hdf5@1.10/";
     else
       export HDF5_INSTALL_DIR=$TRAVIS_BUILD_DIR/cbuild;
     fi
