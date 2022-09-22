@@ -7,7 +7,7 @@ jobs:
   - dist: focal
     os: linux
   - os: osx
-    osx_image: xcode12.2
+    osx_image: xcode13.1
   - os: windows
 language: c
 compiler: gcc
@@ -24,9 +24,7 @@ before_install:
   - if [[ $BUILD == "True" ]]; then
       chmod +x travis_setup.sh; 
       ./travis_setup.sh;
-      export HDF5_INSTALL_DIR=$TRAVIS_BUILD_DIR/cbuild;
       mkdir cmake;
-      echo "HDF5_INSTALL_DIR '$HDF5_INSTALL_DIR'";
     else
       echo "no build.";
     fi
@@ -40,6 +38,13 @@ before_install:
     else
       echo "unknown OS ('$TRAVIS_OS_NAME')" >&2; exit 1;
     fi
+
+  - if [[ $BUILD == "True" && $TRAVIS_OS_NAME == "osx" ]]; then
+      export HDF5_INSTALL_DIR="/usr/local/opt/hdf5@1.10/"
+    else
+      export HDF5_INSTALL_DIR=$TRAVIS_BUILD_DIR/cbuild;
+    fi
+  - echo "HDF5_INSTALL_DIR '$HDF5_INSTALL_DIR'";
 
   - export LD_LIBRARY_PATH=$HDF5_INSTALL_DIR/lib:$LD_LIBRARY_PATH 
   - export DYLD_LIBRARY_PATH=$HDF5_INSTALL_DIR/lib:$DYLD_LIBRARY_PATH
