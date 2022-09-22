@@ -7,6 +7,7 @@ jobs:
   - dist: focal
     os: linux
   - os: osx
+    osx_image: xcode12.2
   - os: windows
 language: c
 compiler: gcc
@@ -25,6 +26,7 @@ before_install:
       ./travis_setup.sh;
       export HDF5_INSTALL_DIR=$TRAVIS_BUILD_DIR/cbuild;
       mkdir cmake
+      echo "HDF5_INSTALL_DIR '$HDF5_INSTALL_DIR'"
     else
       echo "no build.";
     fi

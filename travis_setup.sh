@@ -1,9 +1,12 @@
 #!/bin/bash
 
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then # use homebrew version
+  echo "Updating brew"
   brew update
-  brew install hdf5
+  echo "Installing hdf5"
+  brew install hdf5@1.10
   echo "brew install finished"
+  export HDF5_INSTALL_DIR="/usr/local/opt/hdf5@1.10/"
 else # install from source
   wget --no-check-certificate "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.9/src/hdf5-1.10.9.tar.gz"
   tar -xzf "hdf5-1.10.9.tar.gz"
