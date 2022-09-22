@@ -25,8 +25,8 @@ before_install:
       chmod +x travis_setup.sh; 
       ./travis_setup.sh;
       export HDF5_INSTALL_DIR=$TRAVIS_BUILD_DIR/cbuild;
-      mkdir cmake
-      echo "HDF5_INSTALL_DIR '$HDF5_INSTALL_DIR'"
+      mkdir cmake;
+      echo "HDF5_INSTALL_DIR '$HDF5_INSTALL_DIR'";
     else
       echo "no build.";
     fi
