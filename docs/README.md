@@ -5,23 +5,15 @@
 
 In many ways HDF5 acts like a truly hierarchical file system similar to that used by Linux or Windows. This structure contains two primary objects:
 
-Datasets 
+**Datasets** may contain multidimensional arrays of homogenously-typed data or compound data containing a mixture of types. These act similarly to files within a traditional POSIX file system.
 
-: These may contain multidimensional arrays of homogenously-typed data or compound data containing a mixture of types. These act similarly to files within a traditional POSIX file system.
-
-Groups 
-
-: These act as container structures which can hold datasets or other further groups. These act similarly to folders in a traditional POSIX file system.
+**Groups** act as container structures which can hold datasets or other further groups. These act similarly to folders in a traditional POSIX file system.
 
 A number of secondary objects and structures add complexity to the format and in doing so allow the format to be used for a wider number of use cases.
 
-Attributes
+**Attributes** allow metadata information to be associated with a dataset or group, i.e. associate the date of data collection with a group or the room temperature at the time a set of results was collected.
 
-: Allow metadata information to be associated with a dataset or group, i.e. associate the date of data collection with a group or the room temperature at the time a set of results was collected.
-
-Linking functionality
-
-: Like a traditional POSIX file system, it is possible to create links between objects (hard/soft/external); these allow datasets or groups relevant to multiple experiments or use cases to be accessed via routes that a user may find more intuitive.
+**Linking functionality** Like a traditional POSIX file system, it is possible to create links between objects (hard/soft/external); these allow datasets or groups relevant to multiple experiments or use cases to be accessed via routes that a user may find more intuitive.
 
 ## Use cases
 
