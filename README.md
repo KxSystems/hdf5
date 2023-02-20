@@ -8,7 +8,7 @@
 
 This interface provides a mechanism for kdb+ users to interact with and create HDF5 datasets. The interface is a thin wrapper for kdb+ around the HDF Group’s C API for HDF5, outlined in full [here](https://portal.hdfgroup.org/pages/viewpage.action?pageId=50073943)
 
-This is part of the [_Fusion for kdb+_](http://code.kx.com/q/interfaces/fusion/) interface collection.
+This is part of the [_Fusion for kdb+_](http://code.kx.com/q/interfaces/#fusion-interfaces/) interface collection.
 
 ## New to kdb+ ?
 
