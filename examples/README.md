@@ -2,7 +2,7 @@
 
 The scripts outlined here provide examples of the expected usage of this interface. Each script deals with a different aspect of the interface and showcases a particular section of the hdf5 library.
 
-A more basic example workflow is highlighted in the documentation for this interface [here](https://code.kx.com/q/interfaces/hdf5/examples).
+A more basic example workflow is highlighted in the documentation for this interface [here](../docs/examples.md).
 
 ## Running examples
 
@@ -20,7 +20,7 @@ chmod +x all.sh
 
 The following section provides a breakdown of the functionality exposed by each of the example scripts, showing the command to be executed from command line to run the individual scripts.
 
-## Example Scripts
+## Example scripts
 
 ### `h5_file.q`
 
