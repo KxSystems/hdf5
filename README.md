@@ -69,7 +69,7 @@ If you have any HDF5 related questions, you can raise them on the [HDF Forum](ht
 
 ## Example Usage
 
-:point_right: [`Examples`](docs/example.md)
+:point_right: [`Examples`](docs/examples.md)
 
 ## :warning: Unsupported functionality
 
