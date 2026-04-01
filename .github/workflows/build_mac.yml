@@ -26,9 +26,6 @@ jobs:
       - name: Install hdf5 lib
         run: brew install hdf5@1.10
 
-      - name: find
-        run: find /opt/homebrew/Cellar/ -name hdf5.h -print
-
       - name: Build
         run: |
           mkdir cmake && cd cmake && cmake .. -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release && cmake --build . --target install && cd .. && tar  -zcvf "$OUTPUT_FILE" -C cmake/hdf5 .
