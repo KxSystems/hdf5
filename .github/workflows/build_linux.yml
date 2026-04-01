@@ -1,0 +1,77 @@
+name: linux-hdf5-build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened]
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: rockylinux:8
+
+    env:
+      HDF5_INSTALL_DIR: ${{ github.workspace }}/cbuild
+      OUTPUT_FILE: hdf5-linux.tgz
+      QHOME: ${{ github.workspace }}/qhome
+
+    steps:
+      - name: Install build tools
+        run: |
+          yum -y install \
+            gcc \
+            gcc-c++ \
+            make \
+            cmake \
+            wget \
+            tar \
+            gzip
+
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Restore cached hdf5 lib
+        if: steps.cache-hdf5.outputs.cache-hit != 'true'
+        id: cache-hdf5
+        uses: actions/cache@v5
+        with:
+          path: |
+            cbuild/
+          key: ${{ runner.os }}-hdf5-1.10.9
+          restore-keys: |
+            ${{ runner.os }}-hdf5-1.10.9
+
+      - name: Install hdf5 lib
+        if: steps.cache-hdf5.outputs.cache-hit != 'true'
+        run: |
+          mkdir cbuild &&
+          wget --no-check-certificate "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.9/src/hdf5-1.10.9.tar.gz" &&
+          tar -xzf "hdf5-1.10.9.tar.gz" &&
+          cd "hdf5-1.10.9" &&
+          ./configure --prefix="$HDF5_INSTALL_DIR" && 
+          make install &&
+          cd ..
+
+      - name: Build
+        run: |
+          mkdir cmake && cd cmake && cmake .. -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release && cmake --build . --target install && cd .. && tar  -zcvf "$OUTPUT_FILE" -C cmake/hdf5 .
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: hdf5-linux
+          path: ${{ env.OUTPUT_FILE }}
+          retention-days: 1
+
+  release:
+    needs: build
+    permissions:
+      contents: write
+    uses: ./.github/workflows/release-assets.yml

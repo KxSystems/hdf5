@@ -1,0 +1,80 @@
+name: win-hdf5-build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened]
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    env:
+      HDF5_INSTALL_DIR: ${{ github.workspace }}\cbuild
+      OUTPUT_FILE: hdf5-win.zip
+      QHOME: ${{ github.workspace }}\qhome
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Restore cached protobuf lib
+        id: cache-hdf5
+        uses: actions/cache@v5
+        with:
+          path: |
+            cbuild
+          key: ${{ runner.os }}-hdf5-1.10.9
+          restore-keys: |
+            ${{ runner.os }}-hdf5-1.10.9
+
+      - name: Get hdf5
+        if: steps.cache-hdf5.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          mkdir hdf5-1.10.9
+          $uri = "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.9/src/hdf5-1.10.9.tar.gz"
+          $out = "hdf5-1.10.9.tar.gz"
+          Invoke-WebRequest -Uri $uri -OutFile $out
+          tar xvf $out
+
+      - name: Build hdf5
+        if: steps.cache-hdf5.outputs.cache-hit != 'true'
+        run: |
+          mkdir cbuild
+          cd "hdf5-1.10.9"
+          mkdir cmake 
+          cd cmake
+          cmake -G "Visual Studio 17 2022" -DCMAKE_INSTALL_PREFIX="${{ env.HDF5_INSTALL_DIR }}" .. -DBUILD_TESTING:BOOL=OFF
+          cmake --build . --config Release
+          cmake --build . --config Release --target install
+          cd ..\..
+
+      - name: Build
+        run: |
+          mkdir "${{ env.QHOME }}"
+          mkdir cmake
+          cd cmake
+          cmake -G "Visual Studio 17 2022" ..
+          cmake --build . --config Release
+          cmake --build . --config Release --target install
+          cd ..
+          7z a -tzip -r "${{ env.OUTPUT_FILE }}" .\cmake\hdf5\*
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: hdf5-win
+          path: ${{ env.OUTPUT_FILE }}
+          retention-days: 1
+
+  release:
+    needs: build
+    permissions:
+      contents: write
+    uses: ./.github/workflows/release-assets.yml
